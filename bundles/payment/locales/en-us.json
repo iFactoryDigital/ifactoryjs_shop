@@ -1,0 +1,9 @@
+{
+  "payment" : {
+    "title" : "Payment",
+
+    "order" : {
+      "title" : "Payment"
+    }
+  }
+}

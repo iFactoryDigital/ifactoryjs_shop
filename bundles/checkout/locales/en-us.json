@@ -1,0 +1,6 @@
+{
+  "checkout" : {
+    "summary"  : "Summary",
+    "complete" : "Complete Order"
+  }
+}

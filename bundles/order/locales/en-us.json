@@ -1,0 +1,24 @@
+{
+  "order" : {
+    "title"      : "Order",
+    "items"      : "items totalling",
+    "status"     : "Status",
+    "number"     : "Number",
+    "payment"    : "Payment",
+    "mailing"    : "Mailing",
+    "shipping"   : "Shipping",
+    "completed"  : "Completed",
+    "processing" : "Processing",
+
+    "payment" : {
+      "pending" : "Payment pending"
+    },
+
+    "status" : {
+      "paid"      : "Paid",
+      "pending"   : "Pending",
+      "deployed"  : "Deployed",
+      "deploying" : "Deploying"
+    }
+  }
+}
