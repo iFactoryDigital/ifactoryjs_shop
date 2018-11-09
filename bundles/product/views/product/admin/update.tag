@@ -8,20 +8,27 @@
     <!-- / hidden inputs -->
 
     <!-- product title -->
-    <page-title description="{ this.product.id ? 'Update Existing ' : 'Create New ' } Product">
-      <yield to="right">
-        <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.promoted, 'btn-danger' : !this.parent.promoted } onclick={ this.parent.togglePromoted }>
-          { this.parent.promoted ? 'Promoted' : 'Unpromoted' }
-        </button>
-        <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.published, 'btn-danger' : !this.parent.published } onclick={ this.parent.togglePublish }>
-          { this.parent.published ? 'Published' : 'Unpublished' }
-        </button>
-        <button class="btn btn-lg btn-success" type="submit">
-          <i class="fa fa-save mr-2" />
-          Save
-        </button>
-      </yield>
-    </page-title>
+    <div class="row row-eq-height mb-5">
+      <div class="col-md-8">
+        <h1 class="m-0">
+          { this.product.id ? 'Update Existing ' : 'Create New ' } Product
+        </h1>
+      </div>
+      <div class="col-md-4 text-right h-100 d-flex">
+        <div class="w-100">
+          <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.promoted, 'btn-danger' : !this.parent.promoted } onclick={ this.parent.togglePromoted }>
+            { this.parent.promoted ? 'Promoted' : 'Unpromoted' }
+          </button>
+          <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.published, 'btn-danger' : !this.parent.published } onclick={ this.parent.togglePublish }>
+            { this.parent.published ? 'Published' : 'Unpublished' }
+          </button>
+          <button class="btn btn-lg btn-success" type="submit">
+            <i class="fa fa-save mr-2" />
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
     <!-- / product title -->
 
     <!-- product information -->
