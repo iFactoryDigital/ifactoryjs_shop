@@ -57,6 +57,7 @@ class AdminPaymentController extends Controller {
    * @title   Payment Administration
    * @route   {get} /
    * @layout  admin
+   * @parent  /admin/shop
    */
   async indexAction (req, res) {
     // render grid

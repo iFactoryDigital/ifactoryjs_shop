@@ -137,6 +137,7 @@ class AdminCategoryController extends Controller {
    * @menu    {ADMIN} Categories
    * @title   Category Administration
    * @route   {get} /
+   * @parent  /admin/shop
    * @layout  admin
    */
   async indexAction (req, res) {

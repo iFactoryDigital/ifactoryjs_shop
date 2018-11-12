@@ -53,6 +53,7 @@ class AdminOrderController extends Controller {
    * @title   Order Administration
    * @route   {get} /
    * @layout  admin
+   * @parent  /admin/shop
    */
   async indexAction (req, res) {
     // render grid
