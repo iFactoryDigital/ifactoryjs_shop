@@ -9,6 +9,7 @@ const escapeRegex = require('escape-string-regexp');
 
 // require models
 const Image    = model('image');
+const Widget   = model('widget');
 const Product  = model('product');
 const Category = model('category');
 
@@ -16,7 +17,8 @@ const Category = model('category');
 const config = require('config');
 
 // get helpers
-const productHelper = helper('product');
+const productHelper   = helper('product');
+const DashboardHelper = helper('dashboard');
 
 /**
  * build user admin controller
@@ -51,6 +53,43 @@ class AdminProductController extends Controller {
 
     // build
     this.build();
+
+    // register simple widget
+    DashboardHelper.widget('dashboard.cms.products', {
+      'acl'         : ['admin.shop'],
+      'title'       : 'Products Widget',
+      'description' : 'Shows grid of recent products'
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // return
+      return {
+        'tag'   : 'grid',
+        'name'  : 'Products',
+        'grid'  : await this._grid(req).render(req),
+        'title' : widgetModel.get('title') || ''
+      };
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // set data
+      widgetModel.set('title', req.body.data.title);
+
+      // save widget
+      await widgetModel.save();
+    });
   }
 
   /**

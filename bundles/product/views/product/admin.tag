@@ -1,14 +1,18 @@
 <product-admin-page>
-
-  <!-- product title -->
-  <page-title title="Manage Products" description="Create, update and manage products">
-    <yield to="right">
-      <a href="/admin/product/create" class="btn btn-lg btn-success">Create Product</a>
-    </yield>
-  </page-title>
-  <!-- / product title -->
-
-  <div class="payment-admin">
-    <grid grid={ opts.grid } table-class="table table-sm table-striped table-bordered" title="All Products" />
+  <div class="page page-shop">
+  
+    <admin-header title="Manage Products">
+      <yield to="right">
+        <a href="/admin/product/create" class="btn btn-lg btn-success">
+          Create
+        </a>
+      </yield>
+    </admin-header>
+    
+    <div class="container-fluid">
+    
+      <grid grid={ opts.grid } table-class="table table-sm table-striped table-bordered" title="All Products" />
+    
+    </div>
   </div>
 </product-admin-page>

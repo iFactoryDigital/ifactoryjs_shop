@@ -2,6 +2,9 @@
 // bind dependencies
 const Controller = require('controller');
 
+// require helpers
+const DashboardHelper = helper('dashboard');
+
 /**
  * build Block controller
  *
@@ -26,12 +29,19 @@ class ShopAdminController extends Controller {
    * @param  {Response}  res
    * @param  {Function}  next
    *
-   * @menu  {ADMIN} Shop
-   * @icon  fa fa-shopping-cart
-   * @route {GET} /
+   * @menu   {ADMIN} Shop
+   * @icon   fa fa-shopping-cart
+   * @route  {GET} /
+   * @layout admin
    */
   async indexAction (req, res) {
-
+    // Render admin page
+    res.render('admin', {
+      'name'      : 'Admin Shop',
+      'type'      : 'admin.shop',
+      'jumbotron' : 'Shop Dashboard',
+      'dashboard' : await DashboardHelper.render('admin.shop', req.user)
+    });
   }
 }
 

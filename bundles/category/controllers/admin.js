@@ -14,6 +14,12 @@ const Category = model('category');
 // require helpers
 const categoryHelper = helper('category');
 
+// add models
+const Widget = model('widget');
+
+// bind helpers
+const DashboardHelper = helper('dashboard');
+
 /**
  * build user admin controller
  *
@@ -47,6 +53,43 @@ class AdminCategoryController extends Controller {
 
     // build admin controller
     this.build();
+
+    // register simple widget
+    DashboardHelper.widget('dashboard.cms.categories', {
+      'acl'         : ['admin.shop'],
+      'title'       : 'Categories Widget',
+      'description' : 'Shows grid of recent categories'
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // return
+      return {
+        'tag'   : 'grid',
+        'name'  : 'Categories',
+        'grid'  : await this._grid(req).render(req),
+        'title' : widgetModel.get('title') || ''
+      };
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // set data
+      widgetModel.set('title', req.body.data.title);
+
+      // save widget
+      await widgetModel.save();
+    });
   }
 
   /**

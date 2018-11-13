@@ -8,10 +8,14 @@ const Controller = require('controller');
 
 // require models
 const Order   = model('order');
+const Widget  = model('widget');
 const Payment = model('payment');
 
 // bind local dependencies
 const config = require('config');
+
+// require helpers
+const DashboardHelper = helper('dashboard');
 
 /**
  * build user admin controller
@@ -40,6 +44,43 @@ class AdminOrderController extends Controller {
 
     // bind private methods
     this._grid = this._grid.bind(this);
+
+    // register simple widget
+    DashboardHelper.widget('dashboard.cms.orders', {
+      'acl'         : ['admin.shop'],
+      'title'       : 'Orders Widget',
+      'description' : 'Shows grid of recent orders'
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // return
+      return {
+        'tag'   : 'grid',
+        'name'  : 'Orders',
+        'grid'  : await this._grid(req).render(req),
+        'title' : widgetModel.get('title') || ''
+      };
+    }, async (req, widget) => {
+      // get notes widget from db
+      let widgetModel = await Widget.findOne({
+        'uuid' : widget.uuid
+      }) || new Widget({
+        'uuid' : widget.uuid,
+        'type' : widget.type
+      });
+
+      // set data
+      widgetModel.set('title', req.body.data.title);
+
+      // save widget
+      await widgetModel.save();
+    });
   }
 
   /**

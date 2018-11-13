@@ -1,18 +1,29 @@
 <payment-admin-remove-page>
-  <!-- product title -->
-  <page-title title="Remove Payment" description="Remove Payment { opts.payment.id }" />
-  <!-- / product title -->
+  <div class="page page-shop">
 
-  <form method="post" action="/admin/payment/{ opts.payment.id }/remove">
-    <div class="card">
-      <div class="card-body">
-        <p>
-          Are you sure you want to delete <b>{ opts.payment.id }</b>?
-        </p>
-      </div>
-      <div class="card-footer">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
+    <admin-header title="Remove Payment">
+      <yield to="right">
+        <a href="/admin/payment" class="btn btn-lg btn-primary">
+          Back
+        </a>
+      </yield>
+    </admin-header>
+    
+    <div class="container-fluid">
+    
+      <form method="post" action="/admin/payment/{ opts.payment.id }/remove">
+        <div class="card">
+          <div class="card-body">
+            <p>
+              Are you sure you want to delete <b>{ opts.payment.id }</b>?
+            </p>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+    
     </div>
-  </form>
+  </div>
 </payment-admin-remove-page>

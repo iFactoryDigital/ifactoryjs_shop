@@ -1,23 +1,36 @@
 <category-admin-remove-page>
-  <page-title description="Remove Category '{ opts.category.title[this.language] }'" />
+  <div class="page page-shop">
 
-  <form method="post" action="/admin/category/{ opts.category.id }/remove">
-    <div class="card mb-3">
-      <div class="card-body">
-        <p>
-          Are you sure you want to delete <b>{ opts.category.title[this.language] }</b>?
-        </p>
-      </div>
+    <admin-header title="Remove Category '{ opts.category.title[this.language] }'">
+      <yield to="right">
+        <a href="/admin/category" class="btn btn-lg btn-primary">
+          Back
+        </a>
+      </yield>
+    </admin-header>
+    
+    <div class="container-fluid">
+    
+      <form method="post" action="/admin/category/{ opts.category.id }/remove">
+        <div class="card mb-3">
+          <div class="card-body">
+            <p>
+              Are you sure you want to delete <b>{ opts.category.title[this.language] }</b>?
+            </p>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-lg btn-success">Submit</button>
+      </form>
+    
     </div>
-    <button type="submit" class="btn btn-lg btn-success">Submit</button>
-  </form>
-
+  </div>
+  
   <script>
     // do mixins
-    this.mixin ('i18n');
+    this.mixin('i18n');
 
     // load data
-    this.language = this.i18n.lang ();
+    this.language = this.i18n.lang();
 
   </script>
 </category-admin-remove-page>
