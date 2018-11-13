@@ -68,11 +68,16 @@ class AdminCategoryController extends Controller {
         'type' : widget.type
       });
 
+      // create new req
+      let fauxReq = {
+        'query' : widgetModel.get('state') || {}
+      };
+
       // return
       return {
         'tag'   : 'grid',
         'name'  : 'Categories',
-        'grid'  : await this._grid(req).render(req),
+        'grid'  : await this._grid(req).render(fauxReq),
         'title' : widgetModel.get('title') || ''
       };
     }, async (req, widget) => {
@@ -85,6 +90,7 @@ class AdminCategoryController extends Controller {
       });
 
       // set data
+      widgetModel.set('state', req.body.data.state);
       widgetModel.set('title', req.body.data.title);
 
       // save widget
