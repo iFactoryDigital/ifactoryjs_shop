@@ -57,7 +57,7 @@ class AdminProductController extends Controller {
     // register simple widget
     DashboardHelper.widget('dashboard.cms.products', {
       'acl'         : ['admin.shop'],
-      'title'       : 'Products Widget',
+      'title'       : 'Products Grid',
       'description' : 'Shows grid of recent products'
     }, async (req, widget) => {
       // get notes widget from db

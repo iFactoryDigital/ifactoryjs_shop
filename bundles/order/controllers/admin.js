@@ -7,6 +7,7 @@ const formatter  = require('currency-formatter');
 const Controller = require('controller');
 
 // require models
+const User    = model('user');
 const Order   = model('order');
 const Widget  = model('widget');
 const Payment = model('payment');
@@ -48,7 +49,7 @@ class AdminOrderController extends Controller {
     // register simple widget
     DashboardHelper.widget('dashboard.cms.orders', {
       'acl'         : ['admin.shop'],
-      'title'       : 'Orders Widget',
+      'title'       : 'Orders Grid',
       'description' : 'Shows grid of recent orders'
     }, async (req, widget) => {
       // get notes widget from db
@@ -368,6 +369,35 @@ class AdminOrderController extends Controller {
             '<a href="/admin/order/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
           '</div>'
         ].join('');
+      }
+    });
+
+    // add grid filters
+    orderGrid.filter('username', {
+      'title' : 'Username',
+      'type'  : 'text',
+      'query' : async (param) => {
+        // check param
+        if (!param || !param.length) return;
+
+        // get users
+        let users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+
+        // user id in
+        orderGrid.in('user.id', users.map((user) => user.get('_id').toString()));
+      }
+    }).filter('email', {
+      'title' : 'Email',
+      'type'  : 'text',
+      'query' : async (param) => {
+        // check param
+        if (!param || !param.length) return;
+
+        // get users
+        let users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+
+        // user id in
+        orderGrid.in('user.id', users.map((user) => user.get('_id').toString()));
       }
     });
 

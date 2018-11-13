@@ -1,11 +1,13 @@
 
 // bind dependencies
-const grid       = require('grid');
-const alert      = require('alert');
-const crypto     = require('crypto');
-const Controller = require('controller');
+const grid        = require('grid');
+const alert       = require('alert');
+const crypto      = require('crypto');
+const Controller  = require('controller');
+const escapeRegex = require('escape-string-regexp');
 
 // require models
+const User    = model('user');
 const Widget  = model('widget');
 const Payment = model('payment');
 
@@ -50,7 +52,7 @@ class AdminPaymentController extends Controller {
     // register simple widget
     DashboardHelper.widget('dashboard.cms.payments', {
       'acl'         : ['admin.shop'],
-      'title'       : 'Payments Widget',
+      'title'       : 'Payments Grid',
       'description' : 'Shows grid of recent payments'
     }, async (req, widget) => {
       // get notes widget from db
@@ -348,15 +350,27 @@ class AdminPaymentController extends Controller {
       'title' : 'Username',
       'type'  : 'text',
       'query' : async (param) => {
-        // another where
-        paymentGrid.match('username', new RegExp(param.toString().toLowerCase(), 'i'));
+        // check param
+        if (!param || !param.length) return;
+
+        // get users
+        let users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+
+        // user id in
+        paymentGrid.in('user.id', users.map((user) => user.get('_id').toString()));
       }
     }).filter('email', {
       'title' : 'Email',
       'type'  : 'text',
       'query' : async (param) => {
-        // another where
-        paymentGrid.match('email', new RegExp(param.toString().toLowerCase(), 'i'));
+        // check param
+        if (!param || !param.length) return;
+
+        // get users
+        let users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+
+        // user id in
+        paymentGrid.in('user.id', users.map((user) => user.get('_id').toString()));
       }
     });
 

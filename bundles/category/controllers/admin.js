@@ -57,7 +57,7 @@ class AdminCategoryController extends Controller {
     // register simple widget
     DashboardHelper.widget('dashboard.cms.categories', {
       'acl'         : ['admin.shop'],
-      'title'       : 'Categories Widget',
+      'title'       : 'Categories Grid',
       'description' : 'Shows grid of recent categories'
     }, async (req, widget) => {
       // get notes widget from db
