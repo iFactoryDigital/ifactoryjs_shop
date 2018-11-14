@@ -63,9 +63,9 @@ class ShopAdminController extends Controller {
     res.render('admin', {
       'name'       : 'Admin Shop',
       'type'       : 'admin.shop',
-      'blocks'     : BlockHelper.renderBlocks(),
+      'blocks'     : BlockHelper.renderBlocks('admin'),
       'jumbotron'  : 'Manage Shop',
-      'dashboards' : await Promise.all(dashboards.map(async (dashboard) => dashboard.sanitise()))
+      'dashboards' : await Promise.all(dashboards.map(async (dashboard, i) => dashboard.sanitise(i === 0 ? req : null)))
     });
   }
 
