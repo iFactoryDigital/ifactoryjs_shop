@@ -1,4 +1,4 @@
-<widget-shop-stat>
+<block-shop-stat>
   <a class="card bg-{ opts.data.type || 'primary' }" href={ opts.data.href }>
     <div class="card-body text-white">
       <div class="row">
@@ -26,8 +26,6 @@
   <script>
     // do mixins
     this.mixin ('i18n');
-    
-    console.log(opts);
 
     // set size
     this.size = {};
@@ -129,4 +127,4 @@
       this.update();
     });
   </script>
-</widget-shop-stat>
+</block-shop-stat>

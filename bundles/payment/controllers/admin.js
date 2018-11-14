@@ -8,15 +8,15 @@ const escapeRegex = require('escape-string-regexp');
 
 // require models
 const User    = model('user');
-const Widget  = model('widget');
+const Block   = model('block');
 const Payment = model('payment');
 
 // bind local dependencies
 const config = require('config');
 
 // require helpers
-const productHelper   = helper('product');
-const DashboardHelper = helper('dashboard');
+const BlockHelper   = helper('cms/block');
+const ProductHelper = helper('product');
 
 /**
  * build user admin controller
@@ -47,25 +47,26 @@ class AdminPaymentController extends Controller {
     this._grid = this._grid.bind(this);
 
     // register default payment types
-    productHelper.payment('once');
+    ProductHelper.payment('once');
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.cms.payments', {
+    // register simple block
+    BlockHelper.block('dashboard.cms.payments', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Payments Grid',
       'description' : 'Shows grid of recent payments'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // create new req
       let fauxReq = {
-        'query' : widgetModel.get('state') || {}
+        'query' : blockModel.get('state') || {}
       };
 
       // return
@@ -73,23 +74,23 @@ class AdminPaymentController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Payments',
         'grid'  : await this._grid(req).render(fauxReq),
-        'title' : widgetModel.get('title') || ''
+        'title' : blockModel.get('title') || ''
       };
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // set data
-      widgetModel.set('state', req.body.data.state);
-      widgetModel.set('title', req.body.data.title);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
 
-      // save widget
-      await widgetModel.save();
+      // save block
+      await blockModel.save();
     });
   }
 

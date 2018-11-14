@@ -9,7 +9,7 @@ const escapeRegex = require('escape-string-regexp');
 
 // require models
 const Image    = model('image');
-const Widget   = model('widget');
+const Block   = model('block');
 const Product  = model('product');
 const Category = model('category');
 
@@ -17,8 +17,8 @@ const Category = model('category');
 const config = require('config');
 
 // get helpers
-const productHelper   = helper('product');
-const DashboardHelper = helper('dashboard');
+const BlockHelper   = helper('cms/block');
+const ProductHelper = helper('product');
 
 /**
  * build user admin controller
@@ -54,23 +54,24 @@ class AdminProductController extends Controller {
     // build
     this.build();
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.cms.products', {
+    // register simple block
+    BlockHelper.block('dashboard.cms.products', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Products Grid',
       'description' : 'Shows grid of recent products'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // create new req
       let fauxReq = {
-        'query' : widgetModel.get('state') || {}
+        'query' : blockModel.get('state') || {}
       };
 
       // return
@@ -78,23 +79,23 @@ class AdminProductController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Products',
         'grid'  : await this._grid(req).render(fauxReq),
-        'title' : widgetModel.get('title') || ''
+        'title' : blockModel.get('title') || ''
       };
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // set data
-      widgetModel.set('state', req.body.data.state);
-      widgetModel.set('title', req.body.data.title);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
 
-      // save widget
-      await widgetModel.save();
+      // save block
+      await blockModel.save();
     });
   }
 
@@ -182,8 +183,8 @@ class AdminProductController extends Controller {
     });
 
     // register product types
-    productHelper.register('simple');
-    productHelper.register('variable');
+    ProductHelper.register('simple');
+    ProductHelper.register('variable');
   }
 
   /**
@@ -245,7 +246,7 @@ class AdminProductController extends Controller {
     // render page
     res.render('product/admin/update', {
       'title'   : create ? 'Create Product' : 'Update ' + product.get('sku'),
-      'types'   : productHelper.types,
+      'types'   : ProductHelper.types,
       'product' : await product.sanitise()
     });
   }
@@ -354,7 +355,7 @@ class AdminProductController extends Controller {
     // render page
     res.render('product/admin/update', {
       'title'   : create ? 'Create Product' : 'Update ' + product.get('sku'),
-      'types'   : productHelper.types,
+      'types'   : ProductHelper.types,
       'product' : await product.sanitise()
     });
   }

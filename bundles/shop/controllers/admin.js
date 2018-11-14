@@ -2,16 +2,17 @@
 // bind dependencies
 const Controller = require('controller');
 
-// get widget model
-const Acl     = model('acl');
-const User    = model('user');
-const Order   = model('order');
-const Credit  = model('credit');
-const Widget  = model('widget');
-const Payment = model('payment');
+// get block model
+const Acl       = model('acl');
+const User      = model('user');
+const Order     = model('order');
+const Block     = model('block');
+const Credit    = model('credit');
+const Payment   = model('payment');
+const Dashboard = model('dashboard');
 
 // require helpers
-const DashboardHelper = helper('dashboard');
+const BlockHelper = helper('cms/block');
 
 /**
  * build Block controller
@@ -30,10 +31,10 @@ class ShopAdminController extends Controller {
     super();
 
     // bind methods
-    this.widgets = this.widgets.bind(this);
+    this.blocks = this.blocks.bind(this);
 
-    // register widgets
-    this.widgets();
+    // register blocks
+    this.blocks();
   }
 
   /**
@@ -49,38 +50,41 @@ class ShopAdminController extends Controller {
    * @layout admin
    */
   async indexAction (req, res) {
+    // get dashboards
+    let dashboards = await Dashboard.where({
+      'type' : 'admin.shop'
+    }).or({
+      'user.id' : req.user.get('_id').toString()
+    }, {
+      'public' : true
+    }).find();
+
     // Render admin page
     res.render('admin', {
-      'name'      : 'Admin Shop',
-      'type'      : 'admin.shop',
-      'jumbotron' : 'Shop Dashboard',
-      'dashboard' : await DashboardHelper.render('admin.shop', req.user)
+      'name'       : 'Admin Shop',
+      'type'       : 'admin.shop',
+      'blocks'     : BlockHelper.renderBlocks(),
+      'jumbotron'  : 'Manage Shop',
+      'dashboards' : await Promise.all(dashboards.map(async (dashboard) => dashboard.sanitise()))
     });
   }
 
   /**
-   * creates widgets
+   * creates blocks
    */
-  widgets () {
+  blocks () {
 
     /**
      * STAT WIDGETS
      */
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.shop.income', {
+    // register simple block
+    BlockHelper.block('dashboard.shop.income', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Shop Income Stats',
-      'description' : 'Shop income stat widget'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
-      });
-
+      'description' : 'Shop income stat block'
+    }, async (req, block) => {
       // get data
       let data = await this._getIncomeStat(await this._getAdmins());
 
@@ -95,22 +99,15 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, widget) => {});
+    }, async (req, block) => {});
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.shop.expense', {
+    // register simple block
+    BlockHelper.block('dashboard.shop.expense', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Shop Expense Stats',
-      'description' : 'Shop expenses stat widget'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
-      });
-
+      'description' : 'Shop expenses stat block'
+    }, async (req, block) => {
       // get data
       let data = await this._getExpenseStat(await this._getAdmins());
 
@@ -125,22 +122,15 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, widget) => {});
+    }, async (req, block) => {});
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.shop.orders', {
+    // register simple block
+    BlockHelper.block('dashboard.shop.orders', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Shop Order Stats',
-      'description' : 'Shop orders stat widget'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
-      });
-
+      'description' : 'Shop orders stat block'
+    }, async (req, block) => {
       // get data
       let data = await this._getOrdersStat(await this._getAdmins());
 
@@ -155,7 +145,7 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, widget) => {});
+    }, async (req, block) => {});
   }
 
   /**

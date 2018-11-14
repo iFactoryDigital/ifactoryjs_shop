@@ -15,10 +15,10 @@ const Category = model('category');
 const categoryHelper = helper('category');
 
 // add models
-const Widget = model('widget');
+const Block = model('block');
 
 // bind helpers
-const DashboardHelper = helper('dashboard');
+const BlockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -54,23 +54,24 @@ class AdminCategoryController extends Controller {
     // build admin controller
     this.build();
 
-    // register simple widget
-    DashboardHelper.widget('dashboard.cms.categories', {
+    // register simple block
+    BlockHelper.block('dashboard.cms.categories', {
       'acl'         : ['admin.shop'],
+      'for'         : ['dashboard'],
       'title'       : 'Categories Grid',
       'description' : 'Shows grid of recent categories'
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // create new req
       let fauxReq = {
-        'query' : widgetModel.get('state') || {}
+        'query' : blockModel.get('state') || {}
       };
 
       // return
@@ -78,23 +79,23 @@ class AdminCategoryController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Categories',
         'grid'  : await this._grid(req).render(fauxReq),
-        'title' : widgetModel.get('title') || ''
+        'title' : blockModel.get('title') || ''
       };
-    }, async (req, widget) => {
-      // get notes widget from db
-      let widgetModel = await Widget.findOne({
-        'uuid' : widget.uuid
-      }) || new Widget({
-        'uuid' : widget.uuid,
-        'type' : widget.type
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
       });
 
       // set data
-      widgetModel.set('state', req.body.data.state);
-      widgetModel.set('title', req.body.data.title);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
 
-      // save widget
-      await widgetModel.save();
+      // save block
+      await blockModel.save();
     });
   }
 
