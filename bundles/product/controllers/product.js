@@ -4,10 +4,12 @@ const config     = require('config');
 const Controller = require('controller');
 
 // require models
+const Block   = model('block');
 const Product = model('product');
 
 // get helpers
-const productHelper = helper('product');
+const BlockHelper   = helper('cms/block');
+const ProductHelper = helper('product');
 
 /**
  * build product controller
@@ -75,6 +77,53 @@ class ProductController extends Controller {
         'priority'   : 0.8,
         'changefreq' : 'daily'
       });
+    });
+
+    // register simple block
+    BlockHelper.block('frotend.products', {
+      'for'         : ['frontend'],
+      'title'       : 'Products List',
+      'description' : 'Lets list product cards in a block'
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // get products
+      let products = await Product.where({
+        'promoted' : true
+      }).find();
+
+      // return
+      return {
+        'tag'      : 'products',
+        'col'      : blockModel.get('col') || null,
+        'row'      : blockModel.get('row') || null,
+        'class'    : blockModel.get('class') || null,
+        'title'    : blockModel.get('title') || '',
+        'products' : await Promise.all(products.map((product) => product.sanitise()))
+      };
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // set data
+      blockModel.set('col',   req.body.data.col);
+      blockModel.set('row',   req.body.data.row);
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('title', req.body.data.title);
+
+      // save block
+      await blockModel.save();
     });
   }
 
@@ -149,7 +198,6 @@ class ProductController extends Controller {
     res.render('product', {
       'title'   : product.get('title.' + req.language),
       'query'   : req.query || {},
-      'layout'  : 'no-user',
       'product' : sanitised
     });
   }
