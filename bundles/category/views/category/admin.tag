@@ -11,7 +11,7 @@
     
     <div class="container-fluid">
     
-      <grid grid={ opts.grid } table-class="table table-sm table-striped table-bordered" title="Categories Grid" />
+      <grid grid={ opts.grid } table-class="table table-striped table-bordered" title="Categories Grid" />
     
     </div>
   </div>

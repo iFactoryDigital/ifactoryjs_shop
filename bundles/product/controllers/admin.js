@@ -57,7 +57,7 @@ class AdminProductController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.cms.products', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Products Grid',
       'description' : 'Shows grid of recent products'
     }, async (req, block) => {
@@ -79,6 +79,7 @@ class AdminProductController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Products',
         'grid'  : await this._grid(req).render(fauxReq),
+        'class' : blockModel.get('class') || null,
         'title' : blockModel.get('title') || ''
       };
     }, async (req, block) => {
@@ -91,6 +92,7 @@ class AdminProductController extends Controller {
       });
 
       // set data
+      blockModel.set('class', req.body.data.class);
       blockModel.set('state', req.body.data.state);
       blockModel.set('title', req.body.data.title);
 

@@ -57,7 +57,7 @@ class AdminCategoryController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.cms.categories', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Categories Grid',
       'description' : 'Shows grid of recent categories'
     }, async (req, block) => {
@@ -79,6 +79,7 @@ class AdminCategoryController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Categories',
         'grid'  : await this._grid(req).render(fauxReq),
+        'class' : blockModel.get('class') || null,
         'title' : blockModel.get('title') || ''
       };
     }, async (req, block) => {
@@ -91,6 +92,7 @@ class AdminCategoryController extends Controller {
       });
 
       // set data
+      blockModel.set('class', req.body.data.class);
       blockModel.set('state', req.body.data.state);
       blockModel.set('title', req.body.data.title);
 

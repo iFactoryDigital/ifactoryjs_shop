@@ -81,7 +81,7 @@ class ShopAdminController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.shop.income', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Shop Income Stats',
       'description' : 'Shop income stat block'
     }, async (req, block) => {
@@ -104,7 +104,7 @@ class ShopAdminController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.shop.expense', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Shop Expense Stats',
       'description' : 'Shop expenses stat block'
     }, async (req, block) => {
@@ -127,7 +127,7 @@ class ShopAdminController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.shop.orders', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Shop Order Stats',
       'description' : 'Shop orders stat block'
     }, async (req, block) => {

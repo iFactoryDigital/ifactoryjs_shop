@@ -52,7 +52,7 @@ class AdminPaymentController extends Controller {
     // register simple block
     BlockHelper.block('dashboard.cms.payments', {
       'acl'         : ['admin.shop'],
-      'for'         : ['dashboard'],
+      'for'         : ['admin'],
       'title'       : 'Payments Grid',
       'description' : 'Shows grid of recent payments'
     }, async (req, block) => {
@@ -74,6 +74,7 @@ class AdminPaymentController extends Controller {
         'tag'   : 'grid',
         'name'  : 'Payments',
         'grid'  : await this._grid(req).render(fauxReq),
+        'class' : blockModel.get('class') || null,
         'title' : blockModel.get('title') || ''
       };
     }, async (req, block) => {
@@ -86,6 +87,7 @@ class AdminPaymentController extends Controller {
       });
 
       // set data
+      blockModel.set('class', req.body.data.class);
       blockModel.set('state', req.body.data.state);
       blockModel.set('title', req.body.data.title);
 
