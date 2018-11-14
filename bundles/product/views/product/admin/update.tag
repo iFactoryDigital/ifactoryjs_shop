@@ -1,23 +1,23 @@
 <product-admin-update-page>
   <div class="page page-shop">
+    <form method="post" action="/admin/product/{ opts.product.id ? (opts.product.id + '/update') : 'create' }">
 
-    <admin-header title="{ this.product.id ? 'Update' : 'Create' } Product">
-      <yield to="right">
-        <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.promoted, 'btn-danger' : !this.parent.promoted } onclick={ this.parent.togglePromoted }>
-          { this.parent.promoted ? 'Promoted' : 'Unpromoted' }
-        </button>
-        <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.published, 'btn-danger' : !this.parent.published } onclick={ this.parent.togglePublish }>
-          { this.parent.published ? 'Published' : 'Unpublished' }
-        </button>
-        <button class="btn btn-lg btn-success" type="submit">
-          <i class="fa fa-save mr-2" />
-          Save
-        </button>
-      </yield>
-    </admin-header>
-    
-    <div class="container-fluid">
-      <form method="post" action="/admin/product/{ opts.product.id ? (opts.product.id + '/update') : 'create' }">
+      <admin-header title="{ this.product.id ? 'Update' : 'Create' } Product">
+        <yield to="right">
+          <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.promoted, 'btn-danger' : !this.parent.promoted } onclick={ this.parent.togglePromoted }>
+            { this.parent.promoted ? 'Promoted' : 'Unpromoted' }
+          </button>
+          <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : this.parent.published, 'btn-danger' : !this.parent.published } onclick={ this.parent.togglePublish }>
+            { this.parent.published ? 'Published' : 'Unpublished' }
+          </button>
+          <button class="btn btn-lg btn-success" type="submit">
+            <i class="fa fa-save mr-2" />
+            Save
+          </button>
+        </yield>
+      </admin-header>
+      
+      <div class="container-fluid">
         <!-- hidden inputs -->
         <input type="hidden" name="public" value={ this.public ? 'true' : 'false' } />
         <input type="hidden" name="promoted" value={ this.promoted ? 'true' : 'false' } />
@@ -97,7 +97,7 @@
                 </div>
                 <div class="form-group" each={ lng, i in this.languages } hide={ this.language !== lng }>
                   <label for="short">Description ({ lng })</label>
-                  <markdown-editor name="description[{ lng }]" ref="md-{ lng }" content={ (parent.getProduct ().description || {})[lng] } on-change={ onDescription } />
+                  <editor name="description[{ lng }]" ref="md-{ lng }" content={ (parent.getProduct ().description || {})[lng] } on-change={ onDescription } />
                 </div>
               </div>
             </div>
@@ -121,9 +121,9 @@
           </div>
         </div>
         <!-- / product information -->
-      </form>
-      
-    </div>
+        
+      </div>
+    </form>
   </div>
 
   <script>
@@ -136,12 +136,12 @@
     // load data
     this.type      = this.product.type || 'simple';
     this.promoted  = this.product.promoted;
-    this.language  = this.i18n.lang ();
+    this.language  = this.i18n.lang();
     this.published = this.product.published;
-    this.languages = this.eden.get ('i18n').lngs || [];
+    this.languages = this.eden.get('i18n').lngs || [];
 
     // check has language
-    if (this.languages.indexOf (this.i18n.lang ()) === -1) this.languages.unshift (this.i18n.lang ());
+    if (this.languages.indexOf(this.i18n.lang()) === -1) this.languages.unshift(this.i18n.lang());
 
     /**
      * on language
@@ -153,14 +153,13 @@
       this.language = e.item.lng;
 
       // update view
-      this.update ();
+      this.update();
     }
 
     /**
      * on description update
      */
     onDescription () {
-      console.log (this.refs);
       // update descriptions
       for (let i = 0; i < this.languages.length; i++) {
         // set value
@@ -188,13 +187,13 @@
      */
     togglePublish (e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // set publish
       this.published = !this.published;
 
       // update view
-      this.update ();
+      this.update();
     }
 
     /**
@@ -204,13 +203,13 @@
      */
     togglePromoted (e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // set publish
       this.promoted = !this.promoted;
 
       // update view
-      this.update ();
+      this.update();
     }
 
     /**
@@ -230,7 +229,7 @@
      */
     categories () {
       // return ids0
-      return (this.product.categories || []).map ((category) => {
+      return (this.product.categories || []).map((category) => {
         // return category id
         return category.id;
       });
@@ -251,7 +250,7 @@
     /**
      * on mount function
      */
-    this.on ('mount', () => {
+    this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
 

@@ -108,7 +108,7 @@ class AdminProductController extends Controller {
     // build slug function
     let slugify = async (product) => {
       // get title
-      let title = product.get('title.' + (config.get('i18n.fallbackLng')));
+      let title = product.get('title.' + config.get('i18n.fallbackLng'));
 
       // slugify
       let slugifiedTitle = slug(title, {
