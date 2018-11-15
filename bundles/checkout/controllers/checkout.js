@@ -96,7 +96,7 @@ class CheckoutController extends Controller {
     // render grid
     res.render('checkout', {
       'order'  : sanitisedOrder,
-      'layout' : 'no-user'
+      'layout' : 'product'
     });
   }
 

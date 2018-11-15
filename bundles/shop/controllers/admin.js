@@ -85,21 +85,47 @@ class ShopAdminController extends Controller {
       'title'       : 'Shop Income Stats',
       'description' : 'Shop income stat block'
     }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
       // get data
       let data = await this._getIncomeStat(await this._getAdmins());
 
       // set other info
-      data.tag   = 'shop-stat';
-      data.type  = 'success';
+      data.tag   = 'stat';
       data.href  = '/admin/payment';
-      data.title = {
+      data.titles = {
         'today' : 'Income Today',
         'total' : 'Total Income'
       };
+      data.color = blockModel.get('color') || 'primary';
+      data.class = blockModel.get('class') || 'col';
+      data.title = blockModel.get('title') || '';
 
       // return
       return data;
-    }, async (req, block) => {});
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // set data
+      blockModel.set('color', req.body.data.color);
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('title', req.body.data.title);
+
+      // save block
+      await blockModel.save();
+    });
 
     // register simple block
     BlockHelper.block('dashboard.shop.expense', {
@@ -108,21 +134,47 @@ class ShopAdminController extends Controller {
       'title'       : 'Shop Expense Stats',
       'description' : 'Shop expenses stat block'
     }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
       // get data
       let data = await this._getExpenseStat(await this._getAdmins());
 
       // set other info
-      data.tag   = 'shop-stat';
+      data.tag   = 'stat';
       data.href  = '/admin/shop';
-      data.type  = 'danger';
-      data.title = {
+      data.titles = {
         'today' : 'Expenses Today',
         'total' : 'Total Expenses'
       };
+      data.color = blockModel.get('color') || 'primary';
+      data.class = blockModel.get('class') || 'col';
+      data.title = blockModel.get('title') || '';
 
       // return
       return data;
-    }, async (req, block) => {});
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // set data
+      blockModel.set('color', req.body.data.color);
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('title', req.body.data.title);
+
+      // save block
+      await blockModel.save();
+    });
 
     // register simple block
     BlockHelper.block('dashboard.shop.orders', {
@@ -131,21 +183,47 @@ class ShopAdminController extends Controller {
       'title'       : 'Shop Order Stats',
       'description' : 'Shop orders stat block'
     }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
       // get data
       let data = await this._getOrdersStat(await this._getAdmins());
 
       // set other info
-      data.tag   = 'shop-stat';
-      data.href  = '/admin/order';
-      data.type  = 'primary';
-      data.title = {
+      data.tag    = 'stat';
+      data.href   = '/admin/order';
+      data.titles = {
         'today' : 'Orders Today',
         'total' : 'Total Orders'
       };
+      data.color = blockModel.get('color') || 'primary';
+      data.class = blockModel.get('class') || 'col';
+      data.title = blockModel.get('title') || '';
 
       // return
       return data;
-    }, async (req, block) => {});
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // set data
+      blockModel.set('color', req.body.data.color);
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('title', req.body.data.title);
+
+      // save block
+      await blockModel.save();
+    });
   }
 
   /**

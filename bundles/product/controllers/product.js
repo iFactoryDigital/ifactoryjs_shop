@@ -133,8 +133,7 @@ class ProductController extends Controller {
    * @param req
    * @param res
    *
-   * @cache  all
-   * @route  {get} /:slug
+   * @route {get} /:slug
    */
   async viewAction (req, res, next) {
     // get product
@@ -198,6 +197,7 @@ class ProductController extends Controller {
     res.render('product', {
       'title'   : product.get('title.' + req.language),
       'query'   : req.query || {},
+      'layout'  : 'product',
       'product' : sanitised
     });
   }
