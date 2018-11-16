@@ -1,5 +1,5 @@
 
-// bind dependencies
+// Bind dependencies
 const grid        = require('grid');
 const slug        = require('slug');
 const alert       = require('alert');
@@ -7,38 +7,39 @@ const crypto      = require('crypto');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
-// require models
+// Require models
 const Image    = model('image');
 const Block   = model('block');
 const Product  = model('product');
 const Category = model('category');
 
-// bind local dependencies
+// Bind local dependencies
 const config = require('config');
 
-// get helpers
+// Get helpers
 const BlockHelper   = helper('cms/block');
 const ProductHelper = helper('product');
 
 /**
- * build user admin controller
+ * Build user admin controller
  *
  * @acl   admin.product.view
  * @fail  /
  * @mount /admin/product
  */
 class AdminProductController extends Controller {
+
   /**
-   * construct user admin controller
+   * Construct user admin controller
    */
   constructor () {
-    // run super
+    // Run super
     super();
 
-    // bind build methods
+    // Bind build methods
     this.build = this.build.bind(this);
 
-    // bind methods
+    // Bind methods
     this.gridAction         = this.gridAction.bind(this);
     this.indexAction        = this.indexAction.bind(this);
     this.createAction       = this.createAction.bind(this);
@@ -48,20 +49,20 @@ class AdminProductController extends Controller {
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
 
-    // bind private methods
+    // Bind private methods
     this._grid = this._grid.bind(this);
 
-    // build
+    // Build
     this.build();
 
-    // register simple block
+    // Register simple block
     BlockHelper.block('dashboard.cms.products', {
       'acl'         : ['admin.shop'],
       'for'         : ['admin'],
       'title'       : 'Products Grid',
       'description' : 'Shows grid of recent products'
     }, async (req, block) => {
-      // get notes block from db
+      // Get notes block from db
       let blockModel = await Block.findOne({
         'uuid' : block.uuid
       }) || new Block({
@@ -69,12 +70,12 @@ class AdminProductController extends Controller {
         'type' : block.type
       });
 
-      // create new req
+      // Create new req
       let fauxReq = {
         'query' : blockModel.get('state') || {}
       };
 
-      // return
+      // Return
       return {
         'tag'   : 'grid',
         'name'  : 'Products',
@@ -83,7 +84,7 @@ class AdminProductController extends Controller {
         'title' : blockModel.get('title') || ''
       };
     }, async (req, block) => {
-      // get notes block from db
+      // Get notes block from db
       let blockModel = await Block.findOne({
         'uuid' : block.uuid
       }) || new Block({
@@ -91,106 +92,106 @@ class AdminProductController extends Controller {
         'type' : block.type
       });
 
-      // set data
+      // Set data
       blockModel.set('class', req.body.data.class);
       blockModel.set('state', req.body.data.state);
       blockModel.set('title', req.body.data.title);
 
-      // save block
+      // Save block
       await blockModel.save();
     });
   }
 
   /**
-   * builds admin category
+   * Builds admin category
    */
   build () {
-    // build slug function
+    // Build slug function
     let slugify = async (product) => {
-      // get title
+      // Get title
       let title = product.get('title.' + config.get('i18n.fallbackLng'));
 
-      // slugify
+      // Slugify
       let slugifiedTitle = slug(title, {
         'lower' : true
       });
 
-      // check slug
+      // Check slug
       let i = 0;
 
-      // loop until slug available
+      // Loop until slug available
       while (true) {
-        // set slug
+        // Set slug
         let check = await Product.findOne({
           'slug' : (i ? slugifiedTitle + '-' + i : slugifiedTitle)
         });
 
-        // check id
+        // Check id
         if (check && product.get('_id') && product.get('_id').toString() !== check.get('_id').toString()) {
-          // add to i
+          // Add to i
           i++;
         } else {
-          // set new slug
+          // Set new slug
           slugifiedTitle = (i ? slugifiedTitle + '-' + i : slugifiedTitle);
 
-          // break if not found
+          // Break if not found
           break;
         }
       }
 
-      // set slug
+      // Set slug
       product.set('slug', slugifiedTitle);
     };
 
-    // on render
+    // On render
     this.eden.pre('product.update', slugify);
     this.eden.pre('product.create', slugify);
 
-    // on simple product sanitise
+    // On simple product sanitise
     this.eden.pre('product.sanitise', (data) => {
-      // check product type
+      // Check product type
       if (data.product.get('type') !== 'simple' && data.product.get('type') !== 'variable') return;
 
-      // set price
+      // Set price
       data.sanitised.price      = parseFloat(data.product.get('pricing.price')) || 0.00;
       data.sanitised.available  = (parseInt(data.product.get('availability.quantity')) || 0) > 0;
       data.sanitised.variations = data.product.get('variations') || [];
     });
 
-    // pre pricing submit
+    // Pre pricing submit
     this.eden.pre('product.pricing', (data) => {
-      // check type
+      // Check type
       if (data.type !== 'simple' && data.type !== 'variable') return;
 
-      // set pricing
+      // Set pricing
       data.pricing.price = parseFloat(data.pricing.price);
     });
 
-    // pre pricing submit
-    this.eden.pre ('product.submit', (req, product) => {
-      // check type
-      if (product.get ('type') !== 'variable') return;
+    // Pre pricing submit
+    this.eden.pre('product.submit', (req, product) => {
+      // Check type
+      if (product.get('type') !== 'variable') return;
 
-      // set pricing
+      // Set pricing
       product.set('variations', req.body.variation || []);
     });
 
-    // pre pricing submit
+    // Pre pricing submit
     this.eden.pre('product.availability', (data) => {
-      // check type
+      // Check type
       if (data.type !== 'simple') return;
 
-      // set pricing
+      // Set pricing
       data.availability.quantity = parseInt(data.availability.quantity);
     });
 
-    // register product types
+    // Register product types
     ProductHelper.register('simple');
     ProductHelper.register('variable');
   }
 
   /**
-   * index action
+   * Index action
    *
    * @param req
    * @param res
@@ -203,14 +204,14 @@ class AdminProductController extends Controller {
    * @parent  /admin/shop
    */
   async indexAction (req, res) {
-    // render grid
+    // Render grid
     res.render('product/admin', {
       'grid' : await this._grid(req).render(req)
     });
   }
 
   /**
-   * add/edit action
+   * Add/edit action
    *
    * @param req
    * @param res
@@ -220,12 +221,12 @@ class AdminProductController extends Controller {
    * @priority 12
    */
   createAction (req, res) {
-    // return update action
+    // Return update action
     return this.updateAction(req, res);
   }
 
   /**
-   * update action
+   * Update action
    *
    * @param req
    * @param res
@@ -234,18 +235,18 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   async updateAction (req, res) {
-    // set website variable
+    // Set website variable
     let create  = true;
     let product = new Product();
 
-    // check for website model
+    // Check for website model
     if (req.params.id) {
-      // load by id
+      // Load by id
       create  = false;
       product = await Product.findById(req.params.id);
     }
 
-    // render page
+    // Render page
     res.render('product/admin/update', {
       'title'   : create ? 'Create Product' : 'Update ' + product.get('sku'),
       'types'   : ProductHelper.types,
@@ -254,7 +255,7 @@ class AdminProductController extends Controller {
   }
 
   /**
-   * create submit action
+   * Create submit action
    *
    * @param req
    * @param res
@@ -263,12 +264,12 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   createSubmitAction (req, res) {
-    // return update action
+    // Return update action
     return this.updateSubmitAction(req, res);
   }
 
   /**
-   * add/edit action
+   * Add/edit action
    *
    * @param req
    * @param res
@@ -277,56 +278,56 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   async updateSubmitAction (req, res) {
-    // set website variable
+    // Set website variable
     let create  = true;
     let product = new Product({
       'creator' : req.user
     });
 
-    // check for website model
+    // Check for website model
     if (req.params.id) {
-      // load by id
+      // Load by id
       create  = false;
       product = await Product.findById(req.params.id);
     }
 
-    // load images
+    // Load images
     let images = req.body.images ? (await Promise.all((Array.isArray(req.body.images) ? req.body.images : [req.body.images]).map((id) => {
-      // load image
+      // Load image
       return Image.findById(id);
     }))).filter((image) => {
-      // return image
+      // Return image
       return image;
     }) : false;
 
-    // load categories
+    // Load categories
     let categories = req.body.categories ? (await Promise.all(req.body.categories.split(',').map((id) => {
-      // load image
+      // Load image
       return id.length === 24 ? Category.findById(id) : null;
     }))).filter((category) => {
-      // return image
+      // Return image
       return category;
     }) : false;
 
-    // load pricing
+    // Load pricing
     let pricing = req.body.pricing;
 
-    // set pricing
+    // Set pricing
     await this.eden.hook('product.pricing', req.body.type || product.get('type'), pricing);
 
-    // load availability
+    // Load availability
     let availability = req.body.availability;
 
-    // set availability
+    // Set availability
     await this.eden.hook('product.availability', req.body.type || product.get('type'), availability);
 
-    // load availability
+    // Load availability
     let shipping = req.body.shipping;
 
-    // set availability
+    // Set availability
     await this.eden.hook('product.shipping', req.body.type || product.get('type'), shipping);
 
-    // update product
+    // Update product
     product.set('sku',          req.body.sku);
     product.set('type',         req.body.type);
     product.set('title',        req.body.title);
@@ -342,19 +343,19 @@ class AdminProductController extends Controller {
     product.set('description',  req.body.description);
     product.set('availability', availability);
 
-    // run hook
+    // Run hook
     await this.eden.hook('product.submit', req, product, () => {});
 
-    // run hook
+    // Run hook
     await this.eden.hook('product.compile', product, () => {
-      // return save product
+      // Return save product
       return product.save();
     });
 
-    // send alert
+    // Send alert
     req.alert('success', 'Successfully ' + (create ? 'Created' : 'Updated') + ' product!');
 
-    // render page
+    // Render page
     res.render('product/admin/update', {
       'title'   : create ? 'Create Product' : 'Update ' + product.get('sku'),
       'types'   : ProductHelper.types,
@@ -363,7 +364,7 @@ class AdminProductController extends Controller {
   }
 
   /**
-   * delete action
+   * Delete action
    *
    * @param req
    * @param res
@@ -372,16 +373,16 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   async removeAction (req, res) {
-    // set website variable
+    // Set website variable
     let product = false;
 
-    // check for website model
+    // Check for website model
     if (req.params.id) {
-      // load user
+      // Load user
       product = await Product.findById(req.params.id);
     }
 
-    // render page
+    // Render page
     res.render('product/admin/remove', {
       'title'   : 'Remove ' + product.get('sku'),
       'product' : await product.sanitise()
@@ -389,7 +390,7 @@ class AdminProductController extends Controller {
   }
 
   /**
-   * delete action
+   * Delete action
    *
    * @param req
    * @param res
@@ -399,27 +400,27 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   async removeSubmitAction (req, res) {
-    // set website variable
+    // Set website variable
     let product = false;
 
-    // check for website model
+    // Check for website model
     if (req.params.id) {
-      // load user
+      // Load user
       product = await Product.findById(req.params.id);
     }
 
-    // delete website
+    // Delete website
     await product.remove();
 
-    // alert Removed
+    // Alert Removed
     req.alert('success', 'Successfully removed product');
 
-    // render index
+    // Render index
     return this.indexAction(req, res);
   }
 
   /**
-   * user grid action
+   * User grid action
    *
    * @param req
    * @param res
@@ -427,26 +428,26 @@ class AdminProductController extends Controller {
    * @route {post} /grid
    */
   gridAction (req, res) {
-    // return post grid request
+    // Return post grid request
     return this._grid(req).post(req, res);
   }
 
   /**
-   * renders grid
+   * Renders grid
    *
    * @return {grid}
    */
   _grid (req) {
-    // create new grid
+    // Create new grid
     let productGrid = new grid();
 
-    // set route
+    // Set route
     productGrid.route('/admin/product/grid');
 
-    // set grid model
+    // Set grid model
     productGrid.model(Product);
 
-    // add grid columns
+    // Add grid columns
     productGrid.column('sku', {
       'sort'   : true,
       'title'  : 'SKU',
@@ -470,7 +471,9 @@ class AdminProductController extends Controller {
     }).column('categories', {
       'title'  : 'Categories',
       'format' : async (col, row) => {
-        return col && col.length ? col.map((category) => '<a href="?filter[category]=' + category.get('title.' + req.language) + '" class="btn btn-sm btn-primary mr-2">' + category.get('title.' + req.language) + '</a>').join('') : '<i>N/A</i>';
+        return col && col.length ? col.map((category) => {
+          return '<a href="?filter[category]=' + category.get('title.' + req.language) + '" class="btn btn-sm btn-primary mr-2">' + category.get('title.' + req.language) + '</a>';
+        }).join('') : '<i>N/A</i>';
       }
     }).column('quantity', {
       'title'  : 'Quantity',
@@ -526,44 +529,46 @@ class AdminProductController extends Controller {
       'format' : async (col, row) => {
         return [
           '<div class="btn-group btn-group-sm" role="group">',
-            '<a href="/admin/product/' + row.get('_id').toString() + '/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>',
-            '<a href="/admin/product/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
+          '<a href="/admin/product/' + row.get('_id').toString() + '/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>',
+          '<a href="/admin/product/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
           '</div>'
         ].join('');
       }
     });
 
-    // add grid filters
+    // Add grid filters
     productGrid.filter('sku', {
       'title' : 'SKU',
       'type'  : 'text',
       'query' : async (param) => {
-        // another where
+        // Another where
         productGrid.match('sku', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
       }
     }).filter('title', {
       'title' : 'Title',
       'type'  : 'text',
       'query' : async (param) => {
-        // another where
+        // Another where
         productGrid.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
       }
     }).filter('description', {
       'title' : 'Description',
       'type'  : 'text',
       'query' : async (param) => {
-        // another where
+        // Another where
         productGrid.match('description.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
       }
     }).filter('category', {
       'title' : 'Category',
       'type'  : 'text',
       'query' : async (param) => {
-        // get categories
+        // Get categories
         let categories = await Category.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
 
-        // another where
-        productGrid.in('categories.id', categories.map((category) => category.get('_id').toString()));
+        // Another where
+        productGrid.in('categories.id', categories.map((category) => {
+          return category.get('_id').toString();
+        }));
       }
     }).filter('published', {
       'type'    : 'select',
@@ -583,10 +588,10 @@ class AdminProductController extends Controller {
         }
       ],
       'query' : async (param) => {
-        // check param
+        // Check param
         if (param === 'any') return;
 
-        // another where
+        // Another where
         productGrid.where({
           'published' : param === 'yes'
         });
@@ -609,26 +614,26 @@ class AdminProductController extends Controller {
         }
       ],
       'query' : async (param) => {
-        // check param
+        // Check param
         if (param === 'any') return;
 
-        // another where
+        // Another where
         productGrid.where({
           'promoted' : param === 'yes'
         });
       }
     });
 
-    // set default sort order
+    // Set default sort order
     productGrid.sort('created_at', 1);
 
-    // return grid
+    // Return grid
     return productGrid;
   }
 }
 
 /**
- * export admin controller
+ * Export admin controller
  *
  * @type {AdminProductController}
  */
