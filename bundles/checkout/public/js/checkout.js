@@ -15,7 +15,7 @@ class CheckoutStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor (order) {
+  constructor () {
     // set observable
     super()
 
@@ -27,9 +27,6 @@ class CheckoutStore extends Events {
     this.build  = this.build.bind(this);
     this.submit = this.submit.bind(this);
     this.update = this.update.bind(this);
-
-    // build cart store
-    this.build(order);
 
     // on cart update
     cart.on('update', () => {
@@ -196,4 +193,4 @@ class CheckoutStore extends Events {
  *
  * @return {CheckoutStore}
  */
-exports = module.exports = CheckoutStore;
+exports = module.exports = new CheckoutStore();

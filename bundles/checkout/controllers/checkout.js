@@ -9,8 +9,12 @@ const orderHelper = helper('order');
 
 // require models
 const User    = model('user');
+const Block   = model('block');
 const Order   = model('order');
 const Product = model('product');
+
+// require helpers
+const BlockHelper = helper('cms/block');
 
 /**
  * build checkout controller
@@ -34,6 +38,62 @@ class CheckoutController extends Controller {
     // order hooks
     this.eden.pre('order.init',  this._order);
     this.eden.pre('order.guest', this._guest);
+
+    // Set types
+    let types = ['payment', 'summary'];
+
+    // loop block types
+    types.forEach((type) => {
+      // get uppercase
+      let upper = type.charAt(0).toUpperCase() + type.slice(1);
+
+      // register simple block
+      BlockHelper.block('checkout.' + type, {
+        'for'         : ['frontend'],
+        'title'       : 'Checkout ' + upper + ' Block',
+        'description' : 'Checkout ' + upper + ' Block'
+      }, async (req, block) => {
+        // get notes block from db
+        let blockModel = await Block.findOne({
+          'uuid' : block.uuid
+        }) || new Block({
+          'uuid' : block.uuid,
+          'type' : block.type
+        });
+
+        // set locals
+        req.checkout = req.checkout || {};
+
+        // get order
+        let order = req.checkout.order || await this._getOrder(req);
+
+        // set order
+        req.checkout.order = order;
+
+        // return
+        return {
+          'tag'   : 'checkout-' + type,
+          'class' : blockModel.get('class') || null,
+          'block' : blockModel.get('block') || null,
+          'order' : order
+        };
+      }, async (req, block) => {
+        // get notes block from db
+        let blockModel = await Block.findOne({
+          'uuid' : block.uuid
+        }) || new Block({
+          'uuid' : block.uuid,
+          'type' : block.type
+        });
+
+        // set data
+        blockModel.set('class', req.body.data.class);
+        blockModel.set('block', req.body.data.block);
+
+        // save block
+        await blockModel.save();
+      });
+    });
   }
 
   /**
@@ -48,50 +108,8 @@ class CheckoutController extends Controller {
    * @route {get} /
    */
   async indexAction (req, res) {
-    // get cart lines
-    let cart = await this.eden.call('cart', req.sessionID, req.user);
-
-    // create order
-    let order = await Order.findOne({
-      'cart.id' : cart.get('_id').toString()
-    }) || new Order({
-      'cart' : cart,
-      'user' : req.user,
-      'meta' : {
-        'started' : new Date(),
-        'cookies' : req.cookie || req.cookies,
-        'session' : req.sessionID
-      },
-      'lines'   : cart.get('lines') || [],
-      'actions' : {}
-    });
-
-    // create order
-    await this.eden.hook('checkout.create', order);
-
-    // get products
-    order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
-      // return found product
-      return await Product.findById(line.product);
-    }))).filter((product) => product));
-
-    // create order
-    await this.eden.hook('checkout.products', order);
-
-    // create order
-    await this.eden.hook('checkout.init', order);
-
-    // save order
-    await order.save();
-
-    // create order
-    await this.eden.hook('checkout.render', order);
-
-    // sanitise order
-    let sanitisedOrder = await order.sanitise();
-
-    // create order
-    await this.eden.hook('checkout.render', order, sanitisedOrder);
+    // get order
+    let sanitisedOrder = await this._getOrder(req);
 
     // render grid
     res.render('checkout', {
@@ -297,6 +315,63 @@ class CheckoutController extends Controller {
         'priority' : 0
       });
     }
+  }
+
+  /**
+   * get order
+   *
+   * @param  {Request}  req
+   *
+   * @return {Promise}
+   */
+  async _getOrder (req) {
+    // get cart lines
+    let cart = await this.eden.call('cart', req.sessionID, req.user);
+
+    // create order
+    let order = await Order.findOne({
+      'cart.id' : cart.get('_id').toString()
+    }) || new Order({
+      'cart' : cart,
+      'user' : req.user,
+      'meta' : {
+        'started' : new Date(),
+        'cookies' : req.cookie || req.cookies,
+        'session' : req.sessionID
+      },
+      'lines'   : cart.get('lines') || [],
+      'actions' : {}
+    });
+
+    // create order
+    await this.eden.hook('checkout.create', order);
+
+    // get products
+    order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
+      // return found product
+      return await Product.findById(line.product);
+    }))).filter((product) => product));
+
+    // create order
+    await this.eden.hook('checkout.products', order);
+
+    // create order
+    await this.eden.hook('checkout.init', order);
+
+    // save order
+    await order.save();
+
+    // create order
+    await this.eden.hook('checkout.render', order);
+
+    // sanitise order
+    let sanitisedOrder = await order.sanitise();
+
+    // create order
+    await this.eden.hook('checkout.render', order, sanitisedOrder);
+
+    // return sanitised order
+    return sanitisedOrder;
   }
 }
 

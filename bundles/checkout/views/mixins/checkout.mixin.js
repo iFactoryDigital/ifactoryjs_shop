@@ -1,12 +1,12 @@
 
 // create mixin
-riot.mixin ('checkout', {
+riot.mixin('checkout', {
   /**
    * on init function
    */
   'init' : function () {
     // set value
-    this.checkout = this.opts.order || {
+    this.checkout = (this.opts.order || this.opts.data.order) || {
       'loading' : true
     };
 
@@ -32,11 +32,11 @@ riot.mixin ('checkout', {
     // on mount update
     if (!this.eden.frontend) return;
 
-    // set this store
-    let Checkout = require('checkout/public/js/checkout');
+    // set order
+    this.checkout = require('checkout/public/js/checkout');
 
     // set checkout
-    this.checkout = new Checkout(this.opts.order);
+    this.checkout.build(this.opts.order || this.opts.data.order);
 
     // on update
     this.checkout.on('update', this.update);

@@ -7,7 +7,11 @@ const Controller = require('controller');
 
 // require models
 const Cart    = model('cart');
+const Block   = model('block');
 const Product = model('product');
+
+// require helpers
+const BlockHelper = helper('cms/block');
 
 /**
  * build cart controller
@@ -62,6 +66,43 @@ class CartController extends Controller {
         'user'      : user,
         'sessionID' : session
       });
+    });
+
+    // register simple block
+    BlockHelper.block('cart.dropdown', {
+      'for'         : ['frontend'],
+      'title'       : 'Cart Dropdown',
+      'description' : 'Cart Dropdown block'
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // return
+      return {
+        'tag'      : 'cart-dropdown',
+        'class'    : blockModel.get('class') || null,
+        'dropdown' : blockModel.get('dropdown') || null
+      };
+    }, async (req, block) => {
+      // get notes block from db
+      let blockModel = await Block.findOne({
+        'uuid' : block.uuid
+      }) || new Block({
+        'uuid' : block.uuid,
+        'type' : block.type
+      });
+
+      // set data
+      blockModel.set('class',    req.body.data.class);
+      blockModel.set('dropdown', req.body.data.dropdown);
+
+      // save block
+      await blockModel.save();
     });
   }
 

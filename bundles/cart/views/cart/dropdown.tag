@@ -1,5 +1,5 @@
 <cart-dropdown>
-  <ul class="nav navbar-nav navbar-cart">
+  <ul class={ opts.dropdown || 'nav navbar-nav navbar-cart' }>
     <li class="nav-item dropdown">
       <button class="btn btn-primary dropdown-toggle" id="cart" onclick={ onShow }>
         <i class={ 'fa fa-shopping-cart' : true, 'mr-2' : this.cart.count() } /> { this.cart.count() || '' }
