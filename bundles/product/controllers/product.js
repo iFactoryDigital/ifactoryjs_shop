@@ -31,9 +31,7 @@ class ProductController extends Controller {
     this.viewAction = this.viewAction.bind(this);
 
     // bind private methods
-    this._order        = this._order.bind(this);
-    this._pricing      = this._pricing.bind(this);
-    this._availability = this._availability.bind(this);
+    this._order = this._order.bind(this);
 
     // build product helper
     this.build();
@@ -45,17 +43,6 @@ class ProductController extends Controller {
   async build() {
     // await hooks
     this.eden.pre('product.order', this._order);
-
-    // price hooks
-    this.eden.pre('line.price', this._variationPrice);
-
-    // await simple product
-    this.eden.pre('product.simple.pricing',      this._pricing);
-    this.eden.pre('product.simple.availability', this._availability);
-
-    // await variable pricing
-    this.eden.pre('product.variable.pricing',      this._pricing);
-    this.eden.pre('product.variable.availability', this._availability);
 
     // get categories
     (await Product.find({
@@ -156,8 +143,8 @@ class ProductController extends Controller {
 
     // do meta
     if (image) req.image(await image.url('md-sq'));
-    req.title(product.get('title.' + req.language));
-    req.description(product.get('short.' + req.language));
+    req.title(product.get('title.' + req.language) || '');
+    req.description(product.get('short.' + req.language) || '');
 
     // add meta
     req.twitter('card',    'summary_large_image');
@@ -214,76 +201,6 @@ class ProductController extends Controller {
     // check price
     await this.eden.hook('product.' + product.get('type') + '.pricing',      data);
     await this.eden.hook('product.' + product.get('type') + '.availability', data);
-  }
-
-  /**
-   * hook product information
-   *
-   * @param  {Object}  data
-   *
-   * @return {Promise}
-   */
-  async _pricing (data) {
-    // return on error
-    if (data.error) return;
-
-    // set price
-    data.price = parseFloat(data.product.get('pricing.price'));
-  }
-
-  /**
-   * hook product information
-   *
-   * @param  {Object}  data
-   *
-   * @return {Promise}
-   */
-  async _availability (data) {
-    // return on error
-    if (data.error) return;
-
-    // check available
-    if (data.qty > data.product.get('availability.quantity')) data.error = {
-      'id'   : 'availability.notavailable',
-      'text' : 'Not enough quantity available'
-    };
-  }
-
-  /**
-   * alter variation price
-   *
-   * @param  {Object} opts
-   *
-   * @return {*}
-   */
-  async _variationPrice (opts) {
-    // check product type
-    if (opts.item.product.get('type') !== 'variable') return;
-
-    // set price
-    let price = parseFloat(opts.item.product.get('pricing.price'));
-
-    // get variations
-    let variations = await opts.item.product.get('variations');
-
-    // loop for variations
-    for (let type in variations) {
-      // check found option
-      let found = variations[type].options.find((option) => opts.item.opts.includes(option.sku));
-
-      // check found
-      if (!found) {
-        // throw error
-        throw new Error('Variation missing options');
-      }
-
-      // add to price
-      price += parseFloat(found.price);
-    }
-
-    // set price
-    opts.base  = price;
-    opts.price = price * opts.item.qty;
   }
 }
 

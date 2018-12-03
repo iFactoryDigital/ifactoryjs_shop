@@ -147,17 +147,6 @@ class AdminProductController extends Controller {
     this.eden.pre('product.update', slugify);
     this.eden.pre('product.create', slugify);
 
-    // On simple product sanitise
-    this.eden.pre('product.sanitise', (data) => {
-      // Check product type
-      if (data.product.get('type') !== 'simple' && data.product.get('type') !== 'variable') return;
-
-      // Set price
-      data.sanitised.price      = parseFloat(data.product.get('pricing.price')) || 0.00;
-      data.sanitised.available  = (parseInt(data.product.get('availability.quantity')) || 0) > 0;
-      data.sanitised.variations = data.product.get('variations') || [];
-    });
-
     // Pre pricing submit
     this.eden.pre('product.pricing', (data) => {
       // Check type
@@ -186,8 +175,53 @@ class AdminProductController extends Controller {
     });
 
     // Register product types
-    ProductHelper.register('simple');
-    ProductHelper.register('variable');
+    ProductHelper.product('simple', {
+
+    }, async (product, opts) => {
+      // return price
+      return {
+        'amount'    : parseFloat(product.get('pricing.price')),
+        'currency'  : 'USD',
+        'available' : product.get('availability.quantity') > 0
+      };
+    }, async (product, opts) => {
+
+    });
+
+    // Register variable product
+    ProductHelper.product('variable', {
+
+    }, async (product, opts) => {
+      // set price
+      let price = parseFloat(product.get('pricing.price'));
+
+      // get variations
+      let variations = await product.get('variations');
+
+      // loop for variations
+      for (let type in variations) {
+        // check found option
+        let found = variations[type].options.find((option) => opts.includes(option.sku));
+
+        // check found
+        if (!found) {
+          // throw error
+          throw new Error('Variation missing options');
+        }
+
+        // add to price
+        price += parseFloat(found.price);
+      }
+
+      // return price
+      return {
+        'amount'    : parseFloat(price),
+        'currency'  : 'USD',
+        'available' : product.get('availability.quantity') > 0
+      };
+    }, async (product, opts) => {
+
+    });
   }
 
   /**
@@ -249,7 +283,7 @@ class AdminProductController extends Controller {
     // Render page
     res.render('product/admin/update', {
       'title'   : create ? 'Create Product' : 'Update ' + product.get('sku'),
-      'types'   : ProductHelper.types,
+      'types'   : ProductHelper.products().map((p) => p.type),
       'product' : await product.sanitise()
     });
   }

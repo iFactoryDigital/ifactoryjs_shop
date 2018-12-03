@@ -46,9 +46,6 @@ class AdminPaymentController extends Controller {
     // bind private methods
     this._grid = this._grid.bind(this);
 
-    // register default payment types
-    ProductHelper.payment('once');
-
     // register simple block
     BlockHelper.block('dashboard.cms.payments', {
       'acl'         : ['admin.shop'],

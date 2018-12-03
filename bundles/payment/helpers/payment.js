@@ -49,34 +49,29 @@ class PaymentHelper extends Helper {
       'user'  : await order.get('user'),
       'order' : order,
       'total' : (await Promise.all(order.get('lines').map(async (line) => {
-        // priced
-        let item = {
-          'qty'     : line.qty,
-          'opts'    : line.opts || {},
-          'user'    : await order.get('user'),
-          'product' : await Product.findById(line.product)
-        };
+        // get product
+        let product = await Product.findById(line.product);
+
+        // get price
+        let price = await ProductHelper.price(product, line.opts || {});
+
+        // return value
+        let amount = parseFloat(price.amount) * parseInt(line.qty || 1);
+
+        // hook
+        await this.eden.hook('line.price', {
+          'qty'  : line.qty,
+          'user' : await order.get('user'),
+          'opts' : line.opts,
+
+          order,
+          price,
+          amount,
+          product
+        });
 
         // return price
-        await this.eden.hook('product.order', item);
-
-        // check error
-        if (item.error) order.set('error', item.error);
-
-        // let opts
-        let opts = {
-          'qty'   : parseInt(line.qty),
-          'item'  : item,
-          'base'  : (parseFloat(item.price) || 0),
-          'price' : (parseFloat(item.price) || 0) * parseInt(line.qty),
-          'order' : order
-        };
-
-        // price item
-        await this.eden.hook('line.price', opts);
-
-        // return price
-        return opts.price;
+        return price;
       }))).reduce((total, x) => total += x, 0),
       'lines' : order.get('lines')
     });

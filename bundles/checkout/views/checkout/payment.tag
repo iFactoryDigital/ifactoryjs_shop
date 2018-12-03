@@ -5,6 +5,7 @@
     </div>
   </div>
   <div data-is="checkout-guest" if={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />
+  { console.log(this.checkout.getActions()) }
   <virtual if={ !this.checkout.loading } each={ action, key in this.checkout.getActions() }>
     <div data-is="{ action.type }-checkout" action={ action } checkout={ this.checkout } />
   </virtual>
@@ -21,7 +22,7 @@
     // do mixins
     this.mixin('user');
     this.mixin('i18n');
-    
+
     // set checkout
     this.checkout = opts.checkout;
 
@@ -53,14 +54,14 @@
         return !action.value;
       });
     }
-    
+
     /**
      * on mount
      */
     this.on('mount', () => {
       // set checkout
       this.checkout = opts.checkout;
-      
+
     });
 
   </script>

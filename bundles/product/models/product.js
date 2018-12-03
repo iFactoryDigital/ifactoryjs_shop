@@ -11,7 +11,7 @@ const eden  = require('eden');
 const Model = require('model');
 
 // get product helper
-const productHelper = helper('product');
+const ProductHelper = helper('product');
 
 /**
  * create address class
@@ -104,6 +104,7 @@ class Product extends Model {
         // return sanitised category
         return Category.sanitise(true);
       })),
+      'price'        : await ProductHelper.price(this, {}),
       'pricing'      : this.get('pricing')      || 0,
       'promoted'     : this.get('promoted')     || false,
       'published'    : this.get('published')    || false,

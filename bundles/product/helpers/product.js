@@ -20,18 +20,17 @@ class ProductHelper extends Helper {
     // run super
     super();
 
-    // bind variables
-    this.types    = [];
-    this.payments = [];
-
     // bind methods
     this.order    = this.order.bind(this);
-    this.payment  = this.payment.bind(this);
+    this.product  = this.product.bind(this);
     this.quantity = this.quantity.bind(this);
-    this.register = this.register.bind(this);
+    this.products = this.products.bind(this);
 
     // bind private methods
     this._log = this._log.bind(this);
+
+    // bind products
+    this.__products = [];
   }
 
   /**
@@ -67,6 +66,22 @@ class ProductHelper extends Helper {
   }
 
   /**
+   * gets product price for model
+   *
+   * @param  {Product} product
+   * @param  {Object}  opts
+   *
+   * @return {*}
+   */
+  price (product, opts) {
+    // get product type
+    let registered = this.__products.find((p) => p.type === product.get('type'));
+
+    // await price
+    return registered.price(product, opts);
+  }
+
+  /**
    * returns true if product has quantity
    *
    * @param  {product}  Product
@@ -86,23 +101,45 @@ class ProductHelper extends Helper {
   }
 
   /**
-   * registers product type
+   * register block
    *
-   * @param  {Object} type
+   * @param  {String}   type
+   * @param  {Object}   opts
+   * @param  {Function} render
+   * @param  {Function} save
+   *
+   * @return {*}
    */
-  register (type) {
-    // registers product service
-    this.types.push(type);
+  product (type, opts, price, order) {
+    // check found
+    let found = this.__products.find((product) => product.type === type);
+
+    // push block
+    if (!found) {
+      // check found
+      this.__products.push({
+        'type'  : type,
+        'opts'  : opts,
+        'price' : price,
+        'order' : order
+      });
+    } else {
+      // set on found
+      found.type  = type;
+      found.opts  = opts;
+      found.price = price;
+      found.order = order;
+    }
   }
 
   /**
-   * registers product payment type
+   * gets blocks
    *
-   * @param  {String} option
+   * @return {Array}
    */
-  payment (option) {
-    // push payment type
-    this.payments.push(option);
+  products () {
+    // returns blocks
+    return this.__products;
   }
 
   /**
