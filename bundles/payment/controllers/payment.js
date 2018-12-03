@@ -115,8 +115,6 @@ class PaymentController extends Controller {
       }
     };
 
-    console.log(action, order);
-
     // check error
     if (order.get('error')) return;
 

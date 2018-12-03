@@ -86,6 +86,32 @@ class PriceStore extends Events {
       }
     }
 
+    // get subscription
+    if (product.type === 'subscription') {
+      // get pricing options
+      let options = Array.from(product.pricing);
+
+      // get smallest value by default
+      let value = options.reduce((smallest, option) => {
+        // return option if smaller
+        if (option.price < smallest.price) return option;
+
+        // return smallest
+        return smallest;
+      }, {
+        'price' : 999999
+      });
+
+      // check value
+      if ((opts || {}).option) {
+        // set option
+        value = opts.option;
+      }
+
+      // return value
+      return value.price;
+    }
+
     // find register
     return price;
   }

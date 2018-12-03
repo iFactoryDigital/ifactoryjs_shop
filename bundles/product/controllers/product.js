@@ -209,8 +209,6 @@ class ProductController extends Controller {
    */
   async _order (data) {
     // set qty
-    let qty     = data.qty;
-    let opts    = data.opts;
     let product = data.product;
 
     // check price

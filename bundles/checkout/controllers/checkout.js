@@ -330,7 +330,7 @@ class CheckoutController extends Controller {
 
     // create order
     let order = await Order.findOne({
-      'cart.id' : cart.get('_id').toString()
+      'cart.id' : (cart.get('_id') || '').toString()
     }) || new Order({
       'cart' : cart,
       'user' : req.user,
