@@ -343,6 +343,9 @@ class CheckoutController extends Controller {
       'actions' : {}
     });
 
+    // set cart lines
+    order.set('lines', cart.get('lines') || []);
+
     // create order
     await this.eden.hook('checkout.create', order);
 

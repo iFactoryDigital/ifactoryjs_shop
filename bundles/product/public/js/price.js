@@ -40,7 +40,7 @@ class PriceStore extends Events {
    */
   price (product, opts) {
     // let price
-    let price = product.price;
+    let price = product.price.amount;
 
     // get opts
     for (let i = 0; i < (product.variations || []).length; i++) {
@@ -52,38 +52,6 @@ class PriceStore extends Events {
 
       // add to base
       price += option ? parseFloat(option.price) : 0;
-    }
-
-    // set type
-    if (product.type === 'server') {
-      // set discount
-      let discount = {
-        '1'  : 0,
-        '2'  : 2.5,
-        '3'  : 5,
-        '6'  : 10,
-        '12' : 20
-      };
-      let period = opts.period || 1;
-
-      // check opts
-      if (opts.new) {
-        // get next
-        let next = parseFloat((((product.pricing || {}).options || []).find((opt) => parseInt(opts.new.slots) === parseInt(opt.slots)) || ((product.pricing || {}).options || [])[0]).price);
-        let prev = parseFloat((((product.pricing || {}).options || []).find((opt) => parseInt(opts.old.slots) === parseInt(opt.slots)) || ((product.pricing || {}).options || [])[0]).price);
-
-        // get next
-        price = next - prev;
-      } else {
-        // set price
-        price = parseFloat((((product.pricing || {}).options || []).find((opt) => parseInt(opts.slots) === parseInt(opt.slots)) || ((product.pricing || {}).options || [])[0]).price);
-
-        // set period
-        price = price * period;
-
-        // set discount
-        price = parseFloat((price - (price * (discount[period] / 100))).toFixed(2));
-      }
     }
 
     // get subscription
@@ -99,13 +67,13 @@ class PriceStore extends Events {
         // return smallest
         return smallest;
       }, {
-        'price' : 999999
+        'price' : Infinity
       });
 
       // check value
-      if ((opts || {}).option) {
+      if ((opts || {}).period) {
         // set option
-        value = opts.option;
+        value = options.find((opt) => opt.period === opts.period);
       }
 
       // return value

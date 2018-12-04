@@ -15,6 +15,9 @@ const Invoice = model('invoice');
 const Payment = model('payment');
 const Product = model('product');
 
+// get helpers
+const ProductHelper = helper('product');
+
 /**
  * build payment helper
  */
@@ -71,7 +74,7 @@ class PaymentHelper extends Helper {
         });
 
         // return price
-        return price;
+        return price.amount * parseInt(line.qty || 1);
       }))).reduce((total, x) => total += x, 0),
       'lines' : order.get('lines')
     });

@@ -6,11 +6,11 @@
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
         <span class="btn-group float-right">
-          <a href="#!" if={ this.cart.line (opts.product) } onclick={ onRemove } class="btn btn-danger">
+          <a href="#!" if={ this.cart.line(opts.product) } onclick={ onRemove } class="btn btn-danger">
             <fa i="times" />
           </a>
-          <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.available }>
-            { this.t ('buy') } <span if={ this.cart.line (opts.product) }>{ this.cart.line (opts.product).qty }</span>
+          <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.price.available }>
+            { this.t('buy') } <span if={ this.cart.line(opts.product) }>{ this.cart.line(opts.product).qty }</span>
           </a>
         </span>
       </div>
@@ -19,8 +19,8 @@
 
   <script>
     // do mixins
-    this.mixin ('i18n');
-    this.mixin ('cart');
+    this.mixin('i18n');
+    this.mixin('cart');
 
     /**
      * on add function
@@ -29,10 +29,10 @@
      */
     onAdd (e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // get product
-      this.cart.add (opts.product);
+      this.cart.add(opts.product);
     }
 
     /**
@@ -42,10 +42,10 @@
      */
     onRemove (e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // get product
-      this.cart.remove (this.cart.line (opts.product));
+      this.cart.remove(this.cart.line(opts.product));
     }
 
   </script>

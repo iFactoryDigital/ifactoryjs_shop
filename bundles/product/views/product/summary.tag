@@ -46,36 +46,27 @@
      *
      * @return {Float}
      */
-    async total () {
+    total () {
       // let total
       let total = 0;
 
       // sort into groups
-      (opts.lines || []).forEach ((line) => {
+      (opts.lines || []).forEach((line) => {
         // find product
-        let product = (opts.products || []).find ((check) => {
+        let product = (opts.products || []).find((check) => {
           // return check
           return check.id === line.product;
         });
 
         // add to total
-        total += this.price.price (product, line.opts) * line.qty;
+        total += this.price.price(product, line.opts) * line.qty;
       });
 
       // set total
       opts.total = total;
 
-      // loop actions
-      for (let i = 0; i < (opts.actions || []).length; i++) {
-        // let action
-        let action = (opts.actions || [])[i];
-
-        // run action
-        if (this.eden.frontend) await this.eden.store.hook (action.type + '.total', opts, action);
-      }
-
       // return total
-      return opts.total;
+      return total;
     }
 
     // group products by type
@@ -115,12 +106,12 @@
      *
      * @return {Promise}
      */
-    async calculate () {
+    calculate () {
       // check frontend
       if (!this.eden.frontend) return;
 
       // set total
-      let total = await this.total ();
+      let total = this.total();
 
       // update if total
       if (this.calculatedTotal !== total) {
@@ -128,7 +119,7 @@
         this.calculatedTotal = total;
 
         // update
-        this.update ();
+        this.update();
       }
     }
 
@@ -137,14 +128,14 @@
 
      * @type {String} 'update'
      */
-    this.on ('update', this.calculate);
+    this.on('update', this.calculate);
 
     /**
      * on update function
 
      * @type {String} 'update'
      */
-    this.on ('mount', this.calculate);
+    this.on('mount', this.calculate);
 
   </script>
 </product-summary>

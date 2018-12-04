@@ -71,7 +71,7 @@ class Order extends Model {
       'created'  : this.get('created_at'),
       'invoice'  : (await this.get('invoice')) ? await (await this.get('invoice')).sanitise() : null,
       'redirect' : this.get ('redirect'),
-      'products' : await Promise.all(this.get('lines').map(async (line) => {
+      'products' : await Promise.all((this.get('lines') || []).map(async (line) => {
         // get product
         let product = await Product.findById(line.product);
 

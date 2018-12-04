@@ -55,9 +55,11 @@ class CartController extends Controller {
 
     // pre order create
     this.eden.pre('checkout.complete', this._checkout);
+
+    // add cart endpoint
     this.eden.endpoint('cart', async (session, user) => {
       // return found or new cart
-      return await Cart.or({
+      let cart = await Cart.or({
         'sessionID' : session
       },
       {
@@ -66,6 +68,12 @@ class CartController extends Controller {
         'user'      : user,
         'sessionID' : session
       });
+
+      // save cart
+      await cart.save();
+
+      // return cart
+      return cart;
     });
 
     // register simple block

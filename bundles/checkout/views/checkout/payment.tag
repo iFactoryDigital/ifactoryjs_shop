@@ -5,7 +5,6 @@
     </div>
   </div>
   <div data-is="checkout-guest" if={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />
-  { console.log(this.checkout.getActions()) }
   <virtual if={ !this.checkout.loading } each={ action, key in this.checkout.getActions() }>
     <div data-is="{ action.type }-checkout" action={ action } checkout={ this.checkout } />
   </virtual>
