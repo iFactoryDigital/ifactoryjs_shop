@@ -1,6 +1,7 @@
 {
   "cart" : {
-    "in"  : "In Cart",
-    "add" : "Add to Cart"
+    "in"    : "In Cart",
+    "add"   : "Add to Cart",
+    "added" : "In Cart"
   }
 }

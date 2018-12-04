@@ -5,12 +5,17 @@
         <span class="btn btn-link px-0">
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
+        
+        <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product) }>
+          { this.t('checkout.proceed') }
+        </a>
+        
         <span class="btn-group float-right">
           <a href="#!" if={ this.cart.line(opts.product) } onclick={ onRemove } class="btn btn-danger">
-            <fa i="times" />
+            <i class="fa fa-times" />
           </a>
           <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.price.available }>
-            { this.t('buy') } <span if={ this.cart.line(opts.product) }>{ this.cart.line(opts.product).qty }</span>
+            <span if={ this.cart.line(opts.product) }>{ this.cart.line(opts.product).qty }</span> { this.t(this.cart.has(opts.product) ? 'cart.added' : 'cart.add') }
           </a>
         </span>
       </div>

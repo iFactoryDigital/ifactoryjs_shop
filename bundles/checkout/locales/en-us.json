@@ -1,6 +1,7 @@
 {
   "checkout" : {
     "summary"  : "Summary",
+    "proceed"  : "Go to Checkout",
     "complete" : "Complete Order"
   }
 }

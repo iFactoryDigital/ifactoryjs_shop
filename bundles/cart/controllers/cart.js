@@ -11,7 +11,8 @@ const Block   = model('block');
 const Product = model('product');
 
 // require helpers
-const BlockHelper = helper('cms/block');
+const BlockHelper   = helper('cms/block');
+const ProductHelper = helper('product');
 
 /**
  * build cart controller
@@ -130,13 +131,45 @@ class CartController extends Controller {
     let cart = await this.eden.call('cart', sessionID, req.user);
 
     // get items
-    let products = await Promise.all(req.body.lines.map ((line) => {
-      // return find
-      return Product.findById(line.product);
-    }));
+    let products = [];
+
+    // set lines
+    let lines = [];
+
+    // loop lines
+    for (let line of (req.body.lines || [])) {
+      // get product
+      let product = await Product.findById(line.product);
+
+      // set extra data
+      req.line  = line;
+      req.lines = lines;
+
+      // run try/catch
+      try {
+        // check can add
+        if (await ProductHelper.order(product, line, req) === false) {
+          // return null
+          continue;
+        }
+      } catch (e) {
+        console.log(e);
+        // continue on error
+        continue;
+      }
+
+      // push line
+      lines.push(line);
+
+      // check push product
+      if (!products.find((p) => p.get('_id').toString() !== product.get('_id').toString())) {
+        // push product
+        products.push(product);
+      }
+    }
 
     // set products
-    cart.set('lines',    req.body.lines || []);
+    cart.set('lines',    lines);
     cart.set('products', products);
 
     // save cart

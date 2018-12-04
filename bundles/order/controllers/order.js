@@ -105,8 +105,7 @@ class OrderController extends Controller {
   async indexAction (req, res) {
     // render index
     res.render('order/index', {
-      'grid'   : await (await this._grid(req)).render(req),
-      'layout' : 'user'
+      'grid' : await (await this._grid(req)).render(req)
     });
   }
 
@@ -130,9 +129,8 @@ class OrderController extends Controller {
 
     // render order page
     res.render('order', {
-      'title'  : 'View Order #' + viewOrder.get('_id').toString(),
-      'order'  : await viewOrder.sanitise(),
-      'layout' : 'user'
+      'title' : 'View Order #' + viewOrder.get('_id').toString(),
+      'order' : await viewOrder.sanitise()
     });
   }
 

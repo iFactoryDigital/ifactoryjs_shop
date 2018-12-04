@@ -82,6 +82,23 @@ class ProductHelper extends Helper {
   }
 
   /**
+   * gets product price for model
+   *
+   * @param  {Product} product
+   * @param  {Object}  line
+   * @param  {Object}  req
+   *
+   * @return {*}
+   */
+  order (product, line, req) {
+    // get product type
+    let registered = this.__products.find((p) => p.type === product.get('type'));
+
+    // await price
+    return registered.order(product, line, req);
+  }
+
+  /**
    * returns true if product has quantity
    *
    * @param  {product}  Product

@@ -23,13 +23,13 @@
         </span>
         <span class="btn-group float-right">
           <a href="#!" if={ this.cart.line (opts.product, Object.values (skus ())) } onclick={ onRemove } class="btn btn-danger">
-            <fa i="times" />
+            <i class="fa fa-times" />
           </a>
           <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.available }>
-            <money amount={ price () } /> { this.t ('cart.add') }
+            <money amount={ price () } /> { this.t('cart.add') }
           </a>
         </span>
-        <span class="float-right btn btn-link" if={ this.cart.line (opts.product, Object.values (skus ())) }>
+        <span class="float-right btn btn-link" if={ this.cart.line (opts.product, Object.values(skus())) }>
           <span>{ this.cart.line (opts.product, Object.values (skus ())).qty }</span>
         </span>
       </div>
