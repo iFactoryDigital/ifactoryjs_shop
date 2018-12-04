@@ -34,7 +34,7 @@ class PaymentMethodController extends Controller {
     this.eden.pre('payment.init', this._method);
 
     // Hook payment pay
-    this.eden.pre('payment.pay', this._pay);
+    this.eden.post('payment.pay', this._pay);
   }
 
   /**
