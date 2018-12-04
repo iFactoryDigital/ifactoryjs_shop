@@ -23,6 +23,7 @@ class ProductHelper extends Helper {
     // bind methods
     this.order    = this.order.bind(this);
     this.product  = this.product.bind(this);
+    this.complete = this.complete.bind(this);
     this.quantity = this.quantity.bind(this);
     this.products = this.products.bind(this);
 
@@ -99,6 +100,23 @@ class ProductHelper extends Helper {
   }
 
   /**
+   * gets product price for model
+   *
+   * @param  {Product} product
+   * @param  {Object}  line
+   * @param  {Order}   order
+   *
+   * @return {*}
+   */
+  complete (product, line, order) {
+    // get product type
+    let registered = this.__products.find((p) => p.type === product.get('type'));
+
+    // await price
+    return registered.complete(product, line, order);
+  }
+
+  /**
    * returns true if product has quantity
    *
    * @param  {product}  Product
@@ -122,12 +140,13 @@ class ProductHelper extends Helper {
    *
    * @param  {String}   type
    * @param  {Object}   opts
-   * @param  {Function} render
-   * @param  {Function} save
+   * @param  {Function} price
+   * @param  {Function} order
+   * @param  {Function} complete
    *
    * @return {*}
    */
-  product (type, opts, price, order) {
+  product (type, opts, price, order, complete) {
     // check found
     let found = this.__products.find((product) => product.type === type);
 
@@ -135,17 +154,19 @@ class ProductHelper extends Helper {
     if (!found) {
       // check found
       this.__products.push({
-        'type'  : type,
-        'opts'  : opts,
-        'price' : price,
-        'order' : order
+        'type'     : type,
+        'opts'     : opts,
+        'price'    : price,
+        'order'    : order,
+        'complete' : complete
       });
     } else {
       // set on found
-      found.type  = type;
-      found.opts  = opts;
-      found.price = price;
-      found.order = order;
+      found.type     = type;
+      found.opts     = opts;
+      found.price    = price;
+      found.order    = order;
+      found.complete = complete;
     }
   }
 

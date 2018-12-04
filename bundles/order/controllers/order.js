@@ -8,9 +8,10 @@ const Controller = require('controller');
 const Order = model('order');
 
 // require helpers
-const GridHelper  = helper('grid');
-const OrderHelper = helper('order');
-const ModelHelper = helper('model');
+const GridHelper    = helper('grid');
+const OrderHelper   = helper('order');
+const ModelHelper   = helper('model');
+const ProductHelper = helper('product');
 
 /**
  * build cart controller
@@ -188,10 +189,24 @@ class OrderController extends Controller {
       await orderStatus.save();
 
       // emit create
-      this.eden.emit('order.paid', {
+      this.eden.emit('order.complete', {
         'id'    : orderStatus.get('_id').toString(),
         'model' : 'order'
       }, true);
+
+      console.log('completed');
+
+      // loop items
+      for (let item of (orderStatus.get('lines') || [])) {
+        console.log(item);
+        // get product
+        let product = await Product.findById(item.product);
+
+        console.log(product);
+
+        // do in product helper
+        await ProductHelper.complete(product, orderStatus, item);
+      }
     }
   }
 

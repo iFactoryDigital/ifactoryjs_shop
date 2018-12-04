@@ -184,7 +184,9 @@ class AdminProductController extends Controller {
         'currency'  : 'USD',
         'available' : product.get('availability.quantity') > 0
       };
-    }, async (product, opts) => {
+    }, async (product, line, req) => {
+
+    }, async (product, line, order) => {
 
     });
 
@@ -219,7 +221,9 @@ class AdminProductController extends Controller {
         'currency'  : 'USD',
         'available' : product.get('availability.quantity') > 0
       };
-    }, async (product, opts) => {
+    }, async (product, line, req) => {
+
+    }, async (product, line, order) => {
 
     });
   }
