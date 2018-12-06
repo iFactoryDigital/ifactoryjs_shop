@@ -346,53 +346,70 @@ class CheckoutController extends Controller {
     // get cart lines
     let cart = await this.eden.call('cart', req.sessionID, req.user);
 
-    // create order
-    let order = await Order.findOne({
-      'cart.id' : (cart.get('_id') || '').toString()
-    }) || new Order({
-      'cart' : cart,
-      'user' : req.user,
-      'meta' : {
-        'started' : new Date(),
-        'cookies' : req.cookie || req.cookies,
-        'session' : req.sessionID
-      },
-      'lines'   : cart.get('lines') || [],
-      'actions' : {}
-    });
+    // lock cart
+    await cart.lock();
 
-    // set cart lines
-    order.set('lines', cart.get('lines') || []);
+    // run try/catch
+    try {
+      // create order
+      let order = await Order.findOne({
+        'cart.id' : (cart.get('_id') || '').toString()
+      }) || new Order({
+        'cart' : cart,
+        'user' : req.user,
+        'meta' : {
+          'started' : new Date(),
+          'cookies' : req.cookie || req.cookies,
+          'session' : req.sessionID
+        },
+        'actions' : {}
+      });
 
-    // create order
-    await this.eden.hook('checkout.create', order);
+      // set cart lines
+      order.set('lines', cart.get('lines') || []);
 
-    // get products
-    order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
-      // return found product
-      return await Product.findById(line.product);
-    }))).filter((product) => product));
+      // save order
+      await order.save();
 
-    // create order
-    await this.eden.hook('checkout.products', order);
+      // create order
+      await this.eden.hook('checkout.create', order);
 
-    // create order
-    await this.eden.hook('checkout.init', order);
+      // get products
+      order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
+        // return found product
+        return await Product.findById(line.product);
+      }))).filter((product) => product));
 
-    // save order
-    await order.save();
+      // create order
+      await this.eden.hook('checkout.products', order);
 
-    // create order
-    await this.eden.hook('checkout.render', order);
+      // create order
+      await this.eden.hook('checkout.init', order);
 
-    // sanitise order
-    let sanitisedOrder = await order.sanitise();
+      // save order
+      await order.save();
 
-    // create order
-    await this.eden.hook('checkout.render', order, sanitisedOrder);
+      // create order
+      await this.eden.hook('checkout.render', order);
 
-    // return sanitised order
-    return sanitisedOrder;
+      // sanitise order
+      let sanitisedOrder = await order.sanitise();
+
+      // create order
+      await this.eden.hook('checkout.render', order, sanitisedOrder);
+
+      // unlock cart
+      cart.unlock();
+
+      // return sanitised order
+      return sanitisedOrder;
+    } catch (e) {
+      // unlock cart
+      cart.unlock();
+
+      // throw error
+      throw e;
+    }
   }
 }
 
