@@ -31,7 +31,6 @@ class CartController extends Controller {
     this.build = this.build.bind(this);
 
     // bind private methods
-    this._checkout   = this._checkout.bind(this);
     this._middleware = this._middleware.bind(this);
 
     // build
@@ -54,9 +53,6 @@ class CartController extends Controller {
       delete render.state.cart;
     });
 
-    // pre order create
-    this.eden.pre('checkout.complete', this._checkout);
-
     // add cart endpoint
     this.eden.endpoint('cart', async (session, user) => {
       // return found or new cart
@@ -75,6 +71,28 @@ class CartController extends Controller {
 
       // return cart
       return cart;
+    });
+
+    // add cart endpoint
+    this.eden.post('order.complete', async (order) => {
+      // get cart lines
+      let cart = await order.get('cart');
+      let user = await order.get('user');
+
+      // remove cart
+      if (cart) await cart.remove();
+
+      // create new cart
+      cart = new Cart({
+        'user'      : await order.get('user'),
+        'sessionID' : order.get('meta.session')
+      });
+
+      // save cart
+      await cart.save();
+
+      // emit to user/socket
+      socket[user ? 'user' : 'session'](user ? user : order.get('meta.session'), 'cart', await cart.sanitise());
     });
 
     // register simple block
@@ -153,7 +171,6 @@ class CartController extends Controller {
           continue;
         }
       } catch (e) {
-        console.log(e);
         // continue on error
         continue;
       }
@@ -209,40 +226,6 @@ class CartController extends Controller {
 
     // Run next
     next();
-  }
-
-  /**
-   * checkout middleware
-   *
-   * @param  {order}  Order
-   *
-   * @return {Promise}
-   */
-  async _checkout (order) {
-    // check error
-    if (order.get('error')) return;
-
-    // set session
-    let session = order.get('sessionID') || '';
-
-    // get user
-    let user = await order.get('user');
-
-    // delete carts
-    await Promise.all((await Cart.or({
-      'sessionID' : session
-    }, {
-      'user.id' : user ? user.get('_id').toString() : null
-    }).find()).map((cart) => cart.remove()));
-
-    // load cart
-    let cart = await this.eden.call('cart', session, user);
-
-    // save cart
-    await cart.save();
-
-    // emit to user/socket
-    socket.user(user, 'cart', await cart.sanitise());
   }
 }
 

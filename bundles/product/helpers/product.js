@@ -75,8 +75,11 @@ class ProductHelper extends Helper {
    * @return {*}
    */
   price (product, opts) {
+    // get type
+    let type = product.get('type') || 'simple';
+
     // get product type
-    let registered = this.__products.find((p) => p.type === product.get('type') || 'simple');
+    let registered = this.__products.find((p) => p.type === type);
 
     // await price
     return registered.price(product, opts);
@@ -92,8 +95,11 @@ class ProductHelper extends Helper {
    * @return {*}
    */
   order (product, line, req) {
+    // get type
+    let type = product.get('type') || 'simple';
+
     // get product type
-    let registered = this.__products.find((p) => p.type === product.get('type') || 'simple');
+    let registered = this.__products.find((p) => p.type === type);
 
     // await price
     return registered.order(product, line, req);
@@ -109,8 +115,11 @@ class ProductHelper extends Helper {
    * @return {*}
    */
   complete (product, line, order) {
+    // get type
+    let type = product.get('type') || 'simple';
+
     // get product type
-    let registered = this.__products.find((p) => p.type === product.get('type') || 'simple');
+    let registered = this.__products.find((p) => p.type === type);
 
     // await price
     return registered.complete(product, line, order);

@@ -4,9 +4,9 @@ const uuid   = require('uuid');
 const Events = require('events');
 
 // require local dependencies
-const store  = require('default/public/js/store');
-const price  = require('product/public/js/price');
-const socket = require('socket/public/js/bootstrap');
+const store        = require('default/public/js/store');
+const socket       = require('socket/public/js/bootstrap');
+const ProductStore = require('product/public/js/product');
 
 /**
  * build bootstrap class
@@ -78,7 +78,7 @@ class CartStore extends Events {
    */
   add (product, opts) {
     // check products
-    if (!this.has(product)) this.products.push(product);
+    if (!this.products.find((p) => p.id === product.id)) this.products.push(product);
 
     // check quantities
     if (!this.lines.find((line) => {
@@ -239,7 +239,7 @@ class CartStore extends Events {
     // calculate total
     this.lines.forEach((line) => {
       // add value
-      total += price.price(this.product(line), line.opts) * line.qty;
+      total += ProductStore.price(this.product(line), line.opts) * line.qty;
     });
 
     // return total

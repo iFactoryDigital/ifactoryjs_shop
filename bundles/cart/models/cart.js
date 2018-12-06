@@ -9,6 +9,9 @@
 // import local dependencies
 const Model = require('model');
 
+// get other models
+const Product = model('product');
+
 /**
  * create address class
  */
@@ -37,9 +40,9 @@ class Cart extends Model {
     return {
       'id'       : this.get('_id') ? this.get('_id').toString() : null,
       'lines'    : this.get('lines') || [],
-      'products' : await Promise.all((await this.get('products') || []).map((product) => {
+      'products' : await Promise.all((this.get('lines') || []).map(async (line) => {
         // return sanitised images
-        return product.sanitise();
+        return await (await Product.findById(line.product)).sanitise();
       }))
     };
   }

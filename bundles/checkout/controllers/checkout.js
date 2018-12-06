@@ -154,7 +154,7 @@ class CheckoutController extends Controller {
     await this.eden.hook('checkout.create', order);
 
     // get products
-    order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
+    order.set('products', (await Promise.all((order.get('lines') || []).map(async (line) => {
       // return found product
       let product = await Product.findById(line.product);
 
@@ -162,7 +162,7 @@ class CheckoutController extends Controller {
       if (!product) return null;
 
       // sanitise
-      return await product.sanitise();
+      return product;
     }))).filter((product) => product));
 
     // create order
@@ -208,15 +208,33 @@ class CheckoutController extends Controller {
       order = await Order.findById(req.params.id);
     } catch (e) {}
 
-    // create order
-    await orderHelper.complete(order, req.body);
-
     // set order meta
     order.set('meta', {
       'cookies'   : req.cookie || req.cookies,
       'session'   : req.sessionID,
       'continued' : new Date()
     });
+
+    // set lines
+    order.set('lines', req.body.lines);
+
+    // get products
+    order.set('products', (await Promise.all((order.get('lines') || []).map(async (line) => {
+      // return found product
+      let product = await Product.findById(line.product);
+
+      // check products
+      if (!product) return null;
+
+      // sanitise
+      return product;
+    }))).filter((product) => product));
+
+    // create order
+    await this.eden.hook('checkout.products', order);
+
+    // create order
+    await orderHelper.complete(order, req.body);
 
     // save order
     await order.save();

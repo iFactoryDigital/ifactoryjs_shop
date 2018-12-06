@@ -1,7 +1,7 @@
 <checkout-payment>
   <div class="card card-loading" if={ this.checkout.loading }>
     <div class="card-body text-center display-3 py-5">
-      <fa i="spinner fa-spin" />
+      <i class="fa fa-spinner fa-spin" />
     </div>
   </div>
   <div data-is="checkout-guest" if={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />

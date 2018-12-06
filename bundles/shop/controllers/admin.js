@@ -94,7 +94,7 @@ class ShopAdminController extends Controller {
       });
 
       // get data
-      let data = await this._getIncomeStat(await this._getAdmins());
+      let data = await this._getIncomeStat();
 
       // set other info
       data.tag   = 'stat';
@@ -143,7 +143,7 @@ class ShopAdminController extends Controller {
       });
 
       // get data
-      let data = await this._getExpenseStat(await this._getAdmins());
+      let data = await this._getExpenseStat();
 
       // set other info
       data.tag   = 'stat';
@@ -192,7 +192,7 @@ class ShopAdminController extends Controller {
       });
 
       // get data
-      let data = await this._getOrdersStat(await this._getAdmins());
+      let data = await this._getOrdersStat();
 
       // set other info
       data.tag    = 'stat';
@@ -229,11 +229,9 @@ class ShopAdminController extends Controller {
   /**
    * income statistics
    *
-   * @param {Array} admins
-   *
    * @return {Object}
    */
-  async _getIncomeStat (admins) {
+  async _getIncomeStat () {
     // let date
     let start = new Date();
         start.setHours(24, 0, 0, 0);
@@ -257,7 +255,7 @@ class ShopAdminController extends Controller {
           next.setDate(next.getDate() + 1);
 
       // return amount sum
-      let total = await Payment.where('complete', true).gte('created_at', current).lte('created_at', next).gte('amount', 0).nin('user.id', admins).sum('amount');
+      let total = await Payment.where('complete', true).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
 
       // add to totals
       totals.push(total);
@@ -273,10 +271,10 @@ class ShopAdminController extends Controller {
 
     // return totals and values
     return {
-      'total'   : '$' + (await Payment.gte('amount', 0).nin('user.id', admins).sum('amount')).toFixed(2),
-      'today'   : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).nin('user.id', admins).sum('amount')).toFixed(2),
-      'weekly'  : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).nin('user.id', admins).sum('amount')).toFixed(2),
-      'monthly' : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).nin('user.id', admins).sum('amount')).toFixed(2),
+      'total'   : '$' + (await Payment.gte('amount', 0).sum('amount')).toFixed(2),
+      'today'   : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).sum('amount')).toFixed(2),
+      'weekly'  : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2),
+      'monthly' : '$' + (await Payment.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2),
 
       totals,
       values
@@ -286,11 +284,9 @@ class ShopAdminController extends Controller {
   /**
    * deposit logic
    *
-   * @param {Array} Admins
-   *
    * @return {Object}
    */
-  async _getExpenseStat (admins) {
+  async _getExpenseStat () {
     // let date
     let start = new Date();
         start.setHours(24, 0, 0, 0);
@@ -314,7 +310,7 @@ class ShopAdminController extends Controller {
           next.setDate(next.getDate() + 1);
 
       // return amount sum
-      let total = await Credit.where('credited', true).gte('created_at', current).lte('created_at', next).gte('amount', 0).nin('referrer.id', admins).sum('amount');
+      let total = await Credit.where('credited', true).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
 
       // add to totals
       totals.push(total);
@@ -330,10 +326,10 @@ class ShopAdminController extends Controller {
 
     // return totals and values
     return {
-      'total'   : '$' + (await Credit.gte('amount', 0).nin('referrer.id', admins).sum('amount')).toFixed(2),
-      'today'   : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).nin('referrer.id', admins).sum('amount')).toFixed(2),
-      'weekly'  : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).nin('referrer.id', admins).sum('amount')).toFixed(2),
-      'monthly' : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).nin('referrer.id', admins).sum('amount')).toFixed(2),
+      'total'   : '$' + (await Credit.gte('amount', 0).sum('amount')).toFixed(2),
+      'today'   : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).sum('amount')).toFixed(2),
+      'weekly'  : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2),
+      'monthly' : '$' + (await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2),
 
       totals,
       values
@@ -343,11 +339,9 @@ class ShopAdminController extends Controller {
   /**
    * deposit logic
    *
-   * @param {Array} Admins
-   *
    * @return {Object}
    */
-  async _getOrdersStat (admins) {
+  async _getOrdersStat () {
     // let date
     let start = new Date();
         start.setHours(24, 0, 0, 0);
@@ -371,7 +365,7 @@ class ShopAdminController extends Controller {
           next.setDate(next.getDate() + 1);
 
       // return amount sum
-      let total = await Order.gte('created_at', current).lte('created_at', next).nin('status', [null, 'pending']).nin('user.id', admins).count();
+      let total = await Order.gte('created_at', current).lte('created_at', next).nin('status', [null, 'pending']).count();
 
       // add to totals
       totals.push(total);
@@ -387,34 +381,14 @@ class ShopAdminController extends Controller {
 
     // return totals and values
     return {
-      'total'   : (await Order.nin('status', [null, 'pending']).nin('user.id', admins).count()).toLocaleString(),
-      'today'   : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).nin('user.id', admins).count()).toLocaleString(),
-      'weekly'  : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).nin('user.id', admins).count()).toLocaleString(),
-      'monthly' : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).nin('user.id', admins).count()).toLocaleString(),
+      'total'   : (await Order.nin('status', [null, 'pending']).count()).toLocaleString(),
+      'today'   : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(new Date().setHours (0, 0, 0, 0))).count()).toLocaleString(),
+      'weekly'  : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).count()).toLocaleString(),
+      'monthly' : (await Order.nin('status', [null, 'pending']).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).count()).toLocaleString(),
 
       totals,
       values
     };
-  }
-
-  /**
-   * gets admins
-   *
-   * @return {*}
-   */
-  async _getAdmins () {
-    // set admins
-    let adminACL = await Acl.findOne({
-      'name' : 'Admin'
-    });
-
-    // get admins
-    let admins = (await User.where({
-      'acl.id' : adminACL.get('_id').toString()
-    }).find()).map((user) => user.get('_id').toString());
-
-    // return admins
-    return admins;
   }
 }
 

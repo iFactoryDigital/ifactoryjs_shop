@@ -3,10 +3,9 @@
 const Events = require('events');
 
 // require local dependencies
-const cart   = require('cart/public/js/cart');
-const store  = require('default/public/js/store');
-const price  = require('product/public/js/price');
-const socket = require('socket/public/js/bootstrap');
+const socket       = require('socket/public/js/bootstrap');
+const CartStore    = require('cart/public/js/cart');
+const ProductStore = require('product/public/js/product');
 
 /**
  * build bootstrap class
@@ -28,17 +27,18 @@ class CheckoutStore extends Events {
     this.submit = this.submit.bind(this);
     this.update = this.update.bind(this);
 
-    // on cart update
-    cart.on('update', () => {
+    // on CartStore update
+    CartStore.on('update', () => {
       // build
       this.build({
-        'lines' : cart.lines
+        'lines'    : CartStore.lines,
+        'products' : CartStore.products
       });
     })
   }
 
   /**
-   * build cart
+   * build CartStore
    */
   async build (order) {
     // check res
@@ -171,7 +171,7 @@ class CheckoutStore extends Events {
       });
 
       // add to total
-      total += price.price(product, line.opts) * line.qty;
+      total += ProductStore.price(product, line.opts) * line.qty;
     });
 
     // return total

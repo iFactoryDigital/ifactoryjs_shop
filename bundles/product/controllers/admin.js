@@ -109,7 +109,7 @@ class AdminProductController extends Controller {
     // Build slug function
     let slugify = async (product) => {
       // Get title
-      let title = Object.keys(product.get('title'))[0];
+      let title = Object.values(product.get('title'))[0];
 
       // Slugify
       let slugifiedTitle = slug(title || '', {
@@ -498,7 +498,8 @@ class AdminProductController extends Controller {
       },
       'title'  : 'Price',
       'format' : async (col, row) => {
-        return '$' + parseFloat(row.get('pricing.price') || col || 0).toFixed(2) + ' USD';
+        // return calculated price
+        return '$' + (await ProductHelper.price(row)).amount.toFixed(2) + ' USD';
       }
     }).column('title', {
       'sort'   : true,

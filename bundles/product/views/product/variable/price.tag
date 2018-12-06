@@ -4,13 +4,13 @@
 
   <script>
     // do mixins
-    this.mixin ('price');
-    this.mixin ('settings');
+    this.mixin('product');
+    this.mixin('settings');
 
     // set pricing
     this.pricing = {
-      'min' : parseFloat (opts.product.pricing.price) || 0,
-      'max' : parseFloat (opts.product.pricing.price) || 0
+      'min' : parseFloat(opts.product.pricing.price) || 0,
+      'max' : parseFloat(opts.product.pricing.price) || 0
     };
 
     /**
@@ -20,7 +20,7 @@
      */
     variationPrice () {
       // get price
-      let price = this.price.price (opts.product, []);
+      let price = this.product.price(opts.product, []);
 
       // get min
       let min = price;
@@ -29,11 +29,11 @@
       // get opts
       for (let i = 0; i < (opts.product.variations || []).length; i++) {
         // get value
-        let options = opts.product.variations[i].options.map ((opt) => opt.price);
+        let options = opts.product.variations[i].options.map((opt) => opt.price);
 
         // add to max
-        max += Math.max (...options);
-        min += Math.min (...options);
+        max += Math.max(...options);
+        min += Math.min(...options);
       }
 
       // return min/max
@@ -46,12 +46,12 @@
     /**
      * on mount function
      */
-    this.on ('mount', () => {
+    this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
 
       // set procing
-      this.pricing = this.variationPrice ();
+      this.pricing = this.variationPrice();
 
     });
 

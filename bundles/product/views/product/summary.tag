@@ -1,21 +1,21 @@
 <product-summary>
   <div class="product-summary">
-    <div each={ lines, key in groups () } class="summary-group summary-group-{ key.toLowerCase () }">
+    <div each={ lines, key in groups() } class="summary-group summary-group-{ key.toLowerCase() }">
       <!-- do title -->
-      <div data-is="product-{ key.toLowerCase () }-title" />
+      <div data-is="product-{ key.toLowerCase() }-title" />
 
       <!-- loop lines -->
       <virtual each={ line, i in lines }>
-        <div data-is="product-{ key.toLowerCase () }-summary" line={ line } />
+        <div data-is="product-{ key.toLowerCase() }-summary" line={ line } />
       </virtual>
       <!-- / loop lines -->
 
     </div>
   </div>
   <div class="product-extra">
-    <div each={ action, i in opts.actions } class="extra-group extra-group-{ action.type.toLowerCase () }">
+    <div each={ action, i in opts.actions } class="extra-group extra-group-{ action.type.toLowerCase() }">
       <!-- loop lines -->
-      <div data-is="{ action.type.toLowerCase () }-summary-extra" action={ action } />
+      <div data-is="{ action.type.toLowerCase() }-summary-extra" action={ action } />
       <!-- / loop lines -->
     </div>
   </div>
@@ -36,7 +36,7 @@
 
   <script>
     // add mixins
-    this.mixin ('price');
+    this.mixin('product');
 
     // set variables
     this.calculatedTotal = 0;
@@ -59,7 +59,7 @@
         });
 
         // add to total
-        total += this.price.price(product, line.opts) * line.qty;
+        total += this.product.price(product, line.opts) * line.qty;
       });
 
       // set total
@@ -75,9 +75,9 @@
       let groups = {};
 
       // sort into groups
-      (opts.lines || []).forEach ((line) => {
+      (opts.lines || []).forEach((line) => {
         // find product
-        let product = (opts.products || []).find ((check) => {
+        let product = (opts.products || []).find((check) => {
           // return check
           return check.id === line.product;
         });
@@ -94,7 +94,7 @@
         if (!groups[newLine.type]) groups[newLine.type] = [];
 
         // add line
-        groups[newLine.type].push (newLine);
+        groups[newLine.type].push(newLine);
       });
 
       // return groups

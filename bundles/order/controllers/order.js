@@ -5,7 +5,8 @@ const socket     = require('socket');
 const Controller = require('controller');
 
 // require models
-const Order = model('order');
+const Order   = model('order');
+const Product = model('product');
 
 // require helpers
 const GridHelper    = helper('grid');
@@ -193,19 +194,15 @@ class OrderController extends Controller {
         'id'    : orderStatus.get('_id').toString(),
         'model' : 'order'
       }, true);
-
-      console.log('completed');
+      this.eden.hook('order.complete', orderStatus);
 
       // loop items
       for (let item of (orderStatus.get('lines') || [])) {
-        console.log(item);
         // get product
         let product = await Product.findById(item.product);
 
-        console.log(product);
-
         // do in product helper
-        await ProductHelper.complete(product, orderStatus, item);
+        await ProductHelper.complete(product, item, orderStatus);
       }
     }
   }

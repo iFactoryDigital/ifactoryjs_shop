@@ -10,6 +10,7 @@ const Controller = require('controller');
 const User    = model('user');
 const Order   = model('order');
 const Block   = model('block');
+const Product = model('product');
 const Payment = model('payment');
 
 // bind local dependencies
@@ -306,6 +307,22 @@ class AdminOrderController extends Controller {
 
         // return user name
         return user ? (user.name() || user.get('email')) : 'Anonymous';
+      }
+    }).column('lines', {
+      'sort'   : true,
+      'title'  : 'Lines',
+      'format' : async (col, row) => {
+        // get invoice
+        let lines = await row.get('lines');
+
+        // get products
+        return (await Promise.all(lines.map(async (line) => {
+          // get product
+          let product = await Product.findById(line.product);
+
+          // return value
+          return (line.qty || 1) + 'x <a href="/admin/product/' + product.get('_id').toString() + '/update">' + product.get('title.' + req.language) + '</a>';
+        }))).join(', ');
       }
     }).column('total', {
       'sort'   : true,

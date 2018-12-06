@@ -4,7 +4,6 @@
 
   <script>
     // do mixins
-    this.mixin('price');
     this.mixin('settings');
 
     // set default price

@@ -47,11 +47,14 @@ class PaymentHelper extends Helper {
    * @resolve {invoice}
    */
   async invoice (order) {
+    // get lines
+    let lines = order.get('lines');
+
     // create new invoice
     let invoice = new Invoice({
       'user'  : await order.get('user'),
       'order' : order,
-      'total' : (await Promise.all(order.get('lines').map(async (line) => {
+      'total' : (await Promise.all(lines.map(async (line) => {
         // get product
         let product = await Product.findById(line.product);
 
@@ -73,11 +76,21 @@ class PaymentHelper extends Helper {
           product
         });
 
+        // set price
+        line.price = price;
+        line.total = amount;
+
         // return price
         return price.amount * parseInt(line.qty || 1);
       }))).reduce((total, x) => total += x, 0),
       'lines' : order.get('lines')
     });
+
+    // get lines
+    order.set('lines', lines);
+
+    // save order
+    await order.save();
 
     // save invoice
     await invoice.save();
