@@ -306,7 +306,7 @@ class AdminOrderController extends Controller {
         let user = await row.get('user');
 
         // return user name
-        return user ? (user.name() || user.get('email')) : 'Anonymous';
+        return user ? '<a href="/admin/user/' + user.get('_id').toString() + '/update">' + (user.name() || user.get('email')) + '</a>' : 'Anonymous';
       }
     }).column('lines', {
       'sort'   : true,
@@ -422,7 +422,7 @@ class AdminOrderController extends Controller {
     });
 
     // set default sort order
-    orderGrid.sort('created_at', 1);
+    orderGrid.sort('created_at', -1);
 
     // return grid
     return orderGrid;

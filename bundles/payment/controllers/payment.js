@@ -125,7 +125,7 @@ class PaymentController extends Controller {
     };
 
     // do hook
-    await this.eden.hook('payment.init', sanitisedOrder, check);
+    await this.eden.hook('payment.init', order, check);
 
     // check method found
     if (!check.data.methods.find((method) => {
