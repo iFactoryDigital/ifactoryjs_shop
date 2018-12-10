@@ -158,7 +158,7 @@ class ProductController extends Controller {
     req.meta('product:price:amount',   parseFloat(sanitised.price).toFixed(2));
     req.meta('product:modified_time',  product.get('updated_at').toISOString());
     req.meta('product:published_time', product.get('created_at').toISOString());
-    req.meta('product:price:currency', 'USD');
+    req.meta('product:price:currency', config.get('shop.currency') || 'USD');
 
     // add structured data
     res.locals.page.head = (res.locals.page.head || '') + [
@@ -174,7 +174,7 @@ class ProductController extends Controller {
           'offers'      : {
             '@type'         : 'Offer',
             'price'         : parseFloat(sanitised.price).toFixed(2),
-            'priceCurrency' : 'USD',
+            'priceCurrency' : config.get('shop.currency') || 'USD',
           }
         }),
       '</script>'

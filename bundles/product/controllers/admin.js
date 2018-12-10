@@ -181,7 +181,7 @@ class AdminProductController extends Controller {
       // return price
       return {
         'amount'    : parseFloat(product.get('pricing.price')),
-        'currency'  : 'USD',
+        'currency'  : config.get('shop.currency') || 'USD',
         'available' : product.get('availability.quantity') > 0
       };
     }, async (product, line, req) => {
@@ -218,7 +218,7 @@ class AdminProductController extends Controller {
       // return price
       return {
         'amount'    : parseFloat(price),
-        'currency'  : 'USD',
+        'currency'  : config.get('shop.currency') || 'USD',
         'available' : product.get('availability.quantity') > 0
       };
     }, async (product, line, req) => {
@@ -499,7 +499,7 @@ class AdminProductController extends Controller {
       'title'  : 'Price',
       'format' : async (col, row) => {
         // return calculated price
-        return '$' + (await ProductHelper.price(row)).amount.toFixed(2) + ' USD';
+        return '$' + (await ProductHelper.price(row)).amount.toFixed(2) + ' ' + (config.get('shop.currency') || 'USD');
       }
     }).column('title', {
       'sort'   : true,

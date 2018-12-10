@@ -82,9 +82,7 @@
               </div>
               <div class="card-body">
                 <div class="btn-group mb-3">
-                  <virtual each={ lng, i in this.languages }>
-                    <a class={ 'btn btn-primary' : true, 'btn-success' : this.language === lng } href="#!" onclick={ onLanguage }>{ lng }</a>
-                  </virtual>
+                  <button each={ lng, i in this.languages } class={ 'btn btn-primary' : true, 'btn-success' : this.language === lng } onclick={ onLanguage }>{ lng }</button>
                 </div>
                 <div class="form-group" each={ lng, i in this.languages } hide={ this.language !== lng }>
                   <label for="title">Title ({ lng })</label>
@@ -128,7 +126,7 @@
 
   <script>
     // do mixins
-    this.mixin ('i18n');
+    this.mixin('i18n');
 
     // set product
     this.product = opts.product;
@@ -149,6 +147,10 @@
      * @param  {Event} e
      */
     onLanguage (e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
       // set language
       this.language = e.item.lng;
 

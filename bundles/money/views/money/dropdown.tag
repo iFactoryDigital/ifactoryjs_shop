@@ -5,7 +5,7 @@
         { this.currency }
       </button>
       <div class="dropdown-menu">
-        <virtual each={ currency, key in this.eden.get('rates') }>
+        <virtual each={ currency, key in this.eden.get('shop.rates') }>
           <a href="#!" class={ 'dropdown-item' : true, 'active' : isCurrency(key) } onclick={ onChange }>{ key }</a>
         </virtual>
       </div>
@@ -20,7 +20,7 @@
 
     // set variables
     this.show     = false;
-    this.currency = this.settings.currency || 'USD';
+    this.currency = this.settings.currency || this.eden.get('shop.currency');
 
     /**
      * on show dropdown

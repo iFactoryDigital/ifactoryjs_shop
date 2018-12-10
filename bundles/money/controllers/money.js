@@ -48,7 +48,10 @@ class MoneyController extends Controller {
       await this.building;
 
       // set categories
-      render.rates = this.rates;
+      render.shop = {
+        'rates'    : this.rates,
+        'currency' : config.get('shop.currency') || 'USD'
+      };
     });
 
     // pre invoice
@@ -65,13 +68,14 @@ class MoneyController extends Controller {
    * gets rates
    */
   async _rates () {
-    // log exchange rates
-    this.rates.USD = 1;
-    this.rates.AUD = await this.currency.rates('USD', 'AUD');
-    this.rates.CNY = await this.currency.rates('USD', 'CNY');
-    this.rates.EUR = await this.currency.rates('USD', 'EUR');
-    this.rates.NZD = await this.currency.rates('USD', 'NZD');
-    this.rates.JPY = await this.currency.rates('USD', 'JPY');
+    // set rates
+    let rates = config.get('shop.currencies') || [config.get('shop.currency') || 'USD'];
+
+    // set default
+    for (let rate of rates) {
+      // set rate
+      this.rates[rate] = await this.currency.rates(config.get('shop.currency') || 'USD', rate);
+    }
 
     // set rates
     this.eden.set('rates', this.rates);
@@ -90,12 +94,12 @@ class MoneyController extends Controller {
     let rates = await this.eden.get('rates') || this.rates;
 
     // get rate
-    let currency = await settings.get(await invoice.get('user'), 'currency') || 'USD';
+    let currency = await settings.get(await invoice.get('user'), 'currency') || config.get('shop.currency') || 'USD';
 
     // set currency
     invoice.set('rate',     rates[currency] || 1);
     invoice.set('total',    invoice.get('total') * invoice.get('rate'));
-    invoice.set('currency', (Object.keys(this.rates).includes(currency)) ? currency : 'USD');
+    invoice.set('currency', (Object.keys(this.rates).includes(currency)) ? currency : config.get('shop.currency') || 'USD');
 
     // round currencies
     if (currency === 'JPY') {

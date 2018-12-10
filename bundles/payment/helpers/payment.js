@@ -122,7 +122,7 @@ class PaymentHelper extends Helper {
       'rate'     : invoice.get('rate') || 1,
       'amount'   : total,
       'invoice'  : invoice,
-      'currency' : invoice.get('currency') || 'USD',
+      'currency' : invoice.get('currency') || config.get('shop.currency') || 'USD',
       'complete' : false
     });
 

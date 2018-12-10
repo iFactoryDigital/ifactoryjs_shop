@@ -336,7 +336,7 @@ class AdminOrderController extends Controller {
 
         // return invoice total
         return formatter.format(invoice.get('total'), {
-          'code' : invoice.get('currency') || 'USD'
+          'code' : invoice.get('currency') || config.get('shop.currency') || 'USD'
         });
       }
     }).column('status', {
