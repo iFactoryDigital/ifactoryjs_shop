@@ -1,9 +1,7 @@
 <block-checkout-summary>
-  <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } on-remove={ opts.onRemove } on-card={ onCard } block={ opts.block } data={ opts.data } on-update-title={ onUpdateTitle } on-complete-update-title={ onCompleteUpdateTitle } on-should-update-title={ onShouldUpdateTitle } on-update-content={ onUpdateContent } ref="block" class="block-wysiwyg">
+  <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } checkout={ this.checkout } on-remove={ opts.onRemove } on-card={ onCard } block={ opts.block } data={ opts.data } on-update-title={ onUpdateTitle } on-complete-update-title={ onCompleteUpdateTitle } on-should-update-title={ onShouldUpdateTitle } on-update-content={ onUpdateContent } ref="block" class="block-wysiwyg">
     <yield to="body">
-      <div class="card-body text-center">
-        Checkout Summary
-      </div>
+      <checkout-summary card-class={ opts.data.card } checkout={ opts.checkout } />
     </yield>
     <yield to="modal">
       <div class="form-group">
@@ -16,6 +14,8 @@
   </block>
 
   <script>
+    // do checkout mixin
+    this.mixin('checkout');
 
     /**
      * on update name

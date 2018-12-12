@@ -1,9 +1,7 @@
 <block-cart-dropdown>
   <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } on-remove={ opts.onRemove } on-dropdown={ onDropdown } block={ opts.block } data={ opts.data } on-update-title={ onUpdateTitle } on-complete-update-title={ onCompleteUpdateTitle } on-should-update-title={ onShouldUpdateTitle } on-update-content={ onUpdateContent } ref="block" class="block-wysiwyg">
     <yield to="body">
-      <div class="card-body text-center">
-        Shopping cart dropdown class
-      </div>
+      <cart-dropdown dropdown-class={ opts.data.dropdown }>
     </yield>
     <yield to="modal">
       <div class="form-group">
