@@ -36,6 +36,9 @@ class ProductStore extends Events {
     }, (product, opts) => {
       // let price
       let price = product.price.amount;
+
+      // return price
+      return price;
     }, (product, opts) => {
 
     });
@@ -58,6 +61,9 @@ class ProductStore extends Events {
         // add to base
         price += option ? parseFloat(option.price) : 0;
       }
+
+      // return price
+      return price;
     }, (product, opts) => {
 
     });
@@ -70,6 +76,7 @@ class ProductStore extends Events {
    * @param  {Object} opts
    */
   price (product, opts) {
+    console.log(this.__products);
     // check found
     let found = this.__products.find((p) => p.type === product.type);
 

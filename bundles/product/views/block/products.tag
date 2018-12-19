@@ -1,6 +1,7 @@
 <block-products>
   <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } on-remove={ opts.onRemove } on-row={ onRow } on-col={ onCol } block={ opts.block } data={ opts.data } on-update-title={ onUpdateTitle } on-complete-update-title={ onCompleteUpdateTitle } on-should-update-title={ onShouldUpdateTitle } on-update-content={ onUpdateContent } ref="block" class="block-notes">  
     <yield to="body">
+      <div if={ !opts.data.products.length } class="text-center">Add Products</div>
       <product-list products={ opts.data.products } row={ opts.data.row } col={ opts.data.col } />
     </yield>
     
