@@ -98,6 +98,18 @@ class ProductController extends Controller {
         product : product ? await product.sanitise() : null,
       };
     }, async (req, block) => { });
+
+    // register simple block
+    BlockHelper.block('frotend.product.filter', {
+      for         : ['frontend'],
+      title       : 'Product Filter',
+      description : 'Filters the current page products',
+    }, async (req, block) => {
+      // return
+      return {
+        tag : 'product-filter'
+      };
+    }, async (req, block) => { });
   }
 
   /**
