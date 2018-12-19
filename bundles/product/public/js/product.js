@@ -76,7 +76,6 @@ class ProductStore extends Events {
    * @param  {Object} opts
    */
   price (product, opts) {
-    console.log(this.__products);
     // check found
     let found = this.__products.find((p) => p.type === product.type);
 
