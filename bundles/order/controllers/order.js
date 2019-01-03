@@ -23,7 +23,7 @@ class OrderController extends Controller {
   /**
    * construct user cart controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
@@ -40,7 +40,7 @@ class OrderController extends Controller {
   /**
    * builds order controller
    */
-  build () {
+  build() {
     // on order change
     this.eden.pre('order.create', this._status);
     this.eden.pre('order.update', this._status);
@@ -55,15 +55,15 @@ class OrderController extends Controller {
    * @call   model.listen.order
    * @return {Async}
    */
-  async liveListenAction (id, uuid, opts) {
+  async liveListenAction(id, uuid, opts) {
     // Get server
-    let viewOrder = await Order.findById(id);
+    const viewOrder = await Order.findById(id);
 
     // Get admins
     if (opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
 
     // Add to room
-    opts.socket.join('order.' + id);
+    opts.socket.join(`order.${id}`);
 
     // Add to room
     return await ModelHelper.listen(opts.sessionID, viewOrder, uuid);
@@ -78,15 +78,15 @@ class OrderController extends Controller {
    * @call   model.deafen.order
    * @return {Async}
    */
-  async liveDeafenAction (id, uuid, opts) {
+  async liveDeafenAction(id, uuid, opts) {
     // Get server
-    let viewOrder = await Order.findById(id);
+    const viewOrder = await Order.findById(id);
 
     // Get admins
     if (opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
 
     // Add to room
-    opts.socket.leave('order.' + id);
+    opts.socket.leave(`order.${id}`);
 
     // Add to room
     return await ModelHelper.deafen(opts.sessionID, viewOrder, uuid);
@@ -104,10 +104,10 @@ class OrderController extends Controller {
    * @fail  /
    * @route {get} /
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // render index
     res.render('order/index', {
-      'grid' : await (await this._grid(req)).render(req)
+      grid : await (await this._grid(req)).render(req),
     });
   }
 
@@ -119,9 +119,9 @@ class OrderController extends Controller {
    *
    * @route {get} /:id
    */
-  async viewAction (req, res) {
+  async viewAction(req, res) {
     // get order
-    let viewOrder = await Order.findById(req.params.id);
+    const viewOrder = await Order.findById(req.params.id);
 
     // check user
     if (await viewOrder.get('user') && (await viewOrder.get('user')).get('_id').toString() !== req.user.get('_id').toString()) {
@@ -131,8 +131,8 @@ class OrderController extends Controller {
 
     // render order page
     res.render('order', {
-      'title' : 'View Order #' + viewOrder.get('_id').toString(),
-      'order' : await viewOrder.sanitise()
+      title : `View Order #${viewOrder.get('_id').toString()}`,
+      order : await viewOrder.sanitise(),
     });
   }
 
@@ -146,7 +146,7 @@ class OrderController extends Controller {
    * @call   order.create
    * @return {Promise}
    */
-  async createAction (lines, actions, opts) {
+  async createAction(lines, actions, opts) {
     // create order for user
     return await (await OrderHelper.create(opts.user, lines, actions)).sanitise();
   }
@@ -161,7 +161,7 @@ class OrderController extends Controller {
    * @fail  /
    * @route {post} /grid
    */
-  async gridAction (req, res) {
+  async gridAction(req, res) {
     // render index
     return (await this._grid(req)).post(req, res);
   }
@@ -171,15 +171,15 @@ class OrderController extends Controller {
    *
    * @param  {order} Order
    */
-  async _status (orderStatus) {
+  async _status(orderStatus) {
     // load invoice
-    let invoice = await orderStatus.get('invoice');
+    const invoice = await orderStatus.get('invoice');
 
     // check invoice
     if (!invoice) return;
 
     // sanitise invoice
-    let sanitised = await invoice.sanitise();
+    const sanitised = await invoice.sanitise();
 
     // set status
     if (orderStatus.get('status') !== 'paid' && sanitised.paid) {
@@ -191,15 +191,15 @@ class OrderController extends Controller {
 
       // emit create
       this.eden.emit('order.complete', {
-        'id'    : orderStatus.get('_id').toString(),
-        'model' : 'order'
+        id    : orderStatus.get('_id').toString(),
+        model : 'order',
       }, true);
       this.eden.hook('order.complete', orderStatus);
 
       // loop items
-      for (let item of (orderStatus.get('lines') || [])) {
+      for (const item of (orderStatus.get('lines') || [])) {
         // get product
-        let product = await Product.findById(item.product);
+        const product = await Product.findById(item.product);
 
         // do in product helper
         await ProductHelper.complete(product, item, orderStatus);
@@ -212,9 +212,9 @@ class OrderController extends Controller {
    *
    * @return {grid}
    */
-  _grid (req) {
+  _grid(req) {
     // create new grid
-    let orderGrid = new GridHelper(req);
+    const orderGrid = new GridHelper(req);
 
     // set route
     orderGrid.route('/order/grid');
@@ -225,50 +225,50 @@ class OrderController extends Controller {
     orderGrid.model(Order);
 
     // add grid filters
-    orderGrid.filter ('status', {
-      'title' : 'Status',
-      'type'  : 'select',
-      'query' : (param) => {
+    orderGrid.filter('status', {
+      title : 'Status',
+      type  : 'select',
+      query : (param) => {
         if (!param.toString().length || param.toString() === 'all') return;
 
         // another where
         if (param === 'pending') {
           // add where
           orderGrid.or({
-            'status' : param.toString().toLowerCase().trim()
+            status : param.toString().toLowerCase().trim(),
           }, {
-            'status' : null
+            status : null,
           });
         } else {
           // add where
           orderGrid.where({
-            'status' : param.toString().toLowerCase().trim()
+            status : param.toString().toLowerCase().trim(),
           });
         }
       },
-      'options' : [
+      options : [
         {
-          'name' : 'All',
-          'value' : 'all'
+          name  : 'All',
+          value : 'all',
         },
         {
-          'name'  : 'Pending',
-          'value' : 'pending'
+          name  : 'Pending',
+          value : 'pending',
         },
         {
-          'name'  : 'Completed',
-          'value' : 'completed'
+          name  : 'Completed',
+          value : 'completed',
         },
         {
-          'name'  : 'Paid',
-          'value' : 'paid'
-        }
-      ]
+          name  : 'Paid',
+          value : 'paid',
+        },
+      ],
     });
 
     // add where
     orderGrid.where({
-      'user.id' : req.user.get('_id').toString()
+      'user.id' : req.user.get('_id').toString(),
     }).ne('invoice', null);
 
     // set default sort order

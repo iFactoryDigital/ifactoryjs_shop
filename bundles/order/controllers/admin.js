@@ -1,10 +1,11 @@
 
 // bind dependencies
-const Grid       = require('grid');
-const alert      = require('alert');
-const crypto     = require('crypto');
-const formatter  = require('currency-formatter');
-const Controller = require('controller');
+const Grid        = require('grid');
+const alert       = require('alert');
+const crypto      = require('crypto');
+const formatter   = require('currency-formatter');
+const Controller  = require('controller');
+const escapeRegex = require('escape-string-regexp');
 
 // require models
 const User    = model('user');
@@ -30,16 +31,16 @@ class AdminOrderController extends Controller {
   /**
    * construct user admin controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
     // bind methods
-    this.gridAction         = this.gridAction.bind(this);
-    this.indexAction        = this.indexAction.bind(this);
-    this.createAction       = this.createAction.bind(this);
-    this.updateAction       = this.updateAction.bind(this);
-    this.removeAction       = this.removeAction.bind(this);
+    this.gridAction = this.gridAction.bind(this);
+    this.indexAction = this.indexAction.bind(this);
+    this.createAction = this.createAction.bind(this);
+    this.updateAction = this.updateAction.bind(this);
+    this.removeAction = this.removeAction.bind(this);
     this.createSubmitAction = this.createSubmitAction.bind(this);
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
@@ -49,39 +50,39 @@ class AdminOrderController extends Controller {
 
     // register simple block
     BlockHelper.block('dashboard.cms.orders', {
-      'acl'         : ['admin.shop'],
-      'for'         : ['admin'],
-      'title'       : 'Orders Grid',
-      'description' : 'Shows grid of recent orders'
+      acl         : ['admin.shop'],
+      for         : ['admin'],
+      title       : 'Orders Grid',
+      description : 'Shows grid of recent orders',
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // create new req
-      let fauxReq = {
-        'query' : blockModel.get('state') || {}
+      const fauxReq = {
+        query : blockModel.get('state') || {},
       };
 
       // return
       return {
-        'tag'   : 'grid',
-        'name'  : 'Orders',
-        'grid'  : await this._grid(req).render(fauxReq),
-        'class' : blockModel.get('class') || null,
-        'title' : blockModel.get('title') || ''
+        tag   : 'grid',
+        name  : 'Orders',
+        grid  : await this._grid(req).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
       };
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // set data
@@ -107,10 +108,10 @@ class AdminOrderController extends Controller {
    * @layout  admin
    * @parent  /admin/shop
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // render grid
     res.render('order/admin', {
-      'grid' : await this._grid(req).render(req)
+      grid : await this._grid(req).render(req),
     });
   }
 
@@ -124,7 +125,7 @@ class AdminOrderController extends Controller {
    * @layout   admin
    * @priority 12
    */
-  createAction (req, res) {
+  createAction(req, res) {
     // return update action
     return this.updateAction(req, res);
   }
@@ -138,7 +139,7 @@ class AdminOrderController extends Controller {
    * @route   {get} /:id/update
    * @layout  admin
    */
-  async updateAction (req, res) {
+  async updateAction(req, res) {
     // set website variable
     let order  = new Order();
     let create = true;
@@ -146,14 +147,14 @@ class AdminOrderController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      order   = await Order.findById(req.params.id);
-      create  = false;
+      order = await Order.findById(req.params.id);
+      create = false;
     }
 
     // render page
     res.render('order/admin/update', {
-      'title' : create ? 'Create Order' : 'Update ' + order.get('_id').toString(),
-      'order' : await order.sanitise()
+      title : create ? 'Create Order' : `Update ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
     });
   }
 
@@ -166,7 +167,7 @@ class AdminOrderController extends Controller {
    * @route   {post} /create
    * @layout  admin
    */
-  createSubmitAction (req, res) {
+  createSubmitAction(req, res) {
     // return update action
     return this.updateSubmitAction(req, res);
   }
@@ -180,15 +181,15 @@ class AdminOrderController extends Controller {
    * @route   {post} /:id/update
    * @layout  admin
    */
-  async updateSubmitAction (req, res) {
+  async updateSubmitAction(req, res) {
     // set website variable
-    let order  = new Order ();
+    let order  = new Order();
     let create = true;
 
     // check for website model
     if (req.params.id) {
       // load by id
-      order  = await Order.findById(req.params.id);
+      order = await Order.findById(req.params.id);
       create = false;
     }
 
@@ -199,12 +200,12 @@ class AdminOrderController extends Controller {
     await order.save();
 
     // send alert
-    req.alert('success', 'Successfully ' + (create ? 'Created' : 'Updated') + ' order!');
+    req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} order!`);
 
     // render page
     res.render('order/admin/update', {
-      'title' : create ? 'Create Order' : 'Update ' + order.get('_id').toString(),
-      'order' : await order.sanitise()
+      title : create ? 'Create Order' : `Update ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
     });
   }
 
@@ -217,7 +218,7 @@ class AdminOrderController extends Controller {
    * @route   {get} /:id/remove
    * @layout  admin
    */
-  async removeAction (req, res) {
+  async removeAction(req, res) {
     // set website variable
     let order = false;
 
@@ -229,8 +230,8 @@ class AdminOrderController extends Controller {
 
     // render page
     res.render('order/admin/remove', {
-      'title' : 'Remove ' + order.get('_id').toString(),
-      'order' : await order.sanitise()
+      title : `Remove ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
     });
   }
 
@@ -244,7 +245,7 @@ class AdminOrderController extends Controller {
    * @title   order Administration
    * @layout  admin
    */
-  async removeSubmitAction (req, res) {
+  async removeSubmitAction(req, res) {
     // set website variable
     let order = false;
 
@@ -255,7 +256,7 @@ class AdminOrderController extends Controller {
     }
 
     // alert Removed
-    req.alert('success', 'Successfully removed ' + (order.get('_id').toString()));
+    req.alert('success', `Successfully removed ${order.get('_id').toString()}`);
 
     // delete website
     await order.remove();
@@ -272,7 +273,7 @@ class AdminOrderController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction (req, res) {
+  gridAction(req, res) {
     // return post grid request
     return this._grid(req).post(req, res);
   }
@@ -282,9 +283,9 @@ class AdminOrderController extends Controller {
    *
    * @return {grid}
    */
-  _grid (req) {
+  _grid(req) {
     // create new grid
-    let orderGrid = new Grid();
+    const orderGrid = new Grid();
 
     // set route
     orderGrid.route('/admin/order/grid');
@@ -294,131 +295,136 @@ class AdminOrderController extends Controller {
 
     // add grid columns
     orderGrid.column('_id', {
-      'title'  : 'ID',
-      'format' : async (col) => {
+      title  : 'ID',
+      format : async (col) => {
         return col ? col.toString() : '<i>N/A</i>';
-      }
+      },
     }).column('user', {
-      'sort'   : true,
-      'title'  : 'User',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'User',
+      format : async (col, row) => {
         // get user
-        let user = await row.get('user');
+        const user = await row.get('user');
 
         // return user name
-        return user ? '<a href="/admin/user/' + user.get('_id').toString() + '/update">' + (user.name() || user.get('email')) + '</a>' : 'Anonymous';
-      }
+        return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : 'Anonymous';
+      },
     }).column('lines', {
-      'sort'   : true,
-      'title'  : 'Lines',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'Lines',
+      format : async (col, row) => {
         // get invoice
-        let lines = await row.get('lines');
+        const lines = await row.get('lines');
 
         // get products
         return (await Promise.all(lines.map(async (line) => {
           // get product
-          let product = await Product.findById(line.product);
+          const product = await Product.findById(line.product);
 
           // return value
-          return (line.qty || 1) + 'x <a href="/admin/product/' + product.get('_id').toString() + '/update">' + product.get('title.' + req.language) + '</a>';
+          return `${line.qty || 1}x <a href="/admin/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
         }))).join(', ');
-      }
+      },
     }).column('total', {
-      'sort'   : true,
-      'title'  : 'Total',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'Total',
+      format : async (col, row) => {
         // get invoice
-        let invoice = await row.get('invoice');
+        const invoice = await row.get('invoice');
 
         // check invoice
         if (!invoice || !invoice.get('total')) return '<i>N/A</i>';
 
         // return invoice total
         return formatter.format(invoice.get('total'), {
-          'code' : invoice.get('currency') || config.get('shop.currency') || 'USD'
+          code : invoice.get('currency') || config.get('shop.currency') || 'USD',
         });
-      }
-    }).column('status', {
-      'sort'   : true,
-      'title'  : 'Status',
-      'format' : async (col, row) => {
-        return !col ? 'Pending' : col;
-      }
-    }).column('paid', {
-      'sort'   : true,
-      'title'  : 'Paid',
-      'format' : async (col, row) => {
+      },
+    })
+      .column('status', {
+        sort   : true,
+        title  : 'Status',
+        format : async (col, row) => {
+          return !col ? 'Pending' : col;
+        },
+      })
+      .column('paid', {
+        sort   : true,
+        title  : 'Paid',
+        format : async (col, row) => {
         // get invoice
-        let invoice = await row.get('invoice');
-        let payment = await Payment.findOne({
-          'invoice.id' : invoice ? invoice.get('_id').toString() : null
-        });
+          const invoice = await row.get('invoice');
+          const payment = await Payment.findOne({
+            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
+          });
 
-        // get paid
-        return payment && payment.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
-      }
-    }).column('updated_at', {
-      'sort'   : true,
-      'title'  : 'Updated',
-      'format' : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
-        });
-      }
-    }).column('created_at', {
-      'sort'   : true,
-      'title'  : 'Created',
-      'format' : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
-        });
-      }
-    }).column('actions', {
-      'type'   : false,
-      'width'  : '1%',
-      'title'  : 'Actions',
-      'format' : async (col, row) => {
-        return [
-          '<div class="btn-group btn-group-sm" role="group">',
-            '<a href="/admin/order/' + row.get('_id').toString() + '/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>',
-            '<a href="/admin/order/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
-          '</div>'
-        ].join('');
-      }
-    });
+          // get paid
+          return payment && payment.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
+        },
+      })
+      .column('updated_at', {
+        sort   : true,
+        title  : 'Updated',
+        format : async (col) => {
+          return col.toLocaleDateString('en-GB', {
+            day   : 'numeric',
+            month : 'short',
+            year  : 'numeric',
+          });
+        },
+      })
+      .column('created_at', {
+        sort   : true,
+        title  : 'Created',
+        format : async (col) => {
+          return col.toLocaleDateString('en-GB', {
+            day   : 'numeric',
+            month : 'short',
+            year  : 'numeric',
+          });
+        },
+      })
+      .column('actions', {
+        type   : false,
+        width  : '1%',
+        title  : 'Actions',
+        format : async (col, row) => {
+          return [
+            '<div class="btn-group btn-group-sm" role="group">',
+            `<a href="/admin/order/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/order/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            '</div>',
+          ].join('');
+        },
+      });
 
     // add grid filters
     orderGrid.filter('username', {
-      'title' : 'Username',
-      'type'  : 'text',
-      'query' : async (param) => {
+      title : 'Username',
+      type  : 'text',
+      query : async (param) => {
         // check param
         if (!param || !param.length) return;
 
         // get users
-        let users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+        const users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
 
         // user id in
-        orderGrid.in('user.id', users.map((user) => user.get('_id').toString()));
-      }
+        orderGrid.in('user.id', users.map(user => user.get('_id').toString()));
+      },
     }).filter('email', {
-      'title' : 'Email',
-      'type'  : 'text',
-      'query' : async (param) => {
+      title : 'Email',
+      type  : 'text',
+      query : async (param) => {
         // check param
         if (!param || !param.length) return;
 
         // get users
-        let users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+        const users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
 
         // user id in
-        orderGrid.in('user.id', users.map((user) => user.get('_id').toString()));
-      }
+        orderGrid.in('user.id', users.map(user => user.get('_id').toString()));
+      },
     });
 
     // set default sort order

@@ -1,8 +1,6 @@
 
 // bind dependencies
-const grid        = require('grid');
-const alert       = require('alert');
-const crypto      = require('crypto');
+const Grid        = require('grid');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
@@ -11,12 +9,8 @@ const User    = model('user');
 const Block   = model('block');
 const Payment = model('payment');
 
-// bind local dependencies
-const config = require('config');
-
 // require helpers
-const BlockHelper   = helper('cms/block');
-const ProductHelper = helper('product');
+const BlockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -29,16 +23,16 @@ class AdminPaymentController extends Controller {
   /**
    * construct user admin controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
     // bind methods
-    this.gridAction         = this.gridAction.bind(this);
-    this.indexAction        = this.indexAction.bind(this);
-    this.createAction       = this.createAction.bind(this);
-    this.updateAction       = this.updateAction.bind(this);
-    this.removeAction       = this.removeAction.bind(this);
+    this.gridAction = this.gridAction.bind(this);
+    this.indexAction = this.indexAction.bind(this);
+    this.createAction = this.createAction.bind(this);
+    this.updateAction = this.updateAction.bind(this);
+    this.removeAction = this.removeAction.bind(this);
     this.createSubmitAction = this.createSubmitAction.bind(this);
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
@@ -48,39 +42,39 @@ class AdminPaymentController extends Controller {
 
     // register simple block
     BlockHelper.block('dashboard.cms.payments', {
-      'acl'         : ['admin.shop'],
-      'for'         : ['admin'],
-      'title'       : 'Payments Grid',
-      'description' : 'Shows grid of recent payments'
+      acl         : ['admin.shop'],
+      for         : ['admin'],
+      title       : 'Payments Grid',
+      description : 'Shows grid of recent payments',
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // create new req
-      let fauxReq = {
-        'query' : blockModel.get('state') || {}
+      const fauxReq = {
+        query : blockModel.get('state') || {},
       };
 
       // return
       return {
-        'tag'   : 'grid',
-        'name'  : 'Payments',
-        'grid'  : await this._grid(req).render(fauxReq),
-        'class' : blockModel.get('class') || null,
-        'title' : blockModel.get('title') || ''
+        tag   : 'grid',
+        name  : 'Payments',
+        grid  : await this._grid(req).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
       };
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // set data
@@ -106,10 +100,10 @@ class AdminPaymentController extends Controller {
    * @layout  admin
    * @parent  /admin/shop
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // render grid
     res.render('payment/admin', {
-      'grid' : await this._grid().render()
+      grid : await this._grid().render(),
     });
   }
 
@@ -125,7 +119,7 @@ class AdminPaymentController extends Controller {
    * @layout   admin
    * @priority 12
    */
-  createAction (req, res) {
+  createAction(req, res) {
     // return update action
     return this.updateAction(req, res);
   }
@@ -139,7 +133,7 @@ class AdminPaymentController extends Controller {
    * @route   {get} /:id/update
    * @layout  admin
    */
-  async updateAction (req, res) {
+  async updateAction(req, res) {
     // set website variable
     let create  = true;
     let payment = new Payment();
@@ -147,14 +141,14 @@ class AdminPaymentController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      create  = false;
+      create = false;
       payment = await Payment.findById(req.params.id);
     }
 
     // render page
     res.render('payment/admin/update', {
-      'title'   : create ? 'Create New' : 'Update ' + payment.get('_id').toString(),
-      'payment' : await payment.sanitise()
+      title   : create ? 'Create New' : `Update ${payment.get('_id').toString()}`,
+      payment : await payment.sanitise(),
     });
   }
 
@@ -167,7 +161,7 @@ class AdminPaymentController extends Controller {
    * @route   {post} /create
    * @layout  admin
    */
-  createSubmitAction (req, res) {
+  createSubmitAction(req, res) {
     // return update action
     return this.updateSubmitAction(req, res);
   }
@@ -181,7 +175,7 @@ class AdminPaymentController extends Controller {
    * @route   {post} /:id/update
    * @layout  admin
    */
-  async updateSubmitAction (req, res) {
+  async updateSubmitAction(req, res) {
     // set website variable
     let create  = true;
     let payment = new Payment();
@@ -189,14 +183,14 @@ class AdminPaymentController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      create  = false;
-      payment = await Payment.findById (req.params.id);
+      create = false;
+      payment = await Payment.findById(req.params.id);
     }
 
     // render page
     res.render('payment/admin/update', {
-      'title'   : create ? 'Create New' : 'Update ' + payment.get('_id').toString(),
-      'payment' : await payment.sanitise()
+      title   : create ? 'Create New' : `Update ${payment.get('_id').toString()}`,
+      payment : await payment.sanitise(),
     });
   }
 
@@ -209,7 +203,7 @@ class AdminPaymentController extends Controller {
    * @route   {get} /:id/remove
    * @layout  admin
    */
-  async removeAction (req, res) {
+  async removeAction(req, res) {
     // set website variable
     let payment = false;
 
@@ -221,8 +215,8 @@ class AdminPaymentController extends Controller {
 
     // render page
     res.render('payment/admin/remove', {
-      'title'   : 'Remove ' + payment.get('_id').toString(),
-      'payment' : await payment.sanitise()
+      title   : `Remove ${payment.get('_id').toString()}`,
+      payment : await payment.sanitise(),
     });
   }
 
@@ -236,7 +230,7 @@ class AdminPaymentController extends Controller {
    * @title   Payment Administration
    * @layout  admin
    */
-  async removeSubmitAction (req, res) {
+  async removeSubmitAction(req, res) {
     // set website variable
     let payment = false;
 
@@ -247,7 +241,7 @@ class AdminPaymentController extends Controller {
     }
 
     // alert Removed
-    req.alert('success', 'Successfully removed ' + (payment.get('_id').toString()));
+    req.alert('success', `Successfully removed ${payment.get('_id').toString()}`);
 
     // delete website
     await payment.remove();
@@ -264,7 +258,7 @@ class AdminPaymentController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction (req, res) {
+  gridAction(req, res) {
     // return post grid request
     return this._grid().post(req, res);
   }
@@ -274,9 +268,9 @@ class AdminPaymentController extends Controller {
    *
    * @return {grid}
    */
-  _grid () {
+  _grid(req) {
     // create new grid
-    let paymentGrid = new grid();
+    const paymentGrid = new Grid(req);
 
     // set route
     paymentGrid.route('/admin/payment/grid');
@@ -286,92 +280,95 @@ class AdminPaymentController extends Controller {
 
     // add grid columns
     paymentGrid.column('_id', {
-      'title'  : 'ID',
-      'format' : async (col) => {
+      title  : 'ID',
+      format : async (col) => {
         return col ? col.toString() : '<i>N/A</i>';
-      }
+      },
     }).column('user', {
-      'sort'   : true,
-      'title'  : 'User',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'User',
+      format : async (col, row) => {
         // load user
-        let user = await row.get('user');
+        const user = await row.get('user');
 
         // get name
         return user ? user.name() : '<i>N/A</i>';
-      }
+      },
     }).column('amount', {
-      'title'  : 'Amount',
-      'format' : async (col, row) => {
-        return col ? '$' + col.toFixed(2) + ' ' + row.get('currency') : '<i>N/A</i>';
-      }
+      title  : 'Amount',
+      format : async (col, row) => {
+        return col ? `$${col.toFixed(2)} ${row.get('currency')}` : '<i>N/A</i>';
+      },
     }).column('pending', {
-      'sort'   : true,
-      'title'  : 'Pending',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'Pending',
+      format : async (col, row) => {
         return row.get('complete') ? 'false' : 'true';
-      }
-    }).column('updated_at', {
-      'sort'   : true,
-      'title'  : 'Updated',
-      'format' : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
-        });
-      }
-    }).column('created_at', {
-      'sort'   : true,
-      'title'  : 'Created',
-      'format' : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
-        });
-      }
-    }).column('actions', {
-      'type'   : false,
-      'width'  : '1%',
-      'title'  : 'Actions',
-      'format' : async (col, row) => {
-        return [
-          '<div class="btn-group btn-group-sm" role="group">',
-            '<a href="/admin/payment/' + row.get('_id').toString() + '/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>',
-            '<a href="/admin/payment/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
-          '</div>'
-        ].join('');
-      }
-    });
+      },
+    })
+      .column('updated_at', {
+        sort   : true,
+        title  : 'Updated',
+        format : async (col) => {
+          return col.toLocaleDateString('en-GB', {
+            day   : 'numeric',
+            month : 'short',
+            year  : 'numeric',
+          });
+        },
+      })
+      .column('created_at', {
+        sort   : true,
+        title  : 'Created',
+        format : async (col) => {
+          return col.toLocaleDateString('en-GB', {
+            day   : 'numeric',
+            month : 'short',
+            year  : 'numeric',
+          });
+        },
+      })
+      .column('actions', {
+        type   : false,
+        width  : '1%',
+        title  : 'Actions',
+        format : async (col, row) => {
+          return [
+            '<div class="btn-group btn-group-sm" role="group">',
+            `<a href="/admin/payment/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/payment/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            '</div>',
+          ].join('');
+        },
+      });
 
     // add grid filters
     paymentGrid.filter('username', {
-      'title' : 'Username',
-      'type'  : 'text',
-      'query' : async (param) => {
+      title : 'Username',
+      type  : 'text',
+      query : async (param) => {
         // check param
         if (!param || !param.length) return;
 
         // get users
-        let users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+        const users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
 
         // user id in
-        paymentGrid.in('user.id', users.map((user) => user.get('_id').toString()));
-      }
+        paymentGrid.in('user.id', users.map(user => user.get('_id').toString()));
+      },
     }).filter('email', {
-      'title' : 'Email',
-      'type'  : 'text',
-      'query' : async (param) => {
+      title : 'Email',
+      type  : 'text',
+      query : async (param) => {
         // check param
         if (!param || !param.length) return;
 
         // get users
-        let users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+        const users = await User.match('email', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
 
         // user id in
-        paymentGrid.in('user.id', users.map((user) => user.get('_id').toString()));
-      }
+        paymentGrid.in('user.id', users.map(user => user.get('_id').toString()));
+      },
     });
 
     // set default sort order

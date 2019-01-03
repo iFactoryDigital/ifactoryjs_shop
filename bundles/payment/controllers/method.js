@@ -1,3 +1,4 @@
+
 // Require local class dependencies
 const Controller = require('controller');
 
@@ -7,11 +8,10 @@ const Controller = require('controller');
  * @extends Controller
  */
 class PaymentMethodController extends Controller {
-
   /**
    * Construct Stripe Controller class
    */
-  constructor () {
+  constructor() {
     // Run super
     super();
 
@@ -19,7 +19,7 @@ class PaymentMethodController extends Controller {
     this.build = this.build.bind(this);
 
     // Bind private methods
-    this._pay    = this._pay.bind(this);
+    this._pay = this._pay.bind(this);
     this._method = this._method.bind(this);
 
     // Build Payment Method
@@ -29,7 +29,7 @@ class PaymentMethodController extends Controller {
   /**
    * Build Payment Method Controller
    */
-  build () {
+  build() {
     // Hook payment init
     this.eden.pre('payment.init', this._method);
 
@@ -47,7 +47,7 @@ class PaymentMethodController extends Controller {
    *
    * @private
    */
-  _method (order, action) {
+  _method(order, action) {
     // Return action check
     return action.type === 'payment';
   }
@@ -61,11 +61,10 @@ class PaymentMethodController extends Controller {
    *
    * @private
    */
-  _pay (payment) {
+  _pay(payment) {
     // Return error check
     return !payment.get('error');
   }
-
 }
 
 /**

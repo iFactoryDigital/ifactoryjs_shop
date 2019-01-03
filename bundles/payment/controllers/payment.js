@@ -1,10 +1,9 @@
 
 // require dependencies
-const alert      = require('alert');
 const Controller = require('controller');
 
 // require helpers
-const paymentHelper = helper('payment');
+const PaymentHelper = helper('payment');
 
 /**
  * create payment controller
@@ -17,7 +16,7 @@ class PaymentController extends Controller {
    *
    * @param {eden} eden
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
@@ -25,8 +24,8 @@ class PaymentController extends Controller {
     this.build = this.build.bind(this);
 
     // bind private methods
-    this._order    = this._order.bind(this);
-    this._payment  = this._payment.bind(this);
+    this._order = this._order.bind(this);
+    this._payment = this._payment.bind(this);
     this._checkout = this._checkout.bind(this);
 
     // build
@@ -36,12 +35,12 @@ class PaymentController extends Controller {
   /**
    * builds cart controller
    */
-  build () {
+  build() {
     // checkout hooks
     this.eden.pre('checkout.init', this._checkout);
 
     // order hooks
-    this.eden.pre('order.init',    this._order);
+    this.eden.pre('order.init', this._order);
     this.eden.pre('order.payment', this._payment);
   }
 
@@ -50,14 +49,14 @@ class PaymentController extends Controller {
    *
    * @param  {Object} order
    */
-  async _checkout (order) {
+  async _checkout(order) {
     // create payment action
-    let action = {
-      'type'     : 'payment',
-      'data'     : {
-        'methods' : []
+    const action = {
+      type     : 'payment',
+      data     : {
+        methods : [],
       },
-      'priority' : 100
+      priority : 100,
     };
 
     // do hook
@@ -66,8 +65,8 @@ class PaymentController extends Controller {
     // run actions
     action.data.methods = action.data.methods.sort((a, b) => {
       // set x/y
-      let x = a.priority || 0;
-      let y = b.priority || 0;
+      const x = a.priority || 0;
+      const y = b.priority || 0;
 
       // return action
       return a < y ? -1 : x > y ? 1 : 0;
@@ -82,21 +81,23 @@ class PaymentController extends Controller {
    *
    * @param {order} Order
    */
-  async _order (order) {
+  async _order(order) {
     // check order
-    let actions = order.get('actions');
+    const actions = order.get('actions');
 
     // get action
-    let action = Object.values(actions).find((action) => {
+    const action = Object.values(actions).find((a) => {
       // return address
-      return action.type === 'payment';
+      return a.type === 'payment';
     });
 
     // check found
-    if (!action || !action.value || !Object.keys(action.value)) return order.set('error', {
-      'id'   : 'payment.missing',
-      'text' : 'Order is missing payment'
-    });
+    if (!action || !action.value || !Object.keys(action.value)) {
+      return order.set('error', {
+        id   : 'payment.missing',
+        text : 'Order is missing payment',
+      });
+    }
   }
 
   /**
@@ -106,22 +107,22 @@ class PaymentController extends Controller {
    *
    * @return {Promise}
    */
-  async _payment (order, action) {
+  async _payment(order, action) {
     // get order and action
-    let check = {
-      'type' : 'payment',
-      'data' : {
-        'methods' : []
-      }
+    const check = {
+      type : 'payment',
+      data : {
+        methods : [],
+      },
     };
 
     // check error
     if (order.get('error')) return;
 
     // sanitise order
-    let sanitisedOrder = {
-      'user'  : await order.get('user'),
-      'lines' : order.get('lines')
+    const sanitisedOrder = {
+      user  : await order.get('user'),
+      lines : order.get('lines'),
     };
 
     // do hook
@@ -131,13 +132,15 @@ class PaymentController extends Controller {
     if (!check.data.methods.find((method) => {
       // return type
       return method.type === action.value.type;
-    })) return order.set('error', {
-      'id'   : 'payment.notavailable',
-      'text' : 'Payment method not available'
-    });
+    })) {
+      return order.set('error', {
+        id   : 'payment.notavailable',
+        text : 'Payment method not available',
+      });
+    }
 
     // hook payment
-    let invoice = await paymentHelper.invoice(order);
+    const invoice = await PaymentHelper.invoice(order);
 
     // set to order
     order.set('invoice', invoice);
@@ -149,7 +152,7 @@ class PaymentController extends Controller {
     await this.eden.hook('order.invoice', order, invoice, () => {});
 
     // do payment
-    let payment = await paymentHelper.payment(invoice, action.value);
+    const payment = await PaymentHelper.payment(invoice, action.value);
 
     // check payment
     if (payment.get('error')) return order.set('error', payment.get('error'));

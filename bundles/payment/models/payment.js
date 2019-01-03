@@ -4,7 +4,7 @@
  */
 
 // use strict
-'use strict';
+
 
 // import local dependencies
 const Model = require('model');
@@ -19,7 +19,7 @@ class Payment extends Model {
    * @param attrs
    * @param options
    */
-  constructor () {
+  constructor() {
     // run super
     super(...arguments);
 
@@ -32,14 +32,14 @@ class Payment extends Model {
    *
    * @return {Object}
    */
-  async sanitise () {
+  async sanitise() {
     // return sanitised bot
     return {
-      'id'       : this.get('_id') ? this.get('_id').toString() : null,
-      'data'     : this.get('data'),
-      'method'   : this.get('method'),
-      'amount'   : this.get('amount'),
-      'complete' : this.get('complete')
+      id       : this.get('_id') ? this.get('_id').toString() : null,
+      data     : this.get('data'),
+      method   : this.get('method'),
+      amount   : this.get('amount'),
+      complete : this.get('complete'),
     };
   }
 }

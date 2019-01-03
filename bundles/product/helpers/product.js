@@ -3,7 +3,7 @@
  */
 
 // use strict
-'use strict';
+
 
 // require dependencies
 const config = require('config');
@@ -16,13 +16,13 @@ class ProductHelper extends Helper {
   /**
    * construct product helper
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
     // bind methods
-    this.order    = this.order.bind(this);
-    this.product  = this.product.bind(this);
+    this.order = this.order.bind(this);
+    this.product = this.product.bind(this);
     this.complete = this.complete.bind(this);
     this.quantity = this.quantity.bind(this);
     this.products = this.products.bind(this);
@@ -35,38 +35,6 @@ class ProductHelper extends Helper {
   }
 
   /**
-   * order product quantity
-   *
-   * @param  {product}  Product
-   * @param  {Integer}  quantity
-   *
-   * @return {Promise}
-   */
-  async order (product, quantity) {
-    // throw error
-    if (!await this.quantity(product, quantity)) throw new Error('product.notenough');
-
-    // set pending and sold
-    product.set('selling', (product.get('selling') || 0) + quantity);
-
-    // save product
-    product.save();
-
-    // set order
-    let ordering = {
-      'total'    : parseFloat(product.get('pricing.price')) * quantity,
-      'product'  : product,
-      'quantity' : quantity
-    };
-
-    // add to total
-    await this.eden.hook('product.order', ordering);
-
-    // return total
-    return ordering.total;
-  }
-
-  /**
    * gets product price for model
    *
    * @param  {Product} product
@@ -74,12 +42,12 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  price (product, opts) {
+  price(product, opts) {
     // get type
-    let type = product.get('type') || 'simple';
+    const type = product.get('type') || 'simple';
 
     // get product type
-    let registered = this.__products.find((p) => p.type === type);
+    const registered = this.__products.find(p => p.type === type);
 
     // await price
     return registered.price(product, opts);
@@ -94,12 +62,12 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  order (product, line, req) {
+  order(product, line, req) {
     // get type
-    let type = product.get('type') || 'simple';
+    const type = product.get('type') || 'simple';
 
     // get product type
-    let registered = this.__products.find((p) => p.type === type);
+    const registered = this.__products.find(p => p.type === type);
 
     // await price
     return registered.order(product, line, req);
@@ -114,12 +82,12 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  complete (product, line, order) {
+  complete(product, line, order) {
     // get type
-    let type = product.get('type') || 'simple';
+    const type = product.get('type') || 'simple';
 
     // get product type
-    let registered = this.__products.find((p) => p.type === type);
+    const registered = this.__products.find(p => p.type === type);
 
     // await price
     return registered.complete(product, line, order);
@@ -133,7 +101,7 @@ class ProductHelper extends Helper {
    *
    * @return {Boolean}
    */
-  async quantity (product, quantity) {
+  async quantity(product, quantity) {
     // await hook
     await this.eden.hook('product.quantity', product, quantity);
 
@@ -155,26 +123,26 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  product (type, opts, price, order, complete) {
+  product(type, opts, price, order, complete) {
     // check found
-    let found = this.__products.find((product) => product.type === type);
+    const found = this.__products.find(product => product.type === type);
 
     // push block
     if (!found) {
       // check found
       this.__products.push({
-        'type'     : type,
-        'opts'     : opts,
-        'price'    : price,
-        'order'    : order,
-        'complete' : complete
+        type,
+        opts,
+        price,
+        order,
+        complete,
       });
     } else {
       // set on found
-      found.type     = type;
-      found.opts     = opts;
-      found.price    = price;
-      found.order    = order;
+      found.type = type;
+      found.opts = opts;
+      found.price = price;
+      found.order = order;
       found.complete = complete;
     }
   }
@@ -184,7 +152,7 @@ class ProductHelper extends Helper {
    *
    * @return {Array}
    */
-  products () {
+  products() {
     // returns blocks
     return this.__products;
   }
@@ -196,10 +164,10 @@ class ProductHelper extends Helper {
    * @param  {string}   message
    * @param  {Boolean}  success
    */
-  _log (product, message, success) {
+  _log(product, message, success) {
     // log with log function
-    this.logger.log((success ? 'info' : 'error'), ' [' + colors.green(product.get('title.' + config.get('i18n.fallbackLng'))) + '] ' + message, {
-      'class' : 'product'
+    this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
+      class : 'product',
     });
   }
 }

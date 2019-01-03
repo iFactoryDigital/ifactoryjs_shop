@@ -23,7 +23,7 @@ class CartController extends Controller {
   /**
    * construct user cart controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
@@ -40,7 +40,7 @@ class CartController extends Controller {
   /**
    * builds cart controller
    */
-  build () {
+  build() {
     // use settings middleware
     this.eden.router.use(this._middleware);
 
@@ -56,14 +56,14 @@ class CartController extends Controller {
     // add cart endpoint
     this.eden.endpoint('cart', async (session, user) => {
       // return found or new cart
-      let cart = await Cart.or({
-        'sessionID' : session
+      const cart = await Cart.or({
+        sessionID : session,
       },
       {
-        'user.id' : user && user.get('_id') ? user.get('_id').toString() : 'false'
+        'user.id' : user && user.get('_id') ? user.get('_id').toString() : 'false',
       }).findOne() || new Cart({
-        'user'      : user,
-        'sessionID' : session
+        user,
+        sessionID : session,
       });
 
       // save cart
@@ -77,60 +77,37 @@ class CartController extends Controller {
     this.eden.post('order.complete', async (order) => {
       // get cart lines
       let cart = await order.get('cart');
-      let user = await order.get('user');
+      const user = await order.get('user');
 
       // remove cart
       if (cart) await cart.remove();
 
       // create new cart
       cart = new Cart({
-        'user'      : await order.get('user'),
-        'sessionID' : order.get('meta.session')
+        user      : await order.get('user'),
+        sessionID : order.get('meta.session'),
       });
 
       // save cart
       await cart.save();
 
       // emit to user/socket
-      socket[user ? 'user' : 'session'](user ? user : order.get('meta.session'), 'cart', await cart.sanitise());
+      socket[user ? 'user' : 'session'](user || order.get('meta.session'), 'cart', await cart.sanitise());
     });
 
     // register simple block
     BlockHelper.block('cart.dropdown', {
-      'for'         : ['frontend'],
-      'title'       : 'Cart Dropdown',
-      'description' : 'Cart Dropdown block'
+      for         : ['frontend'],
+      title       : 'Cart Dropdown',
+      description : 'Cart Dropdown block',
     }, async (req, block) => {
-      // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
-      }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
-      });
-
       // return
       return {
-        'tag'      : 'cart-dropdown',
-        'class'    : blockModel.get('class') || null,
-        'dropdown' : blockModel.get('dropdown') || null
+        tag      : 'cart-dropdown',
+        class    : block.class || null,
+        dropdown : block.dropdown || null,
       };
-    }, async (req, block) => {
-      // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
-      }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
-      });
-
-      // set data
-      blockModel.set('class',    req.body.data.class);
-      blockModel.set('dropdown', req.body.data.dropdown);
-
-      // save block
-      await blockModel.save();
-    });
+    }, async (req, block) => {});
   }
 
   /**
@@ -141,26 +118,26 @@ class CartController extends Controller {
    *
    * @route {POST} /update
    */
-  async updateCartAction (req, res) {
+  async updateCartAction(req, res) {
     // set session
-    let sessionID = req.sessionID;
+    const sessionID = req.sessionID;
 
     // load cart
-    let cart = await this.eden.call('cart', sessionID, req.user);
+    const cart = await this.eden.call('cart', sessionID, req.user);
 
     // get items
-    let products = [];
+    const products = [];
 
     // set lines
-    let lines = [];
+    const lines = [];
 
     // loop lines
-    for (let line of (req.body.lines || [])) {
+    for (const line of (req.body.lines || [])) {
       // get product
-      let product = await Product.findById(line.product);
+      const product = await Product.findById(line.product);
 
       // set extra data
-      req.line  = line;
+      req.line = line;
       req.lines = lines;
 
       // run try/catch
@@ -179,21 +156,21 @@ class CartController extends Controller {
       lines.push(line);
 
       // check push product
-      if (!products.find((p) => p.get('_id').toString() !== product.get('_id').toString())) {
+      if (!products.find(p => p.get('_id').toString() !== product.get('_id').toString())) {
         // push product
         products.push(product);
       }
     }
 
     // set products
-    cart.set('lines',    lines);
+    cart.set('lines', lines);
     cart.set('products', products);
 
     // save cart
     await cart.save();
 
     // get sanitised
-    let sanitised = await cart.sanitise();
+    const sanitised = await cart.sanitise();
 
     // set id
     sanitised.id = req.body.id;
@@ -206,7 +183,7 @@ class CartController extends Controller {
 
     // return JSON
     res.json({
-      'success' : true
+      success : true,
     });
   }
 
@@ -217,9 +194,9 @@ class CartController extends Controller {
    * @param {Response} res
    * @param {Function} next
    */
-  async _middleware (req, res, next) {
+  async _middleware(req, res, next) {
     // load cart
-    let cart = await this.eden.call('cart', req.sessionID, req.user);
+    const cart = await this.eden.call('cart', req.sessionID, req.user);
 
     // add to user
     res.locals.cart = await cart.sanitise();

@@ -25,7 +25,7 @@ class CheckoutController extends Controller {
   /**
    * construct user checkout controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
@@ -36,54 +36,54 @@ class CheckoutController extends Controller {
     this.eden.pre('checkout.init', this._checkout);
 
     // order hooks
-    this.eden.pre('order.init',  this._order);
+    this.eden.pre('order.init', this._order);
     this.eden.pre('order.guest', this._guest);
 
     // Set types
-    let types = ['payment', 'summary'];
+    const types = ['payment', 'summary'];
 
     // loop block types
     types.forEach((type) => {
       // get uppercase
-      let upper = type.charAt(0).toUpperCase() + type.slice(1);
+      const upper = type.charAt(0).toUpperCase() + type.slice(1);
 
       // register simple block
-      BlockHelper.block('checkout.' + type, {
-        'for'         : ['frontend'],
-        'title'       : 'Checkout ' + upper + ' Block',
-        'description' : 'Checkout ' + upper + ' Block'
+      BlockHelper.block(`checkout.${type}`, {
+        for         : ['frontend'],
+        title       : `Checkout ${upper} Block`,
+        description : `Checkout ${upper} Block`,
       }, async (req, block) => {
         // get notes block from db
-        let blockModel = await Block.findOne({
-          'uuid' : block.uuid
+        const blockModel = await Block.findOne({
+          uuid : block.uuid,
         }) || new Block({
-          'uuid' : block.uuid,
-          'type' : block.type
+          uuid : block.uuid,
+          type : block.type,
         });
 
         // set locals
         req.checkout = req.checkout || {};
 
         // get order
-        let order = req.checkout.order || await this._getOrder(req);
+        const order = req.checkout.order || await this._getOrder(req);
 
         // set order
         req.checkout.order = order;
 
         // return
         return {
-          'tag'   : 'checkout-' + type,
-          'class' : blockModel.get('class') || null,
-          'block' : blockModel.get('block') || null,
-          'order' : order
+          tag   : `checkout-${type}`,
+          class : blockModel.get('class') || null,
+          block : blockModel.get('block') || null,
+          order,
         };
       }, async (req, block) => {
         // get notes block from db
-        let blockModel = await Block.findOne({
-          'uuid' : block.uuid
+        const blockModel = await Block.findOne({
+          uuid : block.uuid,
         }) || new Block({
-          'uuid' : block.uuid,
-          'type' : block.type
+          uuid : block.uuid,
+          type : block.type,
         });
 
         // set data
@@ -107,14 +107,14 @@ class CheckoutController extends Controller {
    * @title Cart
    * @route {get} /
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // get order
-    let sanitisedOrder = await this._getOrder(req);
+    const sanitisedOrder = await this._getOrder(req);
 
     // render grid
     res.render('checkout', {
-      'order'  : sanitisedOrder,
-      'layout' : 'product'
+      order  : sanitisedOrder,
+      layout : 'product',
     });
   }
 
@@ -130,7 +130,7 @@ class CheckoutController extends Controller {
    * @route  {get} /:id
    * @layout no-user
    */
-  async continueAction (req, res, next) {
+  async continueAction(req, res, next) {
     // let order
     let order = null;
 
@@ -145,9 +145,9 @@ class CheckoutController extends Controller {
 
     // set order meta
     order.set('meta', {
-      'cookies'   : req.cookie || req.cookies,
-      'session'   : req.sessionID,
-      'continued' : new Date()
+      cookies   : req.cookie || req.cookies,
+      session   : req.sessionID,
+      continued : new Date(),
     });
 
     // create order
@@ -156,14 +156,14 @@ class CheckoutController extends Controller {
     // get products
     order.set('products', (await Promise.all((order.get('lines') || []).map(async (line) => {
       // return found product
-      let product = await Product.findById(line.product);
+      const product = await Product.findById(line.product);
 
       // check products
       if (!product) return null;
 
       // sanitise
       return product;
-    }))).filter((product) => product));
+    }))).filter(product => product));
 
     // create order
     await this.eden.hook('checkout.products', order);
@@ -178,14 +178,14 @@ class CheckoutController extends Controller {
     await this.eden.hook('checkout.render', order);
 
     // sanitise order
-    let sanitisedOrder = await order.sanitise();
+    const sanitisedOrder = await order.sanitise();
 
     // create order
     await this.eden.hook('checkout.render', order, sanitisedOrder);
 
     // render grid
     res.render('checkout', {
-      'order' : sanitisedOrder
+      order : sanitisedOrder,
     });
   }
 
@@ -198,7 +198,7 @@ class CheckoutController extends Controller {
    * @route  {POST} /:id/complete
    * @return {Promise}
    */
-  async completeAction (req, res) {
+  async completeAction(req, res) {
     // let order
     let order = null;
 
@@ -210,9 +210,9 @@ class CheckoutController extends Controller {
 
     // set order meta
     order.set('meta', {
-      'cookies'   : req.cookie || req.cookies,
-      'session'   : req.sessionID,
-      'continued' : new Date()
+      cookies   : req.cookie || req.cookies,
+      session   : req.sessionID,
+      continued : new Date(),
     });
 
     // set lines
@@ -221,14 +221,14 @@ class CheckoutController extends Controller {
     // get products
     order.set('products', (await Promise.all((order.get('lines') || []).map(async (line) => {
       // return found product
-      let product = await Product.findById(line.product);
+      const product = await Product.findById(line.product);
 
       // check products
       if (!product) return null;
 
       // sanitise
       return product;
-    }))).filter((product) => product));
+    }))).filter(product => product));
 
     // create order
     await this.eden.hook('checkout.products', order);
@@ -254,7 +254,7 @@ class CheckoutController extends Controller {
    *
    * @return {Promise}
    */
-  async _guest (order, action) {
+  async _guest(order, action) {
     // check error
     if (order.get('error') || await order.get('user')) return;
 
@@ -267,23 +267,23 @@ class CheckoutController extends Controller {
     // check other details
     if (action.value.create) {
       // find user by email
-      let check = await User.findOne({
-        'email' : new RegExp(action.value.email.toString().toLowerCase(), 'i')
+      const check = await User.findOne({
+        email : new RegExp(action.value.email.toString().toLowerCase(), 'i'),
       });
 
       // set check
-      if (check) return order.set('error', 'The email "' + order.get('email') + '" already exists, please login first');
+      if (check) return order.set('error', `The email "${order.get('email')}" already exists, please login first`);
 
       // create new user
-      let user = new User({
-        'email'     : action.value.email,
-        'marketing' : action.value.marketing
+      const user = new User({
+        email     : action.value.email,
+        marketing : action.value.marketing,
       });
 
       // set password
-      let hash = crypto.createHmac('sha256', config.get('secret'))
-          .update(action.value.password)
-          .digest('hex');
+      const hash = crypto.createHmac('sha256', config.get('secret'))
+        .update(action.value.password)
+        .digest('hex');
 
       // create user
       user.set('hash', hash);
@@ -301,15 +301,15 @@ class CheckoutController extends Controller {
    *
    * @param  {order} Order
    */
-  async _order (order) {
+  async _order(order) {
     // check order
-    let actions = order.get('actions');
+    const actions = order.get('actions');
 
     // check user
     if (await order.get('user')) return;
 
     // get action
-    let action = Object.values(actions).find((action) => {
+    const action = Object.values(actions).find((action) => {
       // return address
       return action.type === 'guest';
     });
@@ -323,14 +323,14 @@ class CheckoutController extends Controller {
    *
    * @param  {Object} order
    */
-  async _checkout (order) {
+  async _checkout(order) {
     // check order
     if (!order.get('user.id')) {
       // check actions
       order.set('actions.guest', {
-        'type'     : 'guest',
-        'data'     : {},
-        'priority' : 0
+        type     : 'guest',
+        data     : {},
+        priority : 0,
       });
     }
   }
@@ -342,9 +342,9 @@ class CheckoutController extends Controller {
    *
    * @return {Promise}
    */
-  async _getOrder (req) {
+  async _getOrder(req) {
     // get cart lines
-    let cart = await this.eden.call('cart', req.sessionID, req.user);
+    const cart = await this.eden.call('cart', req.sessionID, req.user);
 
     // lock cart
     await cart.lock();
@@ -352,17 +352,17 @@ class CheckoutController extends Controller {
     // run try/catch
     try {
       // create order
-      let order = await Order.findOne({
-        'cart.id' : (cart.get('_id') || '').toString()
+      const order = await Order.findOne({
+        'cart.id' : (cart.get('_id') || '').toString(),
       }) || new Order({
-        'cart' : cart,
-        'user' : req.user,
-        'meta' : {
-          'started' : new Date(),
-          'cookies' : req.cookie || req.cookies,
-          'session' : req.sessionID
+        cart,
+        user : req.user,
+        meta : {
+          started : new Date(),
+          cookies : req.cookie || req.cookies,
+          session : req.sessionID,
         },
-        'actions' : {}
+        actions : {},
       });
 
       // set cart lines
@@ -378,7 +378,7 @@ class CheckoutController extends Controller {
       order.set('products', (await Promise.all((cart.get('lines') || []).map(async (line) => {
         // return found product
         return await Product.findById(line.product);
-      }))).filter((product) => product));
+      }))).filter(product => product));
 
       // create order
       await this.eden.hook('checkout.products', order);
@@ -393,7 +393,7 @@ class CheckoutController extends Controller {
       await this.eden.hook('checkout.render', order);
 
       // sanitise order
-      let sanitisedOrder = await order.sanitise();
+      const sanitisedOrder = await order.sanitise();
 
       // create order
       await this.eden.hook('checkout.render', order, sanitisedOrder);

@@ -107,7 +107,7 @@ class ProductController extends Controller {
     }, async (req, block) => {
       // return
       return {
-        tag : 'product-filter'
+        tag : 'product-filter',
       };
     }, async (req, block) => { });
   }
@@ -165,14 +165,14 @@ class ProductController extends Controller {
         '@context' : 'http://schema.org/',
         '@type'    : 'Product',
 
-        'name'        : product.get(`title.${req.language}`),
-        'image'       : image ? await image.url('md-sq') : null,
-        'description' : product.get(`short.${req.language}`),
+        name        : product.get(`title.${req.language}`),
+        image       : image ? await image.url('md-sq') : null,
+        description : product.get(`short.${req.language}`),
 
-        'offers' : {
+        offers : {
           '@type'         : 'Offer',
-          'price'         : parseFloat(sanitised.price).toFixed(2),
-          'priceCurrency' : config.get('shop.currency') || 'USD',
+          price         : parseFloat(sanitised.price).toFixed(2),
+          priceCurrency : config.get('shop.currency') || 'USD',
         },
       }),
       '</script>',

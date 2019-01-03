@@ -3,7 +3,6 @@
 const Events = require('events');
 
 // require local dependencies
-const store  = require('default/public/js/store');
 const socket = require('socket/public/js/bootstrap');
 
 /**
@@ -13,17 +12,17 @@ class OrderStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor (order) {
+  constructor(order) {
     // set observable
     super();
 
     // bind variables
-    this.lines    = [];
+    this.lines = [];
     this.products = [];
 
     // bind methods
-    this.build  = this.build.bind(this);
-    this.total  = this.total.bind(this);
+    this.build = this.build.bind(this);
+    this.total = this.total.bind(this);
     this.update = this.update.bind(this);
 
     // bind private methods
@@ -36,7 +35,7 @@ class OrderStore extends Events {
   /**
    * build cart
    */
-  build (order) {
+  build(order) {
     // bind variables
     this._order(order, true);
 
@@ -50,7 +49,7 @@ class OrderStore extends Events {
     });
 
     // listen to room
-    socket.on('order.' + this.id, this._order);
+    socket.on(`order.${this.id}`, this._order);
   }
 
   /**
@@ -58,7 +57,7 @@ class OrderStore extends Events {
    *
    * @return {Integer}
    */
-  total () {
+  total() {
     // loop for total
     let total = this.count() < 2 ? 2 : 0;
 
@@ -67,9 +66,9 @@ class OrderStore extends Events {
       // add value
       total += (this.products.find((product) => {
         // return found product
-        return product.id === line.product
+        return product.id === line.product;
       }) || {
-        'price' : 0
+        price : 0,
       }).price * line.qty;
     });
 
@@ -80,9 +79,9 @@ class OrderStore extends Events {
   /**
    * returns item count in cart
    */
-  count () {
+  count() {
     // set quantities
-    let quantities = this.lines.map((line) => line.qty);
+    const quantities = this.lines.map(line => line.qty);
 
     // push 0 for non empty Array
     quantities.push(0);
@@ -97,7 +96,7 @@ class OrderStore extends Events {
   /**
    * update cart function
    */
-  update () {
+  update() {
     // trigger update
     this.emit('update');
   }
@@ -108,12 +107,12 @@ class OrderStore extends Events {
    * @param  {Object}  order
    * @param  {Boolean} prevent
    */
-  _order (order, prevent) {
+  _order(order, prevent) {
     // check Object
     order = order || {};
 
     // loop for keys
-    for (let key in order) {
+    for (const key in order) {
       // set key
       this[key] = order[key];
     }

@@ -3,11 +3,11 @@
  */
 
 // use strict
-'use strict';
+
 
 // require dependencies
-const is     = require('is-type');
-const socket = require('socket');
+const config = require('config');
+const colors = require('colors');
 const Helper = require('helper');
 
 // require models
@@ -25,9 +25,9 @@ class PaymentHelper extends Helper {
   /**
    * construct payment helper
    */
-  constructor () {
+  constructor() {
     // run super
-    super ();
+    super();
 
     // bind methods
     this.payment = this.payment.bind(this);
@@ -46,34 +46,34 @@ class PaymentHelper extends Helper {
    * @return  {Promise}
    * @resolve {invoice}
    */
-  async invoice (order) {
+  async invoice(order) {
     // get lines
-    let lines = order.get('lines');
+    const lines = order.get('lines');
 
     // create new invoice
-    let invoice = new Invoice({
-      'user'  : await order.get('user'),
-      'order' : order,
-      'total' : (await Promise.all(lines.map(async (line) => {
+    const invoice = new Invoice({
+      user  : await order.get('user'),
+      order,
+      total : (await Promise.all(lines.map(async (line) => {
         // get product
-        let product = await Product.findById(line.product);
+        const product = await Product.findById(line.product);
 
         // get price
-        let price = await ProductHelper.price(product, line.opts || {});
+        const price = await ProductHelper.price(product, line.opts || {});
 
         // return value
-        let amount = parseFloat(price.amount) * parseInt(line.qty || 1);
+        const amount = parseFloat(price.amount) * parseInt(line.qty || 1);
 
         // hook
         await this.eden.hook('line.price', {
-          'qty'  : line.qty,
-          'user' : await order.get('user'),
-          'opts' : line.opts,
+          qty  : line.qty,
+          user : await order.get('user'),
+          opts : line.opts,
 
           order,
           price,
           amount,
-          product
+          product,
         });
 
         // set price
@@ -83,7 +83,7 @@ class PaymentHelper extends Helper {
         // return price
         return price.amount * parseInt(line.qty || 1);
       }))).reduce((total, x) => total += x, 0),
-      'lines' : order.get('lines')
+      lines : order.get('lines'),
     });
 
     // get lines
@@ -112,18 +112,18 @@ class PaymentHelper extends Helper {
    *
    * @return {Promise}
    */
-  async payment (invoice, method) {
+  async payment(invoice, method) {
     // get total
-    let total = parseFloat(invoice.get('total'));
+    const total = parseFloat(invoice.get('total'));
 
     // do payment
-    let payment = new Payment({
-      'user'     : await invoice.get('user'),
-      'rate'     : invoice.get('rate') || 1,
-      'amount'   : total,
-      'invoice'  : invoice,
-      'currency' : invoice.get('currency') || config.get('shop.currency') || 'USD',
-      'complete' : false
+    const payment = new Payment({
+      user     : await invoice.get('user'),
+      rate     : invoice.get('rate') || 1,
+      amount   : total,
+      invoice,
+      currency : invoice.get('currency') || config.get('shop.currency') || 'USD',
+      complete : false,
     });
 
     // save payment
@@ -153,10 +153,10 @@ class PaymentHelper extends Helper {
    * @param  {string}   message
    * @param  {Boolean}  success
    */
-  _log (user, way, message, success) {
+  _log(user, way, message, success) {
     // log with log function
-    this.logger.log((success ? 'info' : 'error'), ' [' + colors.green(user.get('username')) + '] ' + message, {
-      'class' : 'payment'
+    this.logger.log((success ? 'info' : 'error'), ` [${colors.green(user.get('username'))}] ${message}`, {
+      class : 'payment',
     });
   }
 }
