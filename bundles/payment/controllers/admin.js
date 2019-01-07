@@ -299,11 +299,11 @@ class AdminPaymentController extends Controller {
       format : async (col, row) => {
         return col ? `$${col.toFixed(2)} ${row.get('currency')}` : '<i>N/A</i>';
       },
-    }).column('pending', {
+    }).column('status', {
       sort   : true,
-      title  : 'Pending',
+      title  : 'Status',
       format : async (col, row) => {
-        return row.get('complete') ? 'false' : 'true';
+        return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
     })
       .column('updated_at', {

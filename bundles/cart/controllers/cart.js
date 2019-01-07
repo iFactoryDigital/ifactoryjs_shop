@@ -1,13 +1,10 @@
 
 // bind dependencies
-const alert      = require('alert');
-const config     = require('config');
 const socket     = require('socket');
 const Controller = require('controller');
 
 // require models
 const Cart    = model('cart');
-const Block   = model('block');
 const Product = model('product');
 
 // require helpers

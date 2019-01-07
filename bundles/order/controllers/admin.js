@@ -1,8 +1,6 @@
 
 // bind dependencies
 const Grid        = require('grid');
-const alert       = require('alert');
-const crypto      = require('crypto');
 const formatter   = require('currency-formatter');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
@@ -344,7 +342,7 @@ class AdminOrderController extends Controller {
       .column('status', {
         sort   : true,
         title  : 'Status',
-        format : async (col, row) => {
+        format : (col) => {
           return !col ? 'Pending' : col;
         },
       })
