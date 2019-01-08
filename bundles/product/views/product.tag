@@ -3,14 +3,14 @@
     <div class="row product-top mb-4">
       <div class="col-md-4 product-media" if={ this.thumbnail }>
         <div class="card card-product-image mb-3">
-          <a class="card-body" href={ this.media.url (this.thumbnail) } target="_blank">
-            <img class="img-responsive" itemprop="image" src={ this.media.url (this.thumbnail, 'md-sq') } alt={ title () }>
+          <a class="card-body" href={ this.media.url(this.thumbnail) } target="_blank">
+            <img class="img-responsive" itemprop="image" src={ this.media.url(this.thumbnail, 'md-sq') } alt={ title() }>
           </a>
         </div>
         <div class="row row-img-gallery mb-3">
           <a each={ image, i in opts.product.images } href="#!" class="col-4 mb-2" onclick={ onImage }>
             <div class="card py-2 px-2">
-              <img class="img-fluid" src={ this.media.url (image, 'sm-sq') } alt={ title () }>
+              <img class="img-fluid" src={ this.media.url(image, 'sm-sq') } alt={ title() }>
             </div>
           </a>
         </div>
@@ -71,11 +71,11 @@
 
   <script>
     // load mixins
-    this.mixin ('i18n');
-    this.mixin ('media');
+    this.mixin('i18n');
+    this.mixin('media');
 
     // set variables
-    this.language  = this.i18n.lang ();
+    this.language  = this.i18n.lang();
     this.thumbnail = opts.product.images && opts.product.images.length ? opts.product.images[0] : null;
 
     /**
@@ -85,13 +85,13 @@
      */
     onImage (e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // set image
       this.thumbnail = e.item.image;
 
       // update view
-      this.update ();
+      this.update();
     }
 
     /**
@@ -107,9 +107,9 @@
     /**
      * on language update function
      */
-    this.on ('update', () => {
+    this.on('update', () => {
       // set language
-      this.language = this.i18n.lang ();
+      this.language = this.i18n.lang();
     });
 
   </script>

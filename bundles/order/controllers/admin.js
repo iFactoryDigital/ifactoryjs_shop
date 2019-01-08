@@ -283,7 +283,7 @@ class AdminOrderController extends Controller {
    */
   _grid(req) {
     // create new grid
-    const orderGrid = new Grid();
+    const orderGrid = new Grid(req);
 
     // set route
     orderGrid.route('/admin/order/grid');
@@ -297,57 +297,74 @@ class AdminOrderController extends Controller {
       format : async (col) => {
         return col ? col.toString() : '<i>N/A</i>';
       },
-    }).column('user', {
-      sort   : true,
-      title  : 'User',
-      format : async (col, row) => {
-        // get user
-        const user = await row.get('user');
-
-        // return user name
-        return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : 'Anonymous';
-      },
-    }).column('lines', {
-      sort   : true,
-      title  : 'Lines',
-      format : async (col, row) => {
-        // get invoice
-        const lines = await row.get('lines');
-
-        // get products
-        return (await Promise.all(lines.map(async (line) => {
-          // get product
-          const product = await Product.findById(line.product);
-
-          // return value
-          return `${line.qty || 1}x <a href="/admin/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
-        }))).join(', ');
-      },
-    }).column('total', {
-      sort   : true,
-      title  : 'Total',
-      format : async (col, row) => {
-        // get invoice
-        const invoice = await row.get('invoice');
-
-        // check invoice
-        if (!invoice || !invoice.get('total')) return '<i>N/A</i>';
-
-        // return invoice total
-        return formatter.format(invoice.get('total'), {
-          code : invoice.get('currency') || config.get('shop.currency') || 'USD',
-        });
-      },
     })
+      .column('user', {
+        sort   : true,
+        title  : 'User',
+        format : async (col, row) => {
+          // get user
+          const user = await row.get('user');
+
+          // return user name
+          return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : 'Anonymous';
+        },
+      })
+      .column('lines', {
+        sort   : true,
+        title  : 'Lines',
+        format : async (col, row) => {
+          // get invoice
+          const lines = await row.get('lines');
+
+          // get products
+          return (await Promise.all(lines.map(async (line) => {
+            // get product
+            const product = await Product.findById(line.product);
+
+            // return value
+            return `${line.qty || 1}x <a href="/admin/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
+          }))).join(', ');
+        },
+      })
+      .column('total', {
+        sort   : true,
+        title  : 'Total',
+        format : async (col, row) => {
+          // get invoice
+          const invoice = await row.get('invoice');
+
+          // check invoice
+          if (!invoice || !invoice.get('total')) return '<i>N/A</i>';
+
+          // return invoice total
+          return formatter.format(invoice.get('total'), {
+            code : invoice.get('currency') || config.get('shop.currency') || 'USD',
+          });
+        },
+      })
       .column('status', {
         sort   : true,
         title  : 'Status',
         format : (col) => {
-          return !col ? 'Pending' : col;
+          return req.t(`order.status.${col || 'pending'}`);
+        },
+      })
+      .column('payments', {
+        sort   : false,
+        title  : 'Payments',
+        format : async (col, row) => {
+        // get invoice
+          const invoice  = await row.get('invoice');
+          const payments = await Payment.find({
+            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
+          });
+
+          // get paid
+          return payments.map(payment => `<a href="/admin/payment/${payment.get('_id').toString()}/update">${payment.get('_id').toString()}</a>`);
         },
       })
       .column('paid', {
-        sort   : true,
+        sort   : false,
         title  : 'Paid',
         format : async (col, row) => {
         // get invoice

@@ -1,6 +1,6 @@
 
 // Bind dependencies
-const grid        = require('grid');
+const Grid        = require('grid');
 const slug        = require('slug');
 const alert       = require('alert');
 const crypto      = require('crypto');
@@ -476,13 +476,14 @@ class AdminProductController extends Controller {
    */
   _grid(req) {
     // Create new grid
-    const productGrid = new grid();
+    const productGrid = new Grid(req);
 
     // Set route
     productGrid.route('/admin/product/grid');
 
     // Set grid model
     productGrid.model(Product);
+
 
     // Add grid columns
     productGrid.column('sku', {
@@ -491,29 +492,40 @@ class AdminProductController extends Controller {
       format : async (col, row) => {
         return col || '<i>N/A</i>';
       },
-    }).column('price', {
-      sort : (query, dir) => {
-        return query.sort('pricing.price', dir);
-      },
-      title  : 'Price',
-      format : async (col, row) => {
-        // return calculated price
-        return `$${(await ProductHelper.price(row)).amount.toFixed(2)} ${config.get('shop.currency') || 'USD'}`;
-      },
-    }).column('title', {
-      sort   : true,
-      title  : 'Title',
-      format : async (col, row) => {
-        return (col || {})[req.language] || '<i>N/A</i>';
-      },
-    }).column('categories', {
-      title  : 'Categories',
-      format : async (col, row) => {
-        return col && col.length ? col.map((category) => {
-          return `<a href="?filter[category]=${category.get(`title.${req.language}`)}" class="btn btn-sm btn-primary mr-2">${category.get(`title.${req.language}`)}</a>`;
-        }).join('') : '<i>N/A</i>';
-      },
     })
+      .column('images', {
+        sort   : false,
+        title  : 'Image',
+        format : async (col, row) => {
+          // return calculated price
+          return col && col.length ? `<a href="/admin/product/${row.get('_id').toString()}/update"><img src="${await col[0].url('sm-sq')}" class="img-fluid" style="width:80px;" /></a>` : '';
+        },
+      })
+      .column('price', {
+        sort : (query, dir) => {
+          return query.sort('pricing.price', dir);
+        },
+        title  : 'Price',
+        format : async (col, row) => {
+          // return calculated price
+          return `$${(await ProductHelper.price(row)).amount.toFixed(2)} ${config.get('shop.currency') || 'USD'}`;
+        },
+      })
+      .column('title', {
+        sort   : true,
+        title  : 'Title',
+        format : async (col, row) => {
+          return (col || {})[req.language] || '<i>N/A</i>';
+        },
+      })
+      .column('categories', {
+        title  : 'Categories',
+        format : async (col, row) => {
+          return col && col.length ? col.map((category) => {
+            return `<a href="?filter[category]=${category.get(`title.${req.language}`)}" class="btn btn-sm btn-primary mr-2">${category.get(`title.${req.language}`)}</a>`;
+          }).join('') : '<i>N/A</i>';
+        },
+      })
       .column('quantity', {
         title  : 'Quantity',
         format : async (col, row) => {
@@ -590,33 +602,36 @@ class AdminProductController extends Controller {
         // Another where
         productGrid.match('sku', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
       },
-    }).filter('title', {
-      title : 'Title',
-      type  : 'text',
-      query : async (param) => {
-        // Another where
-        productGrid.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
-      },
-    }).filter('description', {
-      title : 'Description',
-      type  : 'text',
-      query : async (param) => {
-        // Another where
-        productGrid.match('description.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
-      },
-    }).filter('category', {
-      title : 'Category',
-      type  : 'text',
-      query : async (param) => {
-        // Get categories
-        const categories = await Category.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
-
-        // Another where
-        productGrid.in('categories.id', categories.map((category) => {
-          return category.get('_id').toString();
-        }));
-      },
     })
+      .filter('title', {
+        title : 'Title',
+        type  : 'text',
+        query : async (param) => {
+          // Another where
+          productGrid.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
+        },
+      })
+      .filter('description', {
+        title : 'Description',
+        type  : 'text',
+        query : async (param) => {
+          // Another where
+          productGrid.match('description.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
+        },
+      })
+      .filter('category', {
+        title : 'Category',
+        type  : 'text',
+        query : async (param) => {
+          // Get categories
+          const categories = await Category.match('title.en-us', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
+
+          // Another where
+          productGrid.in('categories.id', categories.map((category) => {
+            return category.get('_id').toString();
+          }));
+        },
+      })
       .filter('published', {
         type    : 'select',
         title   : 'Published',

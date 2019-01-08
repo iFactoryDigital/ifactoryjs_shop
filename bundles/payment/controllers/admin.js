@@ -187,6 +187,34 @@ class AdminPaymentController extends Controller {
       payment = await Payment.findById(req.params.id);
     }
 
+    // get order
+    const order = await (await payment.get('invoice')).get('order');
+
+    // set details
+    if (!payment.get('complete') && req.body.paid === 'paid') {
+      // set details
+      payment.set('complete', true);
+      payment.set('method', {
+        type : 'manual',
+      });
+      payment.set('manual', {
+        by      : req.user,
+        updated : new Date(),
+      });
+
+      // unset data
+      payment.unset('data');
+    }
+
+    // save payment
+    await payment.save();
+
+    // run hook
+    order.set('state', 'paid');
+
+    // save order
+    await order.save();
+
     // render page
     res.render('payment/admin/update', {
       title   : create ? 'Create New' : `Update ${payment.get('_id').toString()}`,

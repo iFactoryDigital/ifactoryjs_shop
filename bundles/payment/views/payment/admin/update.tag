@@ -18,7 +18,15 @@
             <p class="mb-0">{ opts.payment.username || opts.payment.email || '' }</p>
           </div>
           <div class="card-body">
-            TODO admin payment edit
+            <div class="form-group">
+              <label>
+                Payment Status
+              </label>
+              <select class="form-control">
+                <option value="paid" selected={ opts.payment.complete }>Paid</option>
+                <option value="unpaid" selected={ !opts.payment.complete }>Unpaid</option>
+              </select>
+            </div>
           </div>
           <div class="card-footer">
             <button type="submit" class="btn btn-primary">Submit</button>
