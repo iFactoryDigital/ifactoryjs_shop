@@ -415,8 +415,8 @@ class AdminOrderController extends Controller {
 
     // add grid filters
     orderGrid.filter('username', {
-      title : 'Username',
       type  : 'text',
+      title : 'Username',
       query : async (param) => {
         // check param
         if (!param || !param.length) return;
@@ -428,8 +428,8 @@ class AdminOrderController extends Controller {
         orderGrid.in('user.id', users.map(user => user.get('_id').toString()));
       },
     }).filter('email', {
-      title : 'Email',
       type  : 'text',
+      title : 'Email',
       query : async (param) => {
         // check param
         if (!param || !param.length) return;
