@@ -377,10 +377,18 @@ class AdminOrderController extends Controller {
           return payment && payment.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
         },
       })
+      .column('actions.payment.value.type', {
+        sort   : true,
+        title  : 'Method',
+        format : (col) => {
+          // get paid
+          return col ? req.t(`${col}.title`) : '<i>N/A</i>';
+        },
+      })
       .column('updated_at', {
         sort   : true,
         title  : 'Updated',
-        format : async (col) => {
+        format : (col) => {
           return col.toLocaleDateString('en-GB', {
             day   : 'numeric',
             month : 'short',

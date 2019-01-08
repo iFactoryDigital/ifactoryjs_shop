@@ -258,9 +258,6 @@ class CheckoutController extends Controller {
     // check error
     if (order.get('error') || await order.get('user')) return;
 
-    // check address
-    if (!action.value || (typeof action.value === 'object' && (!action.value.email || !action.value.email.length))) return order.set('error', 'Order is missing address');
-
     // set email
     order.set('email', action.value.email);
 
@@ -303,7 +300,7 @@ class CheckoutController extends Controller {
    */
   async _order(order) {
     // check order
-    const actions = order.get('actions');
+    const actions = order.get('actions') || [];
 
     // check user
     if (await order.get('user')) return;

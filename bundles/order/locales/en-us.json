@@ -20,5 +20,8 @@
       "deployed"  : "Deployed",
       "deploying" : "Deploying"
     }
+  },
+  "manual" : {
+    "title" : "Manual"
   }
 }

@@ -42,6 +42,9 @@ class PaymentController extends Controller {
     // order hooks
     this.eden.pre('order.init', this._order);
     this.eden.pre('order.payment', this._payment);
+
+    // hook payment
+    this.eden.pre('payment.init', this._manual);
   }
 
   /**
@@ -83,7 +86,7 @@ class PaymentController extends Controller {
    */
   async _order(order) {
     // check order
-    const actions = order.get('actions');
+    const actions = order.get('actions') || [];
 
     // get action
     const action = Object.values(actions).find((a) => {
@@ -134,7 +137,7 @@ class PaymentController extends Controller {
       return method.type === action.value.type;
     })) {
       return order.set('error', {
-        id   : 'payment.notavailable',
+        id   : 'payment.nomethod',
         text : 'Payment method not available',
       });
     }
@@ -160,6 +163,25 @@ class PaymentController extends Controller {
 
     // return payment
     return order;
+  }
+
+  /**
+   * opts
+   *
+   * @param  {Object}  opts
+   *
+   * @return {Promise}
+   */
+  async _manual(order, action) {
+    // check action
+    if (action.type !== 'payment') return;
+
+    // return sanitised data
+    action.data.methods.push({
+      type     : 'manual',
+      data     : {},
+      priority : 1,
+    });
   }
 }
 

@@ -52,8 +52,9 @@ class PaymentHelper extends Helper {
 
     // create new invoice
     const invoice = new Invoice({
-      user  : await order.get('user'),
       order,
+
+      user  : await order.get('user'),
       total : (await Promise.all(lines.map(async (line) => {
         // get product
         const product = await Product.findById(line.product);
@@ -120,6 +121,7 @@ class PaymentHelper extends Helper {
     const payment = new Payment({
       user     : await invoice.get('user'),
       rate     : invoice.get('rate') || 1,
+      order    : await invoice.get('order'),
       amount   : total,
       invoice,
       currency : invoice.get('currency') || config.get('shop.currency') || 'USD',

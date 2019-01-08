@@ -39,7 +39,7 @@ class OrderHelper extends Helper {
     }
 
     // run actions
-    const actions = Object.values(order.get('actions')).sort((a, b) => {
+    const actions = Object.values(order.get('actions') || []).sort((a, b) => {
       // set x/y
       const x = a.priority || 0;
       const y = b.priority || 0;
