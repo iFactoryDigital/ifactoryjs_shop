@@ -180,6 +180,7 @@ class PaymentController extends Controller {
     action.data.methods.push({
       type     : 'manual',
       data     : {},
+      show     : false,
       priority : 1,
     });
   }

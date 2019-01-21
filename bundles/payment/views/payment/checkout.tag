@@ -6,7 +6,7 @@
     <!-- payment choices -->
     <div class="card-body p-0">
       <div class="list-group list-group-flush">
-        <virtual each={ method, i in opts.action.data.methods || [] }>
+        <virtual each={ method, i in methods() }>
           <li class={ 'list-group-item list-group-item-method' : true, 'list-group-item-active' : isActive(method.type) } data-is="{ method.type }-method" method={ method } val={ (action().value || {}) } on-ready={ onMethod } />
         </virtual>
       </div>
@@ -16,7 +16,7 @@
 
   <script>
     // mixin i18n
-    this.mixin ('i18n');
+    this.mixin('i18n');
 
     /**
      * return action
@@ -26,6 +26,16 @@
     action () {
       // return action
       return opts.action;
+    }
+    
+    /**
+     * return methods
+     *
+     * @return {Array}
+     */
+    methods () {
+      // return methods
+      return (opts.action.data.methods || []).filter((method) => method.show !== false);
     }
 
     /**

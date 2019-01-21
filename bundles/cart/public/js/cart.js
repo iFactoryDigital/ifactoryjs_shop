@@ -15,24 +15,24 @@ class CartStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor () {
+  constructor() {
     // set observable
-    super ();
+    super();
 
     // bind variables
-    this.lines     = [];
-    this.products  = [];
+    this.lines = [];
+    this.products = [];
     this.persisted = [];
 
     // bind methods
-    this.has      = this.has.bind(this);
-    this.line     = this.line.bind(this);
-    this.build    = this.build.bind(this);
-    this.count    = this.count.bind(this);
-    this.total    = this.total.bind(this);
-    this.update   = this.update.bind(this);
-    this.product  = this.product.bind(this);
-    this.persist  = this.persist.bind(this);
+    this.has = this.has.bind(this);
+    this.line = this.line.bind(this);
+    this.build = this.build.bind(this);
+    this.count = this.count.bind(this);
+    this.total = this.total.bind(this);
+    this.update = this.update.bind(this);
+    this.product = this.product.bind(this);
+    this.persist = this.persist.bind(this);
     this.quantity = this.quantity.bind(this);
 
     // bind private methods
@@ -45,7 +45,7 @@ class CartStore extends Events {
   /**
    * build cart
    */
-  build () {
+  build() {
     // bind variables
     this._cart(store.get('cart'), true);
 
@@ -60,14 +60,14 @@ class CartStore extends Events {
    *
    * @return {Boolean}
    */
-  has (product, opts) {
+  has(product, opts) {
     // check product
     if (!product) return false;
 
     // check if product in cart
-    return !!this.lines.find((line) => {
+    return !!this.lines.find((l) => {
       // return found
-      return JSON.stringify(opts) === JSON.stringify(line.opts) && line.product === product.id;
+      return JSON.stringify(opts) === JSON.stringify(l.opts) && l.product === product.id;
     });
   }
 
@@ -76,34 +76,36 @@ class CartStore extends Events {
    *
    * @param {Object} product
    */
-  add (product, opts) {
+  async add(product, opts) {
     // check products
-    if (!this.products.find((p) => p.id === product.id)) this.products.push(product);
+    if (!this.products.find(p => p.id === product.id)) this.products.push(product);
 
     // check quantities
-    if (!this.lines.find((line) => {
+    if (!this.lines.find((l) => {
       // return found
-      return JSON.stringify(opts) === JSON.stringify(line.opts) && line.product === product.id;
-    })) this.lines.push({
-      'qty'     : 0,
-      'opts'    : opts,
-      'product' : product.id
-    });
+      return JSON.stringify(opts) === JSON.stringify(l.opts) && l.product === product.id;
+    })) {
+      this.lines.push({
+        opts,
+        qty     : 0,
+        product : product.id,
+      });
+    }
 
     // find line
-    let Line = this.lines.find((line) => {
+    const foundLine = this.lines.find((l) => {
       // return found
-      return JSON.stringify(opts) === JSON.stringify(line.opts) && line.product === product.id;
+      return JSON.stringify(opts) === JSON.stringify(l.opts) && l.product === product.id;
     });
 
     // add to quantity
-    Line.qty++;
+    foundLine.qty++;
 
     // emit line
-    this.emit('add', Line);
+    this.emit('add', foundLine);
 
     // persist
-    this.persist();
+    await this.persist();
 
     // update
     this.update();
@@ -115,43 +117,86 @@ class CartStore extends Events {
    * @param  {Object}  product
    * @param  {Integer} quantity
    */
-  remove (line, quantity) {
+  async remove(line, quantity) {
     // check quantity
     if (!quantity) quantity = 1;
 
     // check line exists
-    if (!this.lines.find((check) => {
+    if (!this.lines.find((l) => {
       // return found
-      return JSON.stringify(line.opts) === JSON.stringify(check.opts) && line.product === check.product;
-    })) this.lines.push({
-      'qty'     : 0,
-      'product' : line.product
-    });
+      return JSON.stringify(line.opts) === JSON.stringify(l.opts) && line.product === l.product;
+    })) {
+      this.lines.push({
+        qty     : 0,
+        product : line.product,
+      });
+    }
 
     // check quantities
-    let Line = this.lines.find((check) => {
+    const foundLine = this.lines.find((l) => {
       // return found
-      return JSON.stringify(line.opts) === JSON.stringify(check.opts) && line.product === check.product;
+      return JSON.stringify(line.opts) === JSON.stringify(l.opts) && line.product === l.product;
     });
 
     // check quantity
-    Line.qty -= quantity;
+    foundLine.qty -= quantity;
 
     // emit line
-    this.emit('remove', Line);
+    this.emit('remove', foundLine);
 
     // filter line
-    this.lines = this.lines.filter((check) => {
+    this.lines = this.lines.filter((l) => {
       // return found
-      return check.qty > 0;
+      return l.qty > 0;
     });
 
-    // check if lines
-    if (!this.lines) this.lines = [];
-    if (!Array.isArray (this.lines)) this.lines = [this.lines];
+    // persist
+    await this.persist();
+
+    // update view
+    this.update();
+  }
+
+  /**
+   * updates cart quantity for product
+   *
+   * @param  {Object}  product
+   * @param  {Object}  opts
+   * @param  {Integer} quantity
+   */
+  async quantity(product, opts, quantity) {
+    // check products
+    if (!this.products.find(p => p.id === product.id)) this.products.push(product);
+
+    // check quantities
+    if (!this.lines.find((l) => {
+      // return found
+      return JSON.stringify(opts) === JSON.stringify(l.opts) && l.product === product.id;
+    })) {
+      this.lines.push({
+        opts,
+        qty     : 0,
+        product : product.id,
+      });
+    }
+
+    // find line
+    const foundLine = this.lines.find((l) => {
+      // return found
+      return JSON.stringify(opts) === JSON.stringify(l.opts) && l.product === product.id;
+    });
+
+    // check quantity
+    foundLine.qty = quantity;
+
+    // filter line
+    this.lines.filter((l) => {
+      // return found
+      return l.qty > 0;
+    });
 
     // persist
-    this.persist();
+    await this.persist();
 
     // update view
     this.update();
@@ -164,7 +209,7 @@ class CartStore extends Events {
    *
    * @return {Object}
    */
-  line (product, opts) {
+  line(product, opts) {
     // returns product line
     return this.lines.find((line) => {
       // return found
@@ -179,7 +224,7 @@ class CartStore extends Events {
    *
    * @return {Object}
    */
-  product (line) {
+  product(line) {
     // returns product by line
     return this.products.find((product) => {
       // return found
@@ -188,51 +233,11 @@ class CartStore extends Events {
   }
 
   /**
-   * updates cart quantity for product
-   *
-   * @param  {Object}  product
-   * @param  {Integer} quantity
-   */
-  quantity (line, quantity) {
-    // check quantity
-    if (!quantity) quantity = 1;
-
-    // check line exists
-    if (!this.lines.find((check) => {
-      // return found
-      return JSON.stringify(line.opts) === JSON.stringify(check.opts) && line.product === check.product;
-    })) this.lines.push({
-      'qty'     : 0,
-      'opts'    : line.opts,
-      'product' : line.product
-    });
-
-    // check quantity
-    Line.qty = quantity;
-
-    // filter line
-    this.lines.filter((line) => {
-      // return found
-      return Line.qty > 0;
-    });
-
-    // check if lines
-    if (!this.lines) this.lines = [];
-    if (!Array.isArray(this.lines)) this.lines = [this.lines];
-
-    // persist
-    this.persist();
-
-    // update view
-    this.update();
-  }
-
-  /**
    * returns total
    *
    * @return {Integer}
    */
-  total () {
+  total() {
     // loop for total
     let total = this.count() < 2 ? 2 : 0;
 
@@ -249,9 +254,9 @@ class CartStore extends Events {
   /**
    * returns item count in cart
    */
-  count () {
+  count() {
     // set quantities
-    let quantities = this.lines.map((line) => line.qty);
+    const quantities = this.lines.map(line => line.qty);
 
     // push 0 for non empty Array
     quantities.push(0);
@@ -270,9 +275,9 @@ class CartStore extends Events {
    * @param  {Object} payment
    * @param  {Object} address
    */
-  async order (lines, payment, address) {
+  async order(lines, payment, address) {
     // socket call
-    let order = await socket.call('order.create', lines, payment, address);
+    const order = await socket.call('order.create', lines, payment, address);
 
     // check error
     if (order.error) return;
@@ -292,14 +297,14 @@ class CartStore extends Events {
     // redirect
     if (order.id) {
       // go to order page
-      return window.eden.router.go('/order/' + order.id);
+      return window.eden.router.go(`/order/${order.id}`);
     }
   }
 
   /**
    * update cart function
    */
-  update () {
+  update() {
     // trigger update
     this.emit('update');
   }
@@ -307,25 +312,25 @@ class CartStore extends Events {
   /**
    * persists to backend
    */
-  async persist () {
+  async persist() {
     // create persist id
-    let id = uuid();
+    const id = uuid();
 
     // log data
-    let res = await fetch('/cart/update', {
-      'body' : JSON.stringify({
-        'id'    : id,
-        'lines' : this.lines
+    const res = await fetch('/cart/update', {
+      body : JSON.stringify({
+        id,
+        lines : this.lines,
       }),
-      'method'  : 'post',
-      'headers' : {
-        'Content-Type': 'application/json'
+      method  : 'post',
+      headers : {
+        'Content-Type' : 'application/json',
       },
-      'credentials' : 'same-origin'
+      credentials : 'same-origin',
     });
 
     // load json
-    let data = await res.json();
+    const data = await res.json();
 
     // return data
     return data;
@@ -337,7 +342,7 @@ class CartStore extends Events {
    * @param  {Object}  cart
    * @param  {Boolean} prevent
    */
-  _cart (cart, prevent) {
+  _cart(cart, prevent) {
     // check Object
     cart = cart || {};
 
@@ -345,7 +350,7 @@ class CartStore extends Events {
     if (cart.id && this.persisted.includes(cart.id)) return;
 
     // loop for keys
-    for (let key in cart) {
+    for (const key in cart) {
       // check key
       if (!['lines', 'products'].includes(key)) continue;
 
