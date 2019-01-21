@@ -190,9 +190,9 @@ class CartStore extends Events {
     foundLine.qty = quantity;
 
     // filter line
-    this.lines.filter((l) => {
+    this.lines = this.lines.filter((l) => {
       // return found
-      return l.qty > 0;
+      return parseInt(l.qty || 0, 10) > 0;
     });
 
     // persist
