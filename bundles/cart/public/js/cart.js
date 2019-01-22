@@ -371,4 +371,14 @@ class CartStore extends Events {
  *
  * @return {media}
  */
-exports = module.exports = new CartStore();
+const builtStore = new CartStore();
+
+/**
+ * set built store
+ */
+store.set('cart', builtStore);
+
+/**
+ * export built store
+ */
+exports = module.exports = builtStore;

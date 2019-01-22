@@ -170,7 +170,7 @@ class AdminProductController extends Controller {
       if (data.type !== 'simple') return;
 
       // Set pricing
-      data.availability.quantity = parseInt(data.availability.quantity);
+      data.availability.quantity = parseInt(data.availability.quantity, 10);
     });
 
     // Register product types

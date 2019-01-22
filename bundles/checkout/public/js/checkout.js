@@ -3,6 +3,7 @@
 const Events = require('events');
 
 // require local dependencies
+const store        = require('default/public/js/store');
 const socket       = require('socket/public/js/bootstrap');
 const CartStore    = require('cart/public/js/cart');
 const ProductStore = require('product/public/js/product');
@@ -193,4 +194,14 @@ class CheckoutStore extends Events {
  *
  * @return {CheckoutStore}
  */
-exports = module.exports = new CheckoutStore();
+const builtStore = new CheckoutStore();
+
+/**
+ * set built store
+ */
+store.set('checkout', builtStore);
+
+/**
+* export built store
+*/
+exports = module.exports = builtStore;

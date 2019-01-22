@@ -208,6 +208,9 @@ class CheckoutController extends Controller {
       order = await Order.findById(req.params.id);
     } catch (e) {}
 
+    // unset error
+    order.unset('error');
+
     // set order meta
     order.set('meta', {
       cookies   : req.cookie || req.cookies,

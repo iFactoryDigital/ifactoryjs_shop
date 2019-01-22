@@ -27,7 +27,7 @@
       // return action
       return opts.action;
     }
-    
+
     /**
      * return methods
      *
@@ -48,7 +48,7 @@
       opts.action.value = method;
 
       // update checkout
-      opts.checkout.update ();
+      opts.checkout.update();
     }
 
     /**

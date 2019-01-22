@@ -1,19 +1,19 @@
 <checkout-payment>
-  <div class="card card-loading" if={ this.checkout.loading }>
+  <div class="card card-loading" show={ this.checkout.loading }>
     <div class="card-body text-center display-3 py-5">
       <i class="fa fa-spinner fa-spin" />
     </div>
   </div>
-  <div data-is="checkout-guest" if={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />
-  <virtual if={ !this.checkout.loading } each={ action, key in this.checkout.getActions() }>
-    <div data-is="{ action.type }-checkout" action={ action } checkout={ this.checkout } />
+  <div data-is="checkout-guest" show={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />
+  <virtual each={ action, key in this.checkout.getActions() }>
+    <div hide={ this.checkout.loading } data-is="{ action.type }-checkout" if={ action.show !== false } action={ action } checkout={ this.checkout } />
   </virtual>
 
   <div class="my-3">
     By Checking out you agree to our <a href="/terms" target="_blank">Terms & Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> agreements
   </div>
 
-  <a if={ !this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-lg btn-success mt-4' : true, 'disabled' : !this.hasCheckout() } disabled={ !hasCheckout() }>
+  <a show={ !this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-lg btn-success mt-4' : true, 'disabled' : !this.hasCheckout() } disabled={ !hasCheckout() }>
     { this.t('checkout.complete') }
   </a>
 
