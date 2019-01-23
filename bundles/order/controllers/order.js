@@ -11,6 +11,7 @@ const Product = model('product');
 // require helpers
 const GridHelper    = helper('grid');
 const OrderHelper   = helper('order');
+const EmailHelper   = helper('email');
 const ModelHelper   = helper('model');
 const ProductHelper = helper('product');
 
@@ -194,7 +195,20 @@ class OrderController extends Controller {
         id    : orderStatus.get('_id').toString(),
         model : 'order',
       }, true);
+
+      // complete order
       this.eden.hook('order.complete', orderStatus);
+
+      // get address
+      const address = orderStatus.get('address.email') || (await orderStatus.get('address') ? (await orderStatus.get('address')).get('email') : null) || (await orderStatus.get('user')).get('email');
+
+      // send email
+      if (address) {
+        // email
+        await EmailHelper.send(address, 'order', {
+          order : await orderStatus.sanitise(),
+        });
+      }
 
       // loop items
       for (const item of (orderStatus.get('lines') || [])) {

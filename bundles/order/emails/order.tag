@@ -1,238 +1,132 @@
 <order-email>
-  <table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" data-module="module16" data-thumb="" style="background-color: #eeeeee;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-bgcolor="Body bgcolor" class="">
-    <tbody>
-      <tr>
-        <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-          <table border="0" align="center" width="100%" bgcolor="#000000" style="background-color: #ffffff;width: 100%;max-width: 800px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
-            <tbody>
-              <tr>
-                <td height="25" style="font-size: 5px;line-height: 5px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </td>
-              </tr>
-              <tr>
-                <!-- ======= logo ======= -->
-                <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                  <a href="https://weeb.shop/" target="_blank" style="display: block;border-style: none !important;border: 0 !important;color: #a5ac07;text-decoration: none;" class="editable_img"><img editable="true" mc:edit="logo" width="200" border="0" style="display: block; width:300px" src="https://weeb.shop/public/assets/images/logo.svg" alt="Intellistocks"></a>
-                </td>
-              </tr>
-              <tr>
-                <td height="25" style="font-size: 5px;line-height: 5px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-              </tr>
-              <!--<tr>-->
-              <!--<td height="1" style="font-size: 1px; line-height: 1px; background-color:#2898d5">&nbsp;</td>-->
-              <!--</tr>-->
-            </tbody>
+  <table class="body-wrap" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #f6f6f6; margin: 0;" bgcolor="#f6f6f6">
+    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+      <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+      <td class="container" width="600" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;" valign="top">
+        <div class="content" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+          <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px solid #e9e9e9;" bgcolor="#fff">
+            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+              <td class="content-wrap aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 20px;" align="center" valign="top">
+                <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                  <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                      <h1 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 32px; color: #000; line-height: 1.2em; font-weight: 500; text-align: center; margin: 40px 0 0;" align="center">
+                        ${ opts.order.invoice.total.toFixed(2) } { opts.order.invoice.currency } { opts.order.state }
+                      </h1>
+                    </td>
+                  </tr>
+                  <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                      <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">
+                        Thanks for your order!
+                      </h2>
+                    </td>
+                  </tr>
+                  <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
+                      <table class="invoice" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 80%; margin: 40px auto;">
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                          <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;" valign="top">
+                            { opts.order.address.name }
+                            <br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" />
+                            Invoice #{ opts.order.id }
+                            <br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" />
+                            { formatDate(opts.order.created) }
+                          </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                          <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;" valign="top">
+                            <table class="invoice-items" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; margin: 0;">
+                              <tr each={ line, i in opts.order.lines } style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;" valign="top">
+                                  { line.qty }x { Object.values(getLine(line).product.title)[0] }
+                                </td>
+                                <td class="alignright" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: right; border-top-width: 1px; border-top-color: #eee; border-top-style: solid; margin: 0; padding: 5px 0;" align="right" valign="top">
+                                  ${ (((getLine(line).product.price || {}).amount || 0) * line.qty) }
+                                </td>
+                              </tr>
+                              <tr class="total" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                <td class="alignright" width="80%" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: right; border-top-width: 2px; border-top-color: #333; border-top-style: solid; border-bottom-color: #333; border-bottom-width: 2px; border-bottom-style: solid; font-weight: 700; margin: 0; padding: 5px 0;" align="right" valign="top">
+                                  Total
+                                </td>
+                                <td class="alignright" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: right; border-top-width: 2px; border-top-color: #333; border-top-style: solid; border-bottom-color: #333; border-bottom-width: 2px; border-bottom-style: solid; font-weight: 700; margin: 0; padding: 5px 0;" align="right" valign="top">
+                                  ${ opts.order.invoice.total.toFixed(2) }
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
+                      <a href="http://www.mailgun.com" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #348eda; text-decoration: underline; margin: 0;">View in browser</a>
+                    </td>
+                  </tr>
+                  <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
+                      Acme Inc. 123 Van Ness, San Francisco 94102
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </table>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" data-module="module6" style="background-color: #EEEEEE;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-bgcolor="Body bgcolor" class="">
-    <tbody>
-      <tr>
-        <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-          <table border="0" align="center" width="100%" style="width: 100%;max-width: 800px;background-color: rgb(247, 247, 247);background-size: cover;background-position: 50% 0%;background-repeat: no-repeat;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" bgcolor="#F7F7F7" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
-            <tbody>
-              <tr>
-                <td height="60" style="font-size: 20px;line-height: 20px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
+          <div class="footer" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; clear: both; color: #999; margin: 0; padding: 20px;">
+            <table width="100%" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+              <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">Questions? Email <a href="mailto:" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; color: #999; text-decoration: underline; margin: 0;">support@acme.inc</a></td>
               </tr>
-              <tr>
-                <td align="center" class="padding_20_show" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                  <table border="0" align="center" width="600" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0" class="full" data-bgcolor="Hero Center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                    <tbody>
-                      <tr>
-                        <td align="center" class="padding_20_show" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                          <table align="center" width="500" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0" class="container500" data-bgcolor="Hero Center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                            <tbody>
-                              <tr>
-                                <td height="50" style="font-size: 10px;line-height: 10px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td align="center" mc:edit="big-title1" style="color: #000000;font-size: 22px;font-family: 'Lato', 'Open Sans', sans-serif;line-height: 28px;font-weight: 500;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-size="Header title" data-max="72" data-color="Header title">
-                                  <!-- ======= section text ====== -->
-                                  <div style="line-height: 190%;">
-                                    <span class="text_container">
-                                      <multiline>
-                                        Order Items:
-                                      </multiline>
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td height="10" style="font-size: 10px;line-height: 10px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td align="left" mc:edit="big-title1" style="color: #000000;font-size: 19px;font-family: 'Lato', 'Open Sans', sans-serif;line-height: 28px;font-weight: 500;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-size="Header title" data-max="72" data-color="Header title">
-                                  <!-- ======= section text ====== -->
-                                  <div style="line-height: 190%;">
-                                    <span class="text_container">
-                                      <multiline>
-                                        Thank you for your order
-                                      </multiline>
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td height="10" style="font-size: 10px;line-height: 10px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td height="30" style="font-size: 20px;line-height: 20px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                  <table style="border-collapse: collapse;width: 100%;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                    <tr each={ product, i in opts.products } style={ i % 2 === 0 ? 'background: #f2f2f2' : null }>
-                                      <td style="padding: 8px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;"><img editable="true" src={ this.media.url (product.images[0], 'md-sq') } alt={ product.title['en-us'] } width="100" style="display: block;"></td>
-                                      <td style="padding: 8px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;">{ product.title['en-us'] }</td>
-                                      <td style="padding: 8px;color: #e852a4;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;">
-                                        { product.price }
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td height="30" style="font-size: 10px;line-height: 10px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td align="center" mc:edit="big-title1" style="color: #3da2d5;font-size: 16px;font-family: 'Lato', 'Open Sans', sans-serif;line-height: 28px;font-weight: 600;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-size="Header title" data-max="72" data-color="Header title">
-                                  <!-- ======= section text ====== -->
-                                  <div style="line-height: 190%;">
-                                    <span class="text_container">
-                                      <multiline>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae, dolore.consectetur adipisicing elit. Beatae, dolore.
-                                      </multiline>
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td height="30" style="font-size: 10px;line-height: 10px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                              <tr>
-                                <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                  <table border="0" align="center" width="" cellpadding="0" cellspacing="0" data-bgcolor="Blue-Button" style="background-color: #e952a3;border-radius: 2px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                    <tbody>
-                                      <tr>
-                                        <td align="center" style="padding-bottom: 15px;padding-top: 15px;color: #FFFFFF;font-size: 20px;font-family: 'Lato', 'Calibri', sans-serif;font-weight: 500;/* line-height: 20px;*/padding-left: 20px;padding-right: 20px;letter-spacing: 0px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" mc:edit="main-button" data-size="Button Text" data-min="12" data-max="28">
-                                          <div class="editable_text" style="line-height: 100%;">
-                                            <span class="text_container">
-                                              <multiline>
-                                                <a href="https://weeb.shop/" target="_blank" style="color: #FFFFFF; text-decoration: none;" data-color="Button Text">Learn More</a>
-                                              </multiline>
-                                            </span>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td height="50" style="font-size: 50px;line-height: 50px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td height="50" style="font-size: 50px;line-height: 50px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <table border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" data-module="module4" style="background-color: #EEEEEE;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-bgcolor="Body bgcolor" class="">
-    <tbody>
-      <tr>
-        <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-          <table border="0" align="center" width="100%" style="background-color: #ffffff;width: 100%;max-width: 800px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" cellpadding="0" cellspacing="0" data-bgcolor="White-Bg">
-            <tbody>
-              <tr>
-                <td height="30" style="font-size: 30px;line-height: 30px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-              </tr>
-              <tr>
-                <td align="center" class="padding_20_show" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                  <table border="0" align="center" width="600" cellpadding="0" cellspacing="0" class="container600" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                    <tbody>
-                      <tr>
-                        <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                          <table border="0" align="center" cellpadding="0" cellspacing="0" style="border-collapse: collapse;mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 0;" class="container600">
-                            <tbody>
-                              <tr>
-                                <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                  <table class="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                    <tbody>
-                                      <tr>
-                                        <td height="6" class="hide" style="font-size: 6px;line-height: 6px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                                      </tr>
-                                      <tr>
-                                        <td style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                          <a style="display: block;border-style: none !important;border: 0 !important;color: #a5ac07;text-decoration: none;" href="https://facebook.com/WeebShoppu" target="_blank" class="editable_img"><img editable="true" mc:edit="fb" width="26" border="0" style="display: block;width: 26px;height: 26px" src="http://omar-faruque.com/template/1/f.png" alt="fb"></a>
-                                        </td>
-                                        <td style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                        <td style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                                          <a style="display: block;border-style: none !important;border: 0 !important;color: #a5ac07;text-decoration: none;" href="https://twitter.com/WeebShop" target="_blank" class="editable_img"><img editable="true" mc:edit="fb" width="26" border="0" style="display: block;width: 28px;height: 28px" src="http://www.freeiconspng.com/uploads/twitter-icon-9.png" alt="fb"></a>
-                                        </td>
-                                        <td style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td height="30" style="font-size: 30px;line-height: 30px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td align="center" style="border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">
-                          <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 0;">
-                            <tbody>
-                              <tr>
-                                <td align="center" mc:edit="big-title1" style="color: #522f53;font-size: 13px;font-family: 'Source Sans Pro', 'Open Sans', sans-serif;line-height: 26px;font-weight: 400;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;" data-size="Header title" data-max="72" data-color="Header title">
-                                  <!-- ======= section text ====== -->
-                                  <div style="line-height: 120%;">
-                                    <span>
-                                      <multiline>
-                                        &copy; Copyright 2016 Weeb Shop
-                                      </multiline>
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td height="40" style="font-size: 30px;line-height: 30px;border-collapse: collapse;margin: 0;mso-table-lspace: 0;mso-table-rspace: 0;padding: 0;">&nbsp;</td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    </tbody>
+            </table>
+          </div>
+        </div>
+      </td>
+      <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+    </tr>
   </table>
 
   <script>
     // load mixins
-    this.mixin ('media');
+    this.mixin('i18n');
+    this.mixin('media');
+    this.mixin('product');
+
+    // set language
+    this.language = this.i18n.lang();
+
+    /**
+     * formats date
+     *
+     * @param  {Date} date
+     *
+     * @return {String}
+     */
+    formatDate (date) {
+      // get moment
+      const moment = require('moment');
+
+      // return string
+      return moment(date).fromNow();
+    }
+
+    /**
+     * gets line
+     *
+     * @param  {Object} line
+     *
+     * @return {Object}
+     */
+    getLine (line) {
+      // set new line
+      line = Object.assign({}, line);
+
+      // return line
+      line.product = opts.order.products.find((product) => product.id === line.product);
+
+      // return line
+      return line;
+    }
 
   </script>
 </order-email>

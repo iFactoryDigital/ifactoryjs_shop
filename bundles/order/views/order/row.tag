@@ -43,8 +43,8 @@
 
   <script>
     // mixin
-    this.mixin ('i18n');
-    this.mixin ('media');
+    this.mixin('i18n');
+    this.mixin('media');
 
     /**
      * formats date
