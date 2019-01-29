@@ -37,7 +37,6 @@ class CheckoutController extends Controller {
 
     // order hooks
     this.eden.pre('order.init', this._order);
-    this.eden.pre('order.guest', this._guest);
 
     // Set types
     const types = ['payment', 'summary'];
@@ -250,72 +249,12 @@ class CheckoutController extends Controller {
   }
 
   /**
-   * on address
-   *
-   * @param  {order}  Order
-   * @param  {Object} action
-   *
-   * @return {Promise}
-   */
-  async _guest(order, action) {
-    // check error
-    if (order.get('error') || await order.get('user')) return;
-
-    // set email
-    order.set('email', action.value.email);
-
-    // check other details
-    if (action.value.create) {
-      // find user by email
-      const check = await User.findOne({
-        email : new RegExp(action.value.email.toString().toLowerCase(), 'i'),
-      });
-
-      // set check
-      if (check) return order.set('error', `The email "${order.get('email')}" already exists, please login first`);
-
-      // create new user
-      const user = new User({
-        email     : action.value.email,
-        marketing : action.value.marketing,
-      });
-
-      // set password
-      const hash = crypto.createHmac('sha256', config.get('secret'))
-        .update(action.value.password)
-        .digest('hex');
-
-      // create user
-      user.set('hash', hash);
-
-      // save user
-      await user.save();
-
-      // set to order
-      order.set('user', user);
-    }
-  }
-
-  /**
    * checkout order
    *
    * @param  {order} Order
    */
   async _order(order) {
-    // check order
-    const actions = order.get('actions') || [];
 
-    // check user
-    if (await order.get('user')) return;
-
-    // get action
-    const action = Object.values(actions).find((action) => {
-      // return address
-      return action.type === 'guest';
-    });
-
-    // check found
-    if (!action) return order.set('error', 'Order is missing guest details');
   }
 
   /**
@@ -324,15 +263,7 @@ class CheckoutController extends Controller {
    * @param  {Object} order
    */
   async _checkout(order) {
-    // check order
-    if (!order.get('user.id')) {
-      // check actions
-      order.set('actions.guest', {
-        type     : 'guest',
-        data     : {},
-        priority : 0,
-      });
-    }
+
   }
 
   /**

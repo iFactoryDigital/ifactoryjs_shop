@@ -125,7 +125,7 @@ class OrderController extends Controller {
     const viewOrder = await Order.findById(req.params.id);
 
     // check user
-    if (await viewOrder.get('user') && (await viewOrder.get('user')).get('_id').toString() !== req.user.get('_id').toString()) {
+    if (req.user && await viewOrder.get('user') && (await viewOrder.get('user')).get('_id').toString() !== req.user.get('_id').toString()) {
       // redirect
       return res.redirect('/');
     }
@@ -199,8 +199,18 @@ class OrderController extends Controller {
       // complete order
       this.eden.hook('order.complete', orderStatus);
 
-      // get address
-      const address = orderStatus.get('address.email') || (await orderStatus.get('address') ? (await orderStatus.get('address')).get('email') : null) || (await orderStatus.get('user')).get('email');
+      // set address to null
+      let address = null;
+
+      // run try/catch
+      try {
+        // get address
+        address = orderStatus.get('address.email');
+
+        // get email
+        if (!address) address = await orderStatus.get('user') ? (await orderStatus.get('user')).get('email') : null;
+        if (!address) address = await orderStatus.get('address') ? (await orderStatus.get('address')).get('email') : null;
+      } catch (e) {}
 
       // send email
       if (address) {
