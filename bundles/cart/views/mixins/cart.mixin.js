@@ -1,14 +1,14 @@
 
 // create mixin
-riot.mixin ('cart', {
+riot.mixin('cart', {
   /**
    * on init function
    */
-  'init' : function () {
+  init() {
     // set value
     this.cart = this.eden.get('cart') || {
-      'lines'    : [],
-      'products' : []
+      lines    : [],
+      products : [],
     };
 
     // on mount update
@@ -16,7 +16,7 @@ riot.mixin ('cart', {
       // set functions
       this.cart.has = (product, opts) => {
         // returns product line
-        return !!(this.cart.lines || []).find ((line) => {
+        return !!(this.cart.lines || []).find((line) => {
           // return found
           return JSON.stringify(line.opts) === JSON.stringify(opts) && line.product === product.id;
         });
@@ -37,7 +37,7 @@ riot.mixin ('cart', {
       };
       this.cart.count = () => {
         // set quantities
-        let quantities = (this.cart.lines || []).map((line) => line.qty);
+        const quantities = (this.cart.lines || []).map(line => line.qty);
 
         // push 0 for non empty Array
         quantities.push(0);
@@ -57,9 +57,9 @@ riot.mixin ('cart', {
           // add value
           total += ((this.cart.products || []).find((product) => {
             // return found product
-            return product.id === line.product
+            return product.id === line.product;
           }) || {
-            'price' : 0
+            price : 0,
           }).price * line.qty;
         });
 
@@ -73,5 +73,5 @@ riot.mixin ('cart', {
       // on update
       this.cart.on('update', this.update);
     }
-  }
+  },
 });

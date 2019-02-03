@@ -9,7 +9,7 @@ class ProductStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor () {
+  constructor() {
     // set observable
     super(...arguments);
 
@@ -17,8 +17,8 @@ class ProductStore extends Events {
     this.__products = [];
 
     // build
-    this.build   = this.build.bind(this);
-    this.price   = this.price.bind(this);
+    this.build = this.build.bind(this);
+    this.price = this.price.bind(this);
     this.product = this.product.bind(this);
 
     // build cart store
@@ -28,14 +28,13 @@ class ProductStore extends Events {
   /**
    * build cart
    */
-  build () {
-
+  build() {
     // register simple product
     this.product('simple', {
 
     }, (product, opts) => {
       // let price
-      let price = product.price.amount;
+      const price = product.price.amount;
 
       // return price
       return price;
@@ -53,7 +52,7 @@ class ProductStore extends Events {
       // get opts
       for (let i = 0; i < (product.variations || []).length; i++) {
         // get value
-        let option = product.variations[i].options.find((opt) => {
+        const option = product.variations[i].options.find((opt) => {
           // return found
           return opts.includes(opt.sku);
         });
@@ -75,15 +74,15 @@ class ProductStore extends Events {
    * @param  {Object} product
    * @param  {Object} opts
    */
-  price (product, opts) {
+  price(product, opts) {
     // check found
-    let found = this.__products.find((p) => p.type === product.type);
+    const found = this.__products.find(p => p.type === product.type);
 
     // return 0 if not found
     if (!found) return 0;
 
     // let price
-    let price = found.price(product, opts);
+    const price = found.price(product, opts);
 
     // find register
     return price;
@@ -100,24 +99,24 @@ class ProductStore extends Events {
    *
    * @return {*}
    */
-  product (type, opts, price, add) {
+  product(type, opts, price, add) {
     // check found
-    let found = this.__products.find((product) => product.type === type);
+    const found = this.__products.find(product => product.type === type);
 
     // push block
     if (!found) {
       // check found
       this.__products.push({
-        'add'   : add,
-        'type'  : type,
-        'opts'  : opts,
-        'price' : price,
+        add,
+        type,
+        opts,
+        price,
       });
     } else {
       // set on found
-      found.add   = add;
-      found.type  = type;
-      found.opts  = opts;
+      found.add = add;
+      found.type = type;
+      found.opts = opts;
       found.price = price;
     }
   }

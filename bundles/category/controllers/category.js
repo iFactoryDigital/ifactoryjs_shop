@@ -19,12 +19,12 @@ class CategoryController extends Controller {
   /**
    * construct category controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
     // bind methods
-    this.build       = this.build.bind(this);
+    this.build = this.build.bind(this);
     this.indexAction = this.indexAction.bind(this);
 
     // run build method
@@ -34,7 +34,7 @@ class CategoryController extends Controller {
   /**
    * build category controller
    */
-  async build () {
+  async build() {
     // on render
     this.eden.pre('view.compile', async (render) => {
       // set categories
@@ -43,13 +43,13 @@ class CategoryController extends Controller {
 
     // get categories
     (await Category.find({
-      'active' : true
+      active : true,
     })).map((category) => {
       // add to eden
       this.eden.sitemap.add({
-        'url'        : '/' + category.get('slug'),
-        'priority'   : 1,
-        'changefreq' : 'daily'
+        url        : `/${category.get('slug')}`,
+        priority   : 1,
+        changefreq : 'daily',
       });
     });
   }
@@ -63,7 +63,7 @@ class CategoryController extends Controller {
    * @title  Categories
    * @route  {get} /categories
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // render grid
     res.render('categories');
   }
@@ -80,10 +80,10 @@ class CategoryController extends Controller {
    * @route  {get} /:sub/:sub/:cat
    * @route  {get} /:sub/:sub/:sub/:cat
    */
-  async slugAction (req, res, next) {
+  async slugAction(req, res, next) {
     // get category
-    let category = await Category.findOne({
-      'slug' : req.params.cat
+    const category = await Category.findOne({
+      slug : req.params.cat,
     });
 
     // check category
@@ -113,17 +113,17 @@ class CategoryController extends Controller {
     trail = await Promise.all(trail.map(cat => cat.sanitise(true)));
 
     // get parents
-    let cats = [category.get('_id').toString()];
+    const cats = [category.get('_id').toString()];
 
     // push cats
     cats.push(...(await Category.find({
-      'parents' : category.get('_id').toString()
-    })).map((cat) => cat.get('_id').toString()));
+      parents : category.get('_id').toString(),
+    })).map(cat => cat.get('_id').toString()));
 
     // set sort
     let sort      = 'priority';
     let page      = 1;
-    let limit     = 24;
+    const limit     = 24;
     let direction = -1;
 
     // check sort
@@ -141,14 +141,14 @@ class CategoryController extends Controller {
     }
 
     // add content
-    req.placement(category.get('slug') + '.banner');
+    req.placement(`${category.get('slug')}.banner`);
 
     // get image
-    let image = (await category.get('images') || [])[0];
+    const image = (await category.get('images') || [])[0];
 
     // set description
-    req.title(category.get('title.' + req.language));
-    req.description(category.get('short.' + req.language));
+    req.title(category.get(`title.${req.language}`));
+    req.description(category.get(`short.${req.language}`));
 
     // set image
     if (image) req.image(image.url('md-sq'));
@@ -158,20 +158,22 @@ class CategoryController extends Controller {
 
     // render index page
     res.render('category', {
-      'title'  : category.get('title.' + req.language),
-      'trail'  : trail,
-      'banner' : {
-        'view'      : 'content',
-        'placement' : category.get('slug') + '.banner'
+      title  : category.get(`title.${req.language}`),
+      trail,
+      banner : {
+        view      : 'content',
+        placement : `${category.get('slug')}.banner`,
       },
-      'total' : await Product.where({
-        'publish' : true
+      total : await Product.where({
+        publish : true,
       }).in('categories.id', cats).count(),
-      'parent'   : parent ? await parent.sanitise() : null,
-      'category' : await category.sanitise(),
-      'products' : await Promise.all((await Product.where({
-        'publish' : true
-      }).in('categories.id', cats).sort(sort, direction).skip(limit * (page - 1)).limit(limit).find()).map((product) => product.sanitise()))
+      parent   : parent ? await parent.sanitise() : null,
+      category : await category.sanitise(),
+      products : await Promise.all((await Product.where({
+        publish : true,
+      }).in('categories.id', cats).sort(sort, direction).skip(limit * (page - 1))
+        .limit(limit)
+        .find()).map(product => product.sanitise())),
     });
   }
 
@@ -185,21 +187,21 @@ class CategoryController extends Controller {
    * @call   category.load
    * @return {Promise}
    */
-  async loadMoreAction (id, loaded, sortBy) {
+  async loadMoreAction(id, loaded, sortBy) {
     // load category
-    let category = await Category.findById(id);
+    const category = await Category.findById(id);
 
     // get parents
-    let cats = [category.get('_id').toString()];
+    const cats = [category.get('_id').toString()];
 
     // push cats
     cats.push(...(await Category.find({
-      'parents' : category.get('_id').toString()
-    })).map((cat) => cat.get('_id').toString()));
+      parents : category.get('_id').toString(),
+    })).map(cat => cat.get('_id').toString()));
 
     // set sort
     let sort      = 'priority';
-    let limit     = 24;
+    const limit     = 24;
     let direction = -1;
 
     // check sort
@@ -212,8 +214,10 @@ class CategoryController extends Controller {
 
     // return
     return await Promise.all((await Product.where({
-      'publish' : true
-    }).in('categories.id', cats).sort(sort, direction).skip(loaded).limit(limit).find()).map((product) => product.sanitise()));
+      publish : true,
+    }).in('categories.id', cats).sort(sort, direction).skip(loaded)
+      .limit(limit)
+      .find()).map(product => product.sanitise()));
   }
 }
 

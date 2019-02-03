@@ -4,10 +4,10 @@ riot.mixin('checkout', {
   /**
    * on init function
    */
-  'init' : function () {
+  init() {
     // set value
     this.checkout = (this.opts.order || this.opts.data.order) || {
-      'loading' : true
+      loading : true,
     };
 
     // set actions
@@ -18,8 +18,8 @@ riot.mixin('checkout', {
       // run actions
       actions = actions.sort((a, b) => {
         // set x/y
-        let x = a.priority || 0;
-        let y = b.priority || 0;
+        const x = a.priority || 0;
+        const y = b.priority || 0;
 
         // return action
         return x < y ? -1 : x > y ? 1 : 0;
@@ -46,5 +46,5 @@ riot.mixin('checkout', {
       // remove listener
       this.checkout.removeListener('update', this.update);
     });
-  }
+  },
 });
