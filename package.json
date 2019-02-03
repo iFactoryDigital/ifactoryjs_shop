@@ -1,7 +1,18 @@
 {
   "name": "@edenjs/shop",
-  "version": "1.0.28",
   "description": "",
+  "version": "1.0.28",
+  "dependencies": {
+    "currency-converter": "^0.1.12",
+    "currency-formatter": "^1.5.3",
+    "escape-string-regexp": "^1.0.5",
+    "is-type": "0.0.1",
+    "moment": "^2.22.2",
+    "slug": "^0.9.2"
+  },
+  "engines": {
+    "node": ">= 8.0.0"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,20 +27,12 @@
     "url": "https://github.com/eden-js/shop/issues"
   },
   "homepage": "https://github.com/eden-js/shop#readme",
-  "dependencies": {
-    "currency-converter": "^0.1.12",
-    "currency-formatter": "^1.5.3",
-    "escape-string-regexp": "^1.0.5",
-    "is-type": "0.0.1",
-    "moment": "^2.22.2",
-    "slug": "^0.9.2"
-  },
   "devDependencies": {
-    "@edenjs/eslint-config-eden": "latest",
-    "eslint": "^5.9.0",
+    "@edenjs/eslint-config-eden": "^2.0.14",
+    "eslint": "^5.13.0",
     "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-react": "^7.11.1"
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0",
+    "eslint-plugin-react": "^7.12.4"
   }
 }
