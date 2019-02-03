@@ -31,7 +31,7 @@ class AdminCategoryController extends Controller {
   /**
    * construct user admin controller
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
@@ -39,11 +39,11 @@ class AdminCategoryController extends Controller {
     this.build = this.build.bind(this);
 
     // bind methods
-    this.gridAction         = this.gridAction.bind(this);
-    this.indexAction        = this.indexAction.bind(this);
-    this.createAction       = this.createAction.bind(this);
-    this.updateAction       = this.updateAction.bind(this);
-    this.removeAction       = this.removeAction.bind(this);
+    this.gridAction = this.gridAction.bind(this);
+    this.indexAction = this.indexAction.bind(this);
+    this.createAction = this.createAction.bind(this);
+    this.updateAction = this.updateAction.bind(this);
+    this.removeAction = this.removeAction.bind(this);
     this.createSubmitAction = this.createSubmitAction.bind(this);
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
@@ -56,39 +56,39 @@ class AdminCategoryController extends Controller {
 
     // register simple block
     BlockHelper.block('dashboard.cms.categories', {
-      'acl'         : ['admin.shop'],
-      'for'         : ['admin'],
-      'title'       : 'Categories Grid',
-      'description' : 'Shows grid of recent categories'
+      acl         : ['admin.shop'],
+      for         : ['admin'],
+      title       : 'Categories Grid',
+      description : 'Shows grid of recent categories',
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // create new req
-      let fauxReq = {
-        'query' : blockModel.get('state') || {}
+      const fauxReq = {
+        query : blockModel.get('state') || {},
       };
 
       // return
       return {
-        'tag'   : 'grid',
-        'name'  : 'Categories',
-        'grid'  : await this._grid(req).render(fauxReq),
-        'class' : blockModel.get('class') || null,
-        'title' : blockModel.get('title') || ''
+        tag   : 'grid',
+        name  : 'Categories',
+        grid  : await this._grid(req).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
       };
     }, async (req, block) => {
       // get notes block from db
-      let blockModel = await Block.findOne({
-        'uuid' : block.uuid
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
       }) || new Block({
-        'uuid' : block.uuid,
-        'type' : block.type
+        uuid : block.uuid,
+        type : block.type,
       });
 
       // set data
@@ -104,15 +104,15 @@ class AdminCategoryController extends Controller {
   /**
    * builds admin category
    */
-  build () {
+  build() {
     // build slug function
-    let slugify = async (category) => {
+    const slugify = async (category) => {
       // get title
-      let title = category.get('title.' + (config.get('i18n.fallbackLng')));
+      const title = category.get(`title.${config.get('i18n.fallbackLng')}`);
 
       // slugify
       let slugifiedURL = slug(title, {
-        'lower' : true
+        lower : true,
       });
 
       // check slug
@@ -121,8 +121,8 @@ class AdminCategoryController extends Controller {
       // loop until slug available
       while (true) {
         // set slug
-        let check = await Category.findOne({
-          'slug' : (i ? slugifiedURL + '-' + i : slugifiedURL)
+        const check = await Category.findOne({
+          slug : (i ? `${slugifiedURL}-${i}` : slugifiedURL),
         });
 
         // check id
@@ -131,7 +131,7 @@ class AdminCategoryController extends Controller {
           i++;
         } else {
           // set new slug
-          slugifiedURL = (i ? slugifiedURL + '-' + i : slugifiedURL);
+          slugifiedURL = (i ? `${slugifiedURL}-${i}` : slugifiedURL);
 
           // break if not found
           break;
@@ -144,7 +144,7 @@ class AdminCategoryController extends Controller {
       // set url
       let url     = [category.get('slug')];
       let parent  = await category.get('parent');
-      let parents = [];
+      const parents = [];
 
       // set url
       while (parent) {
@@ -163,7 +163,7 @@ class AdminCategoryController extends Controller {
       url = url.join('/');
 
       // set url
-      category.set('url',     url);
+      category.set('url', url);
       category.set('parents', parents);
 
       // return category
@@ -192,10 +192,10 @@ class AdminCategoryController extends Controller {
    * @parent  /admin/shop
    * @layout  admin
    */
-  async indexAction (req, res) {
+  async indexAction(req, res) {
     // render grid
     res.render('category/admin', {
-      'grid' : await this._grid(req).render()
+      grid : await this._grid(req).render(),
     });
   }
 
@@ -209,7 +209,7 @@ class AdminCategoryController extends Controller {
    * @layout   admin
    * @priority 12
    */
-  createAction (req, res) {
+  createAction(req, res) {
     // return update action
     return this.updateAction(req, res);
   }
@@ -223,7 +223,7 @@ class AdminCategoryController extends Controller {
    * @route   {get} /:id/update
    * @layout  admin
    */
-  async updateAction (req, res) {
+  async updateAction(req, res) {
     // set website variable
     let create   = true;
     let category = new Category();
@@ -231,14 +231,14 @@ class AdminCategoryController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      create   = false;
+      create = false;
       category = await Category.findById(req.params.id);
     }
 
     // render page
     res.render('category/admin/update', {
-      'title'    : create ? 'Create category' : 'Update ' + category.get('_id').toString(),
-      'category' : await category.sanitise()
+      title    : create ? 'Create category' : `Update ${category.get('_id').toString()}`,
+      category : await category.sanitise(),
     });
   }
 
@@ -251,7 +251,7 @@ class AdminCategoryController extends Controller {
    * @route   {post} /create
    * @layout  admin
    */
-  createSubmitAction (req, res) {
+  createSubmitAction(req, res) {
     // return update action
     return this.updateSubmitAction(req, res);
   }
@@ -265,7 +265,7 @@ class AdminCategoryController extends Controller {
    * @route   {post} /:id/update
    * @layout  admin
    */
-  async updateSubmitAction (req, res) {
+  async updateSubmitAction(req, res) {
     // set website variable
     let create   = true;
     let category = new Category();
@@ -273,12 +273,12 @@ class AdminCategoryController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      create   = false;
+      create = false;
       category = await Category.findById(req.params.id);
     }
 
     // load images
-    let images = req.body.images ? (await Promise.all((Array.isArray(req.body.images) ? req.body.images : [req.body.images]).map((id) => {
+    const images = req.body.images ? (await Promise.all((Array.isArray(req.body.images) ? req.body.images : [req.body.images]).map((id) => {
       // load image
       return Image.findById(id);
     }))).filter((image) => {
@@ -296,25 +296,25 @@ class AdminCategoryController extends Controller {
     }
 
     // update category
-    category.set('meta',        req.body.meta);
-    category.set('title',       req.body.title);
-    category.set('short',       req.body.short);
-    category.set('parent',      parent || null);
-    category.set('images',      images || await category.get('images'));
-    category.set('active',      req.body.active === 'true');
-    category.set('promoted',    req.body.promoted === 'true');
+    category.set('meta', req.body.meta);
+    category.set('title', req.body.title);
+    category.set('short', req.body.short);
+    category.set('parent', parent || null);
+    category.set('images', images || await category.get('images'));
+    category.set('active', req.body.active === 'true');
+    category.set('promoted', req.body.promoted === 'true');
     category.set('description', req.body.description);
 
     // save category
     await category.save();
 
     // send alert
-    req.alert('success', 'Successfully ' + (create ? 'Created' : 'Updated') + ' category!');
+    req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} category!`);
 
     // render page
     res.render('category/admin/update', {
-      'title'    : create ? 'Create category' : 'Update ' + category.get('_id').toString(),
-      'category' : await category.sanitise()
+      title    : create ? 'Create category' : `Update ${category.get('_id').toString()}`,
+      category : await category.sanitise(),
     });
   }
 
@@ -327,7 +327,7 @@ class AdminCategoryController extends Controller {
    * @route   {get} /:id/remove
    * @layout  admin
    */
-  async removeAction (req, res) {
+  async removeAction(req, res) {
     // set website variable
     let category = false;
 
@@ -339,8 +339,8 @@ class AdminCategoryController extends Controller {
 
     // render page
     res.render('category/admin/remove', {
-      'title'    : 'Remove ' + category.get('_id').toString(),
-      'category' : await category.sanitise()
+      title    : `Remove ${category.get('_id').toString()}`,
+      category : await category.sanitise(),
     });
   }
 
@@ -354,7 +354,7 @@ class AdminCategoryController extends Controller {
    * @title   Category Administration
    * @layout  admin
    */
-  async removeSubmitAction (req, res) {
+  async removeSubmitAction(req, res) {
     // set website variable
     let category = false;
 
@@ -382,7 +382,7 @@ class AdminCategoryController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction (req, res) {
+  gridAction(req, res) {
     // return post grid request
     return this._grid(req).post(req, res);
   }
@@ -392,9 +392,9 @@ class AdminCategoryController extends Controller {
    *
    * @return {grid}
    */
-  _grid (req) {
+  _grid(req) {
     // create new grid
-    let categoryGrid = new Grid();
+    const categoryGrid = new Grid();
 
     // set route
     categoryGrid.route('/admin/category/grid');
@@ -404,57 +404,58 @@ class AdminCategoryController extends Controller {
 
     // add grid columns
     categoryGrid.column('_id', {
-      'title'  : 'ID',
-      'format' : async (col) => {
+      title  : 'ID',
+      format : async (col) => {
         return col ? col.toString() : 'N/A';
-      }
+      },
     }).column('title', {
-      'sort'   : true,
-      'title'  : 'Title',
-      'format' : async (col, row) => {
+      sort   : true,
+      title  : 'Title',
+      format : async (col, row) => {
         return (col || {})[req.language] || 'N/A';
-      }
+      },
     }).column('updated_at', {
-      'sort'   : true,
-      'title'  : 'Updated',
-      'format' : async (col) => {
+      sort   : true,
+      title  : 'Updated',
+      format : async (col) => {
         return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
+          day   : 'numeric',
+          month : 'short',
+          year  : 'numeric',
         });
-      }
+      },
     }).column('created_at', {
-      'sort'   : true,
-      'title'  : 'Created',
-      'format' : async (col) => {
+      sort   : true,
+      title  : 'Created',
+      format : async (col) => {
         return col.toLocaleDateString('en-GB', {
-          'day'   : 'numeric',
-          'month' : 'short',
-          'year'  : 'numeric'
+          day   : 'numeric',
+          month : 'short',
+          year  : 'numeric',
         });
-      }
-    }).column('actions', {
-      'type'   : false,
-      'title'  : 'Actions',
-      'format' : async (col, row) => {
-        return [
-          '<div class="btn-group btn-group-sm" role="group">',
-            '<a href="/admin/category/' + row.get('_id').toString() + '/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>',
-            '<a href="/admin/category/' + row.get('_id').toString() + '/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>',
-          '</div>'
-        ].join('');
-      }
-    });
+      },
+    })
+      .column('actions', {
+        type   : false,
+        title  : 'Actions',
+        format : async (col, row) => {
+          return [
+            '<div class="btn-group btn-group-sm" role="group">',
+            `<a href="/admin/category/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/category/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            '</div>',
+          ].join('');
+        },
+      });
 
     // add grid filters
     categoryGrid.filter('title', {
-      'title' : 'Title',
-      'type'  : 'text',
-      'query' : async (param) => {
+      title : 'Title',
+      type  : 'text',
+      query : async (param) => {
         // another where
-        categoryGrid.match('title.' + req.language, new RegExp(param.toString().toLowerCase(), 'i'));
-      }
+        categoryGrid.match(`title.${req.language}`, new RegExp(param.toString().toLowerCase(), 'i'));
+      },
     });
 
     // set default sort order

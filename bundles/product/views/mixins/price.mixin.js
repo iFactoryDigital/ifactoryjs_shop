@@ -4,13 +4,13 @@ riot.mixin('product', {
   /**
    * on init function
    */
-  'init' : function () {
+  init() {
     // set value
     this.product = {
-      'price' : (product, opts) => {
+      price : (product, opts) => {
         // let price
         return product.price.amount;
-      }
+      },
     };
 
     // on mount update
@@ -21,5 +21,5 @@ riot.mixin('product', {
 
     // on update
     this.product.on('update', this.update);
-  }
+  },
 });

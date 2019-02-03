@@ -1,6 +1,6 @@
 
 // import local dependencies
-const Model = require ('model');
+const Model = require('model');
 
 /**
  * create address class
@@ -12,7 +12,7 @@ class Address extends Model {
    * @param attrs
    * @param options
    */
-  constructor () {
+  constructor() {
     // run super
     super(...arguments);
 
@@ -25,12 +25,12 @@ class Address extends Model {
    *
    * @return {Object}
    */
-  async sanitise () {
+  async sanitise() {
     // return sanitised bot
     return {
-      'id'        : this.get('_id') ? this.get('_id').toString() : null,
-      'name'      : this.get('name'),
-      'formatted' : this.get('formatted')
+      id        : this.get('_id') ? this.get('_id').toString() : null,
+      name      : this.get('name'),
+      formatted : this.get('formatted'),
     };
   }
 }

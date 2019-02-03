@@ -12,16 +12,16 @@ class CategoryHelper extends Helper {
   /**
    * construct category helper
    */
-  constructor () {
+  constructor() {
     // run super
     super();
 
     // bind variables
-    this.sanitised  = [];
+    this.sanitised = [];
     this.categories = [];
 
     // bind methods
-    this.list  = this.list.bind(this);
+    this.list = this.list.bind(this);
     this.build = this.build.bind(this);
 
     // run build method
@@ -31,7 +31,7 @@ class CategoryHelper extends Helper {
   /**
    * builds category helper
    */
-  build () {
+  build() {
     // build categories
     this.list();
   }
@@ -39,11 +39,11 @@ class CategoryHelper extends Helper {
   /**
    * builds categories array
    */
-  async list () {
+  async list() {
     // get all categories with no parent
     this.categories = await Category.where({
-      'parent' : null,
-      'active' : true
+      parent : null,
+      active : true,
     }).find();
 
     // sanitise categories
