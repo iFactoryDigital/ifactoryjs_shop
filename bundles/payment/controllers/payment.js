@@ -162,7 +162,7 @@ class PaymentController extends Controller {
     if (payment.get('redirect')) order.set('redirect', payment.get('redirect'));
 
     // unset
-    order.unset('actions.payment.value.data.card');
+    if (order.get('actions.payment.value.data.card')) order.unset('actions.payment.value.data.card');
 
     // save order
     await order.save();
