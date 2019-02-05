@@ -205,7 +205,7 @@ class OrderController extends Controller {
       // run try/catch
       try {
         // get address
-        address = orderStatus.get('address.email');
+        address = orderStatus.get('address.email') || orderStatus.get('actions.address.value.email');
 
         // get email
         if (!address) address = await orderStatus.get('user') ? (await orderStatus.get('user')).get('email') : null;
