@@ -15,16 +15,16 @@ class CheckoutStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor () {
+  constructor() {
     // set observable
-    super()
+    super();
 
     // set default variables
-    this._extra  = {};
+    this._extra = {};
     this.loading = false;
 
     // bind methods
-    this.build  = this.build.bind(this);
+    this.build = this.build.bind(this);
     this.submit = this.submit.bind(this);
     this.update = this.update.bind(this);
 
@@ -32,16 +32,16 @@ class CheckoutStore extends Events {
     CartStore.on('update', () => {
       // build
       this.build({
-        'lines'    : CartStore.lines,
-        'products' : CartStore.products
+        lines    : CartStore.lines,
+        products : CartStore.products,
       });
-    })
+    });
   }
 
   /**
    * build CartStore
    */
-  async build (order) {
+  async build(order) {
     // check res
     Object.keys(order || {}).forEach((key) => {
       // set value
@@ -60,15 +60,15 @@ class CheckoutStore extends Events {
    *
    * @return {*}
    */
-  getActions () {
+  getActions() {
     // get actions
     let actions = Object.values(this.actions);
 
     // run actions
     actions = actions.sort((a, b) => {
       // set x/y
-      let x = a.priority || 0;
-      let y = b.priority || 0;
+      const x = a.priority || 0;
+      const y = b.priority || 0;
 
       // return action
       return x < y ? -1 : x > y ? 1 : 0;
@@ -86,7 +86,7 @@ class CheckoutStore extends Events {
    *
    * @return {Promise}
    */
-  async extra (name, value) {
+  async extra(name, value) {
     // set extra
     this._extra[name] = value;
 
@@ -102,7 +102,7 @@ class CheckoutStore extends Events {
    *
    * @return {Promise}
    */
-  async submit () {
+  async submit() {
     // set loading
     this.loading = true;
 
@@ -110,21 +110,21 @@ class CheckoutStore extends Events {
     this.update();
 
     // log data
-    let res = await fetch('/checkout/' + this.id + '/complete', {
-      'body' : JSON.stringify({
-        'id'      : this.id,
-        'lines'   : this.lines,
-        'actions' : this.actions
+    const res = await fetch(`/checkout/${this.id}/complete`, {
+      body : JSON.stringify({
+        id      : this.id,
+        lines   : this.lines,
+        actions : this.actions,
       }),
-      'method'  : 'post',
-      'headers' : {
-        'Content-Type': 'application/json'
+      method  : 'post',
+      headers : {
+        'Content-Type' : 'application/json',
       },
-      'credentials' : 'same-origin'
+      credentials : 'same-origin',
     });
 
     // load json
-    let order = await res.json();
+    const order = await res.json();
 
     // check error
     if (order.error) {
@@ -142,7 +142,7 @@ class CheckoutStore extends Events {
     if (order.redirect) return eden.router.go(order.redirect);
 
     // update order
-    if (order.id) return eden.router.go('/order/' + order.id);
+    if (order.id) return eden.router.go(`/order/${order.id}`);
 
     // set loading
     this.loading = false;
@@ -159,14 +159,14 @@ class CheckoutStore extends Events {
    *
    * @return {Float}
    */
-  async total () {
+  async total() {
     // let total
     let total = 0;
 
     // sort into groups
     (this.lines || []).forEach((line) => {
       // find product
-      let product = (this.products || []).find((check) => {
+      const product = (this.products || []).find((check) => {
         // return check
         return check.id === line.product;
       });
@@ -183,7 +183,7 @@ class CheckoutStore extends Events {
   /**
    * updates view
    */
-  update () {
+  update() {
     // trigger update
     this.emit('update');
   }

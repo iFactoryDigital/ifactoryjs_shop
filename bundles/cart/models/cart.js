@@ -4,7 +4,7 @@
  */
 
 // use strict
-'use strict';
+
 
 // import local dependencies
 const Model = require('model');
@@ -22,7 +22,7 @@ class Cart extends Model {
    * @param attrs
    * @param options
    */
-  constructor () {
+  constructor() {
     // run super
     super(...arguments);
 
@@ -35,15 +35,15 @@ class Cart extends Model {
    *
    * @return {Object}
    */
-  async sanitise () {
+  async sanitise() {
     // return sanitised bot
     return {
-      'id'       : this.get('_id') ? this.get('_id').toString() : null,
-      'lines'    : this.get('lines') || [],
-      'products' : await Promise.all((this.get('lines') || []).map(async (line) => {
+      id       : this.get('_id') ? this.get('_id').toString() : null,
+      lines    : this.get('lines') || [],
+      products : await Promise.all((this.get('lines') || []).map(async (line) => {
         // return sanitised images
         return await (await Product.findById(line.product)).sanitise();
-      }))
+      })),
     };
   }
 }
