@@ -216,7 +216,8 @@ class OrderController extends Controller {
       if (address) {
         // email
         await EmailHelper.send(address, 'order', {
-          order : await orderStatus.sanitise(),
+          order   : await orderStatus.sanitise(),
+          subject : `${config.get('domain')} - order #${orderStatus.get('_id').toStrng()}`,
         });
       }
 
