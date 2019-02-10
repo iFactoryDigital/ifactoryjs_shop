@@ -334,6 +334,13 @@ class AdminPaymentController extends Controller {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
     })
+      .column('error', {
+        sort   : true,
+        title  : 'Error',
+        format : async (col) => {
+          return col && col.text ? col.text : (col ? JSON.stringify(col) : '<i>N/A</i>');
+        },
+      })
       .column('updated_at', {
         sort   : true,
         title  : 'Updated',
@@ -396,6 +403,20 @@ class AdminPaymentController extends Controller {
 
         // user id in
         paymentGrid.in('user.id', users.map(user => user.get('_id').toString()));
+      },
+    }).filter('error', {
+      title : 'Error',
+      type  : 'text',
+      query : async (param) => {
+        // check param
+        if (!param || !param.length) return;
+
+        // user id in
+        paymentGrid.or({
+          error : new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'),
+        }, {
+          'error.text' : new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'),
+        });
       },
     });
 

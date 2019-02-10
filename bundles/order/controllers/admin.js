@@ -306,7 +306,7 @@ class AdminOrderController extends Controller {
           const user = await row.get('user');
 
           // return user name
-          return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : 'Anonymous';
+          return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : (row.get('address.name') || 'Anonymous');
         },
       })
       .column('lines', {
@@ -422,9 +422,9 @@ class AdminOrderController extends Controller {
       });
 
     // add grid filters
-    orderGrid.filter('username', {
+    orderGrid.filter('name', {
       type  : 'text',
-      title : 'Username',
+      title : 'Name',
       query : async (param) => {
         // check param
         if (!param || !param.length) return;
@@ -433,7 +433,13 @@ class AdminOrderController extends Controller {
         const users = await User.match('username', new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
 
         // user id in
-        orderGrid.in('user.id', users.map(user => user.get('_id').toString()));
+        orderGrid.or({
+          'user.id' : {
+            $in : users.map(user => user.get('_id').toString()),
+          },
+        }, {
+          'address.name' : new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'),
+        });
       },
     }).filter('email', {
       type  : 'text',
@@ -448,14 +454,53 @@ class AdminOrderController extends Controller {
         // user id in
         orderGrid.in('user.id', users.map(user => user.get('_id').toString()));
       },
+    }).filter('product', {
+      type  : 'text',
+      title : 'Product',
+      query : async (param) => {
+        // check param
+        if (!param || !param.length) return;
+
+        // get users
+        const products = await Product.match(`title.${req.language}`, new RegExp(escapeRegex(param.toString().toLowerCase()), 'i')).find();
+
+        // user id in
+        orderGrid.elem('lines', {
+          product : {
+            $in : products.map(product => product.get('_id').toString()),
+          },
+        });
+      },
+    }).filter('status', {
+      type  : 'text',
+      title : 'Status',
+      query : async (param) => {
+        // check param
+        if (!param || !param.length) return;
+
+        // check pending
+        if (param === 'pending') {
+          // pending
+          return orderGrid.or({
+            status : 'pending',
+          }, {
+            status : null,
+          });
+        }
+
+        // user id in
+        orderGrid.where({
+          status : param,
+        });
+      },
     });
 
     // set default sort order
     orderGrid.sort('created_at', -1);
     orderGrid.elem('lines', {
       qty : {
-        $gt : 0
-      }
+        $gt : 0,
+      },
     });
 
     // return grid
