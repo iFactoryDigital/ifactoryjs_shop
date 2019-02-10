@@ -452,6 +452,11 @@ class AdminOrderController extends Controller {
 
     // set default sort order
     orderGrid.sort('created_at', -1);
+    orderGrid.elem('lines', {
+      qty : {
+        $gt : 0
+      }
+    });
 
     // return grid
     return orderGrid;
