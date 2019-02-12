@@ -272,7 +272,7 @@ class AdminPaymentController extends Controller {
     req.alert('success', `Successfully removed ${payment.get('_id').toString()}`);
 
     // delete website
-    await payment.remove();
+    await payment.remove(req.user);
 
     // render index
     return this.indexAction(req, res);

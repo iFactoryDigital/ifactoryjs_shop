@@ -77,7 +77,7 @@ class CartController extends Controller {
       const user = await order.get('user');
 
       // remove cart
-      if (cart) await cart.remove();
+      if (cart) await cart.remove(user);
 
       // create new cart
       cart = new Cart({

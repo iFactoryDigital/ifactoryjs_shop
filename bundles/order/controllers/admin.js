@@ -257,7 +257,7 @@ class AdminOrderController extends Controller {
     req.alert('success', `Successfully removed ${order.get('_id').toString()}`);
 
     // delete website
-    await order.remove();
+    await order.remove(req.user);
 
     // render index
     return this.indexAction(req, res);

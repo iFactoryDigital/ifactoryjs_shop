@@ -447,7 +447,7 @@ class AdminProductController extends Controller {
     }
 
     // Delete website
-    await product.remove();
+    await product.remove(req.user);
 
     // Alert Removed
     req.alert('success', 'Successfully removed product');

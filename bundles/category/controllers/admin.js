@@ -365,7 +365,7 @@ class AdminCategoryController extends Controller {
     }
 
     // delete website
-    await category.remove();
+    await category.remove(req.user);
 
     // alert Removed
     req.alert('success', 'Successfully removed category');
