@@ -97,7 +97,7 @@ class AdminProductController extends Controller {
       blockModel.set('title', req.body.data.title);
 
       // Save block
-      await blockModel.save();
+      await blockModel.save(req.user);
     });
   }
 
@@ -386,7 +386,7 @@ class AdminProductController extends Controller {
     // Run hook
     await this.eden.hook('product.compile', product, () => {
       // Return save product
-      return product.save();
+      return product.save(req.user);
     });
 
     // Send alert

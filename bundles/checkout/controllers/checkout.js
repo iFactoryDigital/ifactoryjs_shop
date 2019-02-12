@@ -90,7 +90,7 @@ class CheckoutController extends Controller {
         blockModel.set('block', req.body.data.block);
 
         // save block
-        await blockModel.save();
+        await blockModel.save(req.user);
       });
     });
   }
@@ -171,7 +171,7 @@ class CheckoutController extends Controller {
     await this.eden.hook('checkout.init', order);
 
     // save order
-    await order.save();
+    await order.save(req.user);
 
     // create order
     await this.eden.hook('checkout.render', order);
@@ -239,7 +239,7 @@ class CheckoutController extends Controller {
     await orderHelper.complete(order, req.body);
 
     // save order
-    await order.save();
+    await order.save(req.user);
 
     // run hook
     await this.eden.hook('checkout.complete', order);
@@ -300,7 +300,7 @@ class CheckoutController extends Controller {
       order.set('lines', cart.get('lines') || []);
 
       // save order
-      await order.save();
+      await order.save(req.user);
 
       // create order
       await this.eden.hook('checkout.create', order);
@@ -318,7 +318,7 @@ class CheckoutController extends Controller {
       await this.eden.hook('checkout.init', order);
 
       // save order
-      await order.save();
+      await order.save(req.user);
 
       // create order
       await this.eden.hook('checkout.render', order);

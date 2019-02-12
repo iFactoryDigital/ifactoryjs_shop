@@ -89,7 +89,7 @@ class AdminOrderController extends Controller {
       blockModel.set('title', req.body.data.title);
 
       // save block
-      await blockModel.save();
+      await blockModel.save(req.user);
     });
   }
 
@@ -195,7 +195,7 @@ class AdminOrderController extends Controller {
     await this.eden.hook('order.submit', req, order);
 
     // save order
-    await order.save();
+    await order.save(req.user);
 
     // send alert
     req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} order!`);

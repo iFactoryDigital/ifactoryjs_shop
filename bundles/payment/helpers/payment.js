@@ -48,6 +48,7 @@ class PaymentHelper extends Helper {
    */
   async invoice(order) {
     // get lines
+    const user  = await order.get('user');
     const lines = order.get('lines');
 
     // create new invoice
@@ -91,16 +92,16 @@ class PaymentHelper extends Helper {
     order.set('lines', lines);
 
     // save order
-    await order.save();
+    await order.save(user);
 
     // save invoice
-    await invoice.save();
+    await invoice.save(user);
 
     // hook invoice
     await this.eden.hook('invoice.init', invoice);
 
     // save invoice
-    await invoice.save();
+    await invoice.save(user);
 
     // return invoice
     return invoice;
@@ -115,21 +116,22 @@ class PaymentHelper extends Helper {
    */
   async payment(invoice, method) {
     // get total
+    const user  = await invoice.get('user');
     const total = parseFloat(invoice.get('total'));
 
     // do payment
     const payment = new Payment({
-      user     : await invoice.get('user'),
+      user,
+      invoice,
       rate     : invoice.get('rate') || 1,
       order    : await invoice.get('order'),
       amount   : total,
-      invoice,
       currency : invoice.get('currency') || config.get('shop.currency') || 'USD',
       complete : false,
     });
 
     // save payment
-    await payment.save();
+    await payment.save(user);
 
     // Set method
     payment.set('method', method);
@@ -141,7 +143,7 @@ class PaymentHelper extends Helper {
     payment.unset('method.data.card');
 
     // save payment
-    await payment.save();
+    await payment.save(user);
 
     // return payment
     return payment;

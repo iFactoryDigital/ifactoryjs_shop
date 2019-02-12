@@ -83,7 +83,7 @@ class AdminPaymentController extends Controller {
       blockModel.set('title', req.body.data.title);
 
       // save block
-      await blockModel.save();
+      await blockModel.save(req.user);
     });
   }
 
@@ -207,13 +207,13 @@ class AdminPaymentController extends Controller {
     }
 
     // save payment
-    await payment.save();
+    await payment.save(req.user);
 
     // run hook
     order.set('state', 'paid');
 
     // save order
-    await order.save();
+    await order.save(req.user);
 
     // render page
     res.render('payment/admin/update', {

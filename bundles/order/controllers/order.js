@@ -188,7 +188,7 @@ class OrderController extends Controller {
       orderStatus.set('status', 'paid');
 
       // save order
-      await orderStatus.save();
+      await orderStatus.save(await orderStatus.get('user'));
 
       // emit create
       this.eden.emit('order.complete', {

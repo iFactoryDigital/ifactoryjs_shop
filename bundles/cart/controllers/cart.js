@@ -64,7 +64,7 @@ class CartController extends Controller {
       });
 
       // save cart
-      await cart.save();
+      await cart.save(user);
 
       // return cart
       return cart;
@@ -86,7 +86,7 @@ class CartController extends Controller {
       });
 
       // save cart
-      await cart.save();
+      await cart.save(user);
 
       // emit to user/socket
       socket[user ? 'user' : 'session'](user || order.get('meta.session'), 'cart', await cart.sanitise());
@@ -164,7 +164,7 @@ class CartController extends Controller {
     cart.set('products', products);
 
     // save cart
-    await cart.save();
+    await cart.save(req.user);
 
     // get sanitised
     const sanitised = await cart.sanitise();

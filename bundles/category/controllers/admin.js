@@ -97,7 +97,7 @@ class AdminCategoryController extends Controller {
       blockModel.set('title', req.body.data.title);
 
       // save block
-      await blockModel.save();
+      await blockModel.save(req.user);
     });
   }
 
@@ -306,7 +306,7 @@ class AdminCategoryController extends Controller {
     category.set('description', req.body.description);
 
     // save category
-    await category.save();
+    await category.save(req.user);
 
     // send alert
     req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} category!`);
