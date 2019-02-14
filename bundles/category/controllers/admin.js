@@ -2,9 +2,7 @@
 // bind dependencies
 const Grid       = require('grid');
 const slug       = require('slug');
-const alert      = require('alert');
 const config     = require('config');
-const crypto     = require('crypto');
 const Controller = require('controller');
 
 // require models
@@ -18,7 +16,7 @@ const categoryHelper = helper('category');
 const Block = model('block');
 
 // bind helpers
-const BlockHelper = helper('cms/block');
+const blockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -53,52 +51,6 @@ class AdminCategoryController extends Controller {
 
     // build admin controller
     this.build();
-
-    // register simple block
-    BlockHelper.block('dashboard.cms.categories', {
-      acl         : ['admin.shop'],
-      for         : ['admin'],
-      title       : 'Categories Grid',
-      description : 'Shows grid of recent categories',
-    }, async (req, block) => {
-      // get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
-      });
-
-      // create new req
-      const fauxReq = {
-        query : blockModel.get('state') || {},
-      };
-
-      // return
-      return {
-        tag   : 'grid',
-        name  : 'Categories',
-        grid  : await this._grid(req).render(fauxReq),
-        class : blockModel.get('class') || null,
-        title : blockModel.get('title') || '',
-      };
-    }, async (req, block) => {
-      // get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
-      });
-
-      // set data
-      blockModel.set('class', req.body.data.class);
-      blockModel.set('state', req.body.data.state);
-      blockModel.set('title', req.body.data.title);
-
-      // save block
-      await blockModel.save(req.user);
-    });
   }
 
   /**
@@ -177,6 +129,52 @@ class AdminCategoryController extends Controller {
     // pre category create/update
     this.eden.post('category.create', categoryHelper.list);
     this.eden.post('category.update', categoryHelper.list);
+
+    // register simple block
+    blockHelper.block('dashboard.cms.categories', {
+      acl         : ['admin.shop'],
+      for         : ['admin'],
+      title       : 'Categories Grid',
+      description : 'Shows grid of recent categories',
+    }, async (req, block) => {
+      // get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
+      });
+
+      // create new req
+      const fauxReq = {
+        query : blockModel.get('state') || {},
+      };
+
+      // return
+      return {
+        tag   : 'grid',
+        name  : 'Categories',
+        grid  : await this._grid(req).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
+      };
+    }, async (req, block) => {
+      // get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
+      });
+
+      // set data
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
+
+      // save block
+      await blockModel.save(req.user);
+    });
   }
 
   /**
@@ -195,7 +193,7 @@ class AdminCategoryController extends Controller {
   async indexAction(req, res) {
     // render grid
     res.render('category/admin', {
-      grid : await this._grid(req).render(),
+      grid : await (await this._grid(req)).render(req),
     });
   }
 
@@ -382,9 +380,9 @@ class AdminCategoryController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction(req, res) {
+  async gridAction(req, res) {
     // return post grid request
-    return this._grid(req).post(req, res);
+    return (await this._grid(req)).post(req, res);
   }
 
   /**
