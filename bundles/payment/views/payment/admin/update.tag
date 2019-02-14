@@ -3,7 +3,7 @@
 
     <admin-header title="{ opts.payment.id ? 'Update' : 'Create' } Payment">
       <yield to="right">
-        <a href="/admin/payment" class="btn btn-lg btn-primary">
+        <a href="/admin/shop/payment" class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
@@ -11,7 +11,7 @@
     
     <div class="container-fluid">
     
-      <form method="post" action="/admin/payment/{ opts.payment && opts.payment.id ? (opts.payment.id + '/update') : 'create' }">
+      <form method="post" action="/admin/shop/payment/{ opts.payment && opts.payment.id ? (opts.payment.id + '/update') : 'create' }">
         <div class="card">
           <div class="card-header">
             <strong>{ opts.payment && opts.payment.id ? 'Update' : 'Add' } Payment</strong>

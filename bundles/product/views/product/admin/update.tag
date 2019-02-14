@@ -1,6 +1,6 @@
 <product-admin-update-page>
   <div class="page page-shop">
-    <form method="post" action="/admin/product/{ opts.product.id ? (opts.product.id + '/update') : 'create' }">
+    <form method="post" action="/admin/shop/product/{ opts.product.id ? (opts.product.id + '/update') : 'create' }">
 
       <admin-header title="{ this.product.id ? 'Update' : 'Create' } Product">
         <yield to="right">

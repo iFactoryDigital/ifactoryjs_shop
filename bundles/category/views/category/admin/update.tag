@@ -3,14 +3,14 @@
 
     <admin-header title="{ opts.category.id ? 'Update' : 'Create' } Category">
       <yield to="right">
-        <a href="/admin/category" class="btn btn-lg btn-primary">
+        <a href="/admin/shop/category" class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
     </admin-header>
     
     <div class="container-fluid">
-      <form method="post" action="/admin/category/{ opts.category.id ? (opts.category.id + '/update') : 'create' }">
+      <form method="post" action="/admin/shop/category/{ opts.category.id ? (opts.category.id + '/update') : 'create' }">
         <div class="card mb-3">
           <div class="card-header">
             Category Information

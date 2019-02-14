@@ -3,14 +3,14 @@
 
     <admin-header title="{ opts.order.id ? 'Update' : 'Create' } Order">
       <yield to="right">
-        <a href="/admin/order" class="btn btn-lg btn-primary">
+        <a href="/admin/shop/order" class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
     </admin-header>
     
     <div class="container-fluid">
-      <form method="post" action="/admin/order/{ opts.order.id ? opts.order.id + '/update' : 'create' }">
+      <form method="post" action="/admin/shop/order/{ opts.order.id ? opts.order.id + '/update' : 'create' }">
         <div class="row">
           <div class="col-md-7">
             <div class="card card-order mb-3">

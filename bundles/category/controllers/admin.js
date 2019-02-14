@@ -23,7 +23,7 @@ const blockHelper = helper('cms/block');
  *
  * @acl   admin.category.view
  * @fail  /
- * @mount /admin/category
+ * @mount /admin/shop/category
  */
 class AdminCategoryController extends Controller {
   /**
@@ -369,7 +369,7 @@ class AdminCategoryController extends Controller {
     req.alert('success', 'Successfully removed category');
 
     // render index
-    res.redirect('/admin/category');
+    res.redirect('/admin/shop/category');
   }
 
   /**
@@ -395,7 +395,7 @@ class AdminCategoryController extends Controller {
     const categoryGrid = new Grid();
 
     // set route
-    categoryGrid.route('/admin/category/grid');
+    categoryGrid.route('/admin/shop/category/grid');
 
     // set grid model
     categoryGrid.model(Category);
@@ -439,8 +439,8 @@ class AdminCategoryController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/category/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/category/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            `<a href="/admin/shop/category/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/shop/category/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');
         },

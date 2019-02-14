@@ -3,7 +3,7 @@
 
     <admin-header title="Remove Order">
       <yield to="right">
-        <a href="/admin/order" class="btn btn-lg btn-primary">
+        <a href="/admin/shop/order" class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
@@ -11,7 +11,7 @@
     
     <div class="container-fluid">
         
-      <form method="post" action="/admin/order/{ opts.order.id }/remove">
+      <form method="post" action="/admin/shop/order/{ opts.order.id }/remove">
         <div class="card">
           <div class="card-body">
             <p>

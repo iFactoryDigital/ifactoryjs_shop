@@ -3,7 +3,7 @@
 
     <admin-header title="Remove Payment">
       <yield to="right">
-        <a href="/admin/payment" class="btn btn-lg btn-primary">
+        <a href="/admin/shop/payment" class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
@@ -11,7 +11,7 @@
     
     <div class="container-fluid">
     
-      <form method="post" action="/admin/payment/{ opts.payment.id }/remove">
+      <form method="post" action="/admin/shop/payment/{ opts.payment.id }/remove">
         <div class="card">
           <div class="card-body">
             <p>

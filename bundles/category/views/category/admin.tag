@@ -3,7 +3,7 @@
 
     <admin-header title="Manage Product Categories">
       <yield to="right">
-        <a href="/admin/category/create" class="btn btn-lg btn-success">
+        <a href="/admin/shop/category/create" class="btn btn-lg btn-success">
           Create Category
         </a>
       </yield>

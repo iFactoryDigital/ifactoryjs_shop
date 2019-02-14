@@ -3,7 +3,7 @@
 
     <admin-header title="Manage Products">
       <yield to="right">
-        <a href="/admin/product/create" class="btn btn-lg btn-success">
+        <a href="/admin/shop/product/create" class="btn btn-lg btn-success">
           Create
         </a>
       </yield>

@@ -17,7 +17,7 @@ const BlockHelper = helper('cms/block');
  *
  * @acl   admin.payment.view
  * @fail  /
- * @mount /admin/payment
+ * @mount /admin/shop/payment
  */
 class AdminPaymentController extends Controller {
   /**
@@ -301,7 +301,7 @@ class AdminPaymentController extends Controller {
     const paymentGrid = new Grid();
 
     // set route
-    paymentGrid.route('/admin/payment/grid');
+    paymentGrid.route('/admin/shop/payment/grid');
 
     // set grid model
     paymentGrid.model(Payment);
@@ -370,8 +370,8 @@ class AdminPaymentController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/payment/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/payment/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            `<a href="/admin/shop/payment/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/shop/payment/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');
         },

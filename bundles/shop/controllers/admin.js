@@ -89,7 +89,7 @@ class ShopAdminController extends Controller {
 
       // set other info
       data.tag = 'stat';
-      data.href = '/admin/payment';
+      data.href = '/admin/shop/payment';
       data.titles = {
         today : 'Income Today',
         total : 'Total Income',
@@ -133,7 +133,7 @@ class ShopAdminController extends Controller {
 
       // set other info
       data.tag = 'stat';
-      data.href = '/admin/order';
+      data.href = '/admin/shop/order';
       data.titles = {
         today : 'Orders Today',
         total : 'Total Orders',

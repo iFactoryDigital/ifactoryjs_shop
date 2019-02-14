@@ -23,7 +23,7 @@ const productHelper = helper('product');
  *
  * @acl   admin.product.view
  * @fail  /
- * @mount /admin/product
+ * @mount /admin/shop/product
  */
 class AdminProductController extends Controller {
   /**
@@ -477,7 +477,7 @@ class AdminProductController extends Controller {
     const productGrid = new Grid();
 
     // Set route
-    productGrid.route('/admin/product/grid');
+    productGrid.route('/admin/shop/product/grid');
 
     // Set grid model
     productGrid.model(Product);
@@ -496,7 +496,7 @@ class AdminProductController extends Controller {
         title  : 'Image',
         format : async (col, row) => {
           // return calculated price
-          return col && col.length ? `<a href="/admin/product/${row.get('_id').toString()}/update"><img src="${await col[0].url('sm-sq')}" class="img-fluid" style="width:80px;" /></a>` : '';
+          return col && col.length ? `<a href="/admin/shop/product/${row.get('_id').toString()}/update"><img src="${await col[0].url('sm-sq')}" class="img-fluid" style="width:80px;" /></a>` : '';
         },
       })
       .column('price', {
@@ -585,8 +585,8 @@ class AdminProductController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/product/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/product/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            `<a href="/admin/shop/product/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/shop/product/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');
         },

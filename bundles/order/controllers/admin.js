@@ -23,7 +23,7 @@ const blockHelper = helper('cms/block');
  *
  * @acl   admin.order.view
  * @fail  /
- * @mount /admin/order
+ * @mount /admin/shop/order
  */
 class AdminOrderController extends Controller {
   /**
@@ -286,7 +286,7 @@ class AdminOrderController extends Controller {
     const orderGrid = new Grid();
 
     // set route
-    orderGrid.route('/admin/order/grid');
+    orderGrid.route('/admin/shop/order/grid');
 
     // set grid model
     orderGrid.model(Order);
@@ -322,7 +322,7 @@ class AdminOrderController extends Controller {
             const product = await Product.findById(line.product);
 
             // return value
-            return `${line.qty || 1}x <a href="/admin/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
+            return `${line.qty || 1}x <a href="/admin/shop/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
           }))).join(', ');
         },
       })
@@ -360,7 +360,7 @@ class AdminOrderController extends Controller {
           });
 
           // get paid
-          return payments.map(payment => `<a href="/admin/payment/${payment.get('_id').toString()}/update">${payment.get('_id').toString()}</a>`);
+          return payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id').toString()}/update">${payment.get('_id').toString()}</a>`);
         },
       })
       .column('paid', {
@@ -414,8 +414,8 @@ class AdminOrderController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/order/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/order/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
+            `<a href="/admin/shop/order/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/shop/order/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');
         },
