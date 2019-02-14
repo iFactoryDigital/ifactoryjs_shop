@@ -16,7 +16,7 @@ const Payment = model('payment');
 const config = require('config');
 
 // require helpers
-const BlockHelper = helper('cms/block');
+const blockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -47,7 +47,7 @@ class AdminOrderController extends Controller {
     this._grid = this._grid.bind(this);
 
     // register simple block
-    BlockHelper.block('dashboard.cms.orders', {
+    blockHelper.block('dashboard.cms.orders', {
       acl         : ['admin.shop'],
       for         : ['admin'],
       title       : 'Orders Grid',
@@ -109,7 +109,7 @@ class AdminOrderController extends Controller {
   async indexAction(req, res) {
     // render grid
     res.render('order/admin', {
-      grid : await this._grid(req).render(req),
+      grid : await (await this._grid(req)).render(req),
     });
   }
 
@@ -271,9 +271,9 @@ class AdminOrderController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction(req, res) {
+  async gridAction(req, res) {
     // return post grid request
-    return this._grid(req).post(req, res);
+    return (await this._grid(req)).post(req, res);
   }
 
   /**
@@ -283,7 +283,7 @@ class AdminOrderController extends Controller {
    */
   _grid(req) {
     // create new grid
-    const orderGrid = new Grid(req);
+    const orderGrid = new Grid();
 
     // set route
     orderGrid.route('/admin/order/grid');

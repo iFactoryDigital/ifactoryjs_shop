@@ -117,7 +117,7 @@ class CartController extends Controller {
    */
   async updateCartAction(req, res) {
     // set session
-    const sessionID = req.sessionID;
+    const { sessionID } = req;
 
     // load cart
     const cart = await this.eden.call('cart', sessionID, req.user);

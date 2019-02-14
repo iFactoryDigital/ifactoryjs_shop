@@ -2,8 +2,6 @@
 // Bind dependencies
 const Grid        = require('grid');
 const slug        = require('slug');
-const alert       = require('alert');
-const crypto      = require('crypto');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
@@ -17,8 +15,8 @@ const Category = model('category');
 const config = require('config');
 
 // Get helpers
-const BlockHelper   = helper('cms/block');
-const ProductHelper = helper('product');
+const blockHelper   = helper('cms/block');
+const productHelper = helper('product');
 
 /**
  * Build user admin controller
@@ -53,52 +51,6 @@ class AdminProductController extends Controller {
 
     // Build
     this.build();
-
-    // Register simple block
-    BlockHelper.block('dashboard.cms.products', {
-      acl         : ['admin.shop'],
-      for         : ['admin'],
-      title       : 'Products Grid',
-      description : 'Shows grid of recent products',
-    }, async (req, block) => {
-      // Get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
-      });
-
-      // Create new req
-      const fauxReq = {
-        query : blockModel.get('state') || {},
-      };
-
-      // Return
-      return {
-        tag   : 'grid',
-        name  : 'Products',
-        grid  : await this._grid(req).render(fauxReq),
-        class : blockModel.get('class') || null,
-        title : blockModel.get('title') || '',
-      };
-    }, async (req, block) => {
-      // Get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
-      });
-
-      // Set data
-      blockModel.set('class', req.body.data.class);
-      blockModel.set('state', req.body.data.state);
-      blockModel.set('title', req.body.data.title);
-
-      // Save block
-      await blockModel.save(req.user);
-    });
   }
 
   /**
@@ -173,8 +125,54 @@ class AdminProductController extends Controller {
       data.availability.quantity = parseInt(data.availability.quantity, 10);
     });
 
+    // Register simple block
+    blockHelper.block('dashboard.cms.products', {
+      acl         : ['admin.shop'],
+      for         : ['admin'],
+      title       : 'Products Grid',
+      description : 'Shows grid of recent products',
+    }, async (req, block) => {
+      // Get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
+      });
+
+      // Create new req
+      const fauxReq = {
+        query : blockModel.get('state') || {},
+      };
+
+      // Return
+      return {
+        tag   : 'grid',
+        name  : 'Products',
+        grid  : await this._grid(req).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
+      };
+    }, async (req, block) => {
+      // Get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
+      });
+
+      // Set data
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
+
+      // Save block
+      await blockModel.save(req.user);
+    });
+
     // Register product types
-    ProductHelper.product('simple', {
+    productHelper.product('simple', {
 
     }, async (product, opts) => {
       // return price
@@ -190,7 +188,7 @@ class AdminProductController extends Controller {
     });
 
     // Register variable product
-    ProductHelper.product('variable', {
+    productHelper.product('variable', {
 
     }, async (product, opts) => {
       // set price
@@ -243,7 +241,7 @@ class AdminProductController extends Controller {
   async indexAction(req, res) {
     // Render grid
     res.render('product/admin', {
-      grid : await this._grid(req).render(req),
+      grid : await (await this._grid(req)).render(req),
     });
   }
 
@@ -286,7 +284,7 @@ class AdminProductController extends Controller {
     // Render page
     res.render('product/admin/update', {
       title   : create ? 'Create Product' : `Update ${product.get('sku')}`,
-      types   : ProductHelper.products().map(p => p.type),
+      types   : productHelper.products().map(p => p.type),
       product : await product.sanitise(),
     });
   }
@@ -395,7 +393,7 @@ class AdminProductController extends Controller {
     // Render page
     res.render('product/admin/update', {
       title   : create ? 'Create Product' : `Update ${product.get('sku')}`,
-      types   : ProductHelper.types,
+      types   : productHelper.types,
       product : await product.sanitise(),
     });
   }
@@ -464,9 +462,9 @@ class AdminProductController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction(req, res) {
+  async gridAction(req, res) {
     // Return post grid request
-    return this._grid(req).post(req, res);
+    return (await this._grid(req)).post(req, res);
   }
 
   /**
@@ -476,7 +474,7 @@ class AdminProductController extends Controller {
    */
   _grid(req) {
     // Create new grid
-    const productGrid = new Grid(req);
+    const productGrid = new Grid();
 
     // Set route
     productGrid.route('/admin/product/grid');
@@ -508,7 +506,7 @@ class AdminProductController extends Controller {
         title  : 'Price',
         format : async (col, row) => {
           // return calculated price
-          return `$${(await ProductHelper.price(row)).amount.toFixed(2)} ${config.get('shop.currency') || 'USD'}`;
+          return `$${(await productHelper.price(row)).amount.toFixed(2)} ${config.get('shop.currency') || 'USD'}`;
         },
       })
       .column('title', {

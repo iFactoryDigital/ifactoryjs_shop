@@ -103,7 +103,7 @@ class AdminPaymentController extends Controller {
   async indexAction(req, res) {
     // render grid
     res.render('payment/admin', {
-      grid : await this._grid().render(),
+      grid : await (await this._grid(req)).render(req),
     });
   }
 
@@ -286,9 +286,9 @@ class AdminPaymentController extends Controller {
    *
    * @route {post} /grid
    */
-  gridAction(req, res) {
+  async gridAction(req, res) {
     // return post grid request
-    return this._grid().post(req, res);
+    return (await this._grid()).post(req, res);
   }
 
   /**
@@ -298,7 +298,7 @@ class AdminPaymentController extends Controller {
    */
   _grid(req) {
     // create new grid
-    const paymentGrid = new Grid(req);
+    const paymentGrid = new Grid();
 
     // set route
     paymentGrid.route('/admin/payment/grid');
