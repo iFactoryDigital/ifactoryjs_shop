@@ -365,9 +365,9 @@ class AdminPaymentController extends Controller {
         },
       })
       .column('actions', {
-        type   : false,
         width  : '1%',
         title  : 'Actions',
+        export : false,
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',

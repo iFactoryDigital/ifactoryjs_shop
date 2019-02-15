@@ -435,8 +435,8 @@ class AdminCategoryController extends Controller {
       },
     })
       .column('actions', {
-        type   : false,
         title  : 'Actions',
+        export : false,
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',

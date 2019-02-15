@@ -583,6 +583,7 @@ class AdminProductController extends Controller {
       .column('actions', {
         width  : '1%',
         title  : 'Actions',
+        export : false,
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',

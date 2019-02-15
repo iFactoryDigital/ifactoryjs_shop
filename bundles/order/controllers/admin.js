@@ -303,11 +303,12 @@ class AdminOrderController extends Controller {
         sort   : true,
         title  : 'User',
         format : async (col, row) => {
-          // get user
-          const user = await row.get('user');
-
           // return user name
-          return user ? `<a href="/admin/user/${user.get('_id').toString()}/update">${user.name() || user.get('email')}</a>` : (row.get('address.name') || 'Anonymous');
+          return col ? `<a href="/admin/user/${col.get('_id').toString()}/update">${col.name() || col.get('email')}</a>` : (row.get('address.name') || 'Anonymous');
+        },
+        export : async (col, row) => {
+          // return user name
+          return col ? (col.name() || col.get('email')) : (row.get('address.name') || 'Anonymous');
         },
       })
       .column('lines', {
@@ -324,6 +325,19 @@ class AdminOrderController extends Controller {
 
             // return value
             return `${line.qty || 1}x <a href="/admin/shop/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
+          }))).join(', ');
+        },
+        export : async (col, row) => {
+          // get invoice
+          const lines = await row.get('lines');
+
+          // get products
+          return (await Promise.all(lines.map(async (line) => {
+            // get product
+            const product = await Product.findById(line.product);
+
+            // return value
+            return `${line.qty || 1}x ${product.get(`title.${req.language}`)}`;
           }))).join(', ');
         },
       })
@@ -362,6 +376,16 @@ class AdminOrderController extends Controller {
 
           // get paid
           return payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id').toString()}/update">${payment.get('_id').toString()}</a>`);
+        },
+        export : async (col, row) => {
+        // get invoice
+          const invoice  = await row.get('invoice');
+          const payments = await Payment.find({
+            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
+          });
+
+          // get paid
+          return payments.map(payment => payment.get('_id').toString());
         },
       })
       .column('paid', {
@@ -409,9 +433,9 @@ class AdminOrderController extends Controller {
         },
       })
       .column('actions', {
-        type   : false,
         width  : '1%',
         title  : 'Actions',
+        export : false,
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
