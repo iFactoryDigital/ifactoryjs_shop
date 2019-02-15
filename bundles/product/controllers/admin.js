@@ -460,6 +460,7 @@ class AdminProductController extends Controller {
    * @param req
    * @param res
    *
+   * @route {get}  /grid
    * @route {post} /grid
    */
   async gridAction(req, res) {

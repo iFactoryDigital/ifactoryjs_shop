@@ -12,7 +12,7 @@ const Payment   = model('payment');
 const Dashboard = model('dashboard');
 
 // require helpers
-const BlockHelper = helper('cms/block');
+const blockHelper = helper('cms/block');
 
 /**
  * build Block controller
@@ -63,7 +63,7 @@ class ShopAdminController extends Controller {
     res.render('admin', {
       name       : 'Admin Shop',
       type       : 'admin.shop',
-      blocks     : BlockHelper.renderBlocks('admin'),
+      blocks     : blockHelper.renderBlocks('admin'),
       jumbotron  : 'Manage Shop',
       dashboards : await Promise.all(dashboards.map(async (dashboard, i) => dashboard.sanitise(i === 0 ? req : null))),
     });
@@ -78,7 +78,7 @@ class ShopAdminController extends Controller {
      */
 
     // register simple block
-    BlockHelper.block('dashboard.shop.income', {
+    blockHelper.block('dashboard.shop.income', {
       acl         : ['admin.shop'],
       for         : ['admin'],
       title       : 'Shop Income Stats',
@@ -100,7 +100,7 @@ class ShopAdminController extends Controller {
     }, async (req, block) => { });
 
     // register simple block
-    BlockHelper.block('dashboard.shop.expense', {
+    blockHelper.block('dashboard.shop.expense', {
       acl         : ['admin.shop'],
       for         : ['admin'],
       title       : 'Shop Expense Stats',
@@ -122,7 +122,7 @@ class ShopAdminController extends Controller {
     }, async (req, block) => { });
 
     // register simple block
-    BlockHelper.block('dashboard.shop.orders', {
+    blockHelper.block('dashboard.shop.orders', {
       acl         : ['admin.shop'],
       for         : ['admin'],
       title       : 'Shop Order Stats',
