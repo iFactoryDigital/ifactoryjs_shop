@@ -103,7 +103,7 @@ class AdminCategoryController extends Controller {
       const parents = [];
 
       // set url
-      while (parent) {
+      while (parent && parent.get) {
         // push to parents
         parents.push(parent.get('_id').toString());
 
