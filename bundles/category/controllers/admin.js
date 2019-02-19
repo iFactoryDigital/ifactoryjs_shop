@@ -1,22 +1,22 @@
 
 // bind dependencies
-const Grid       = require('grid');
-const slug       = require('slug');
-const config     = require('config');
-const Controller = require('controller');
+const Grid        = require('grid');
+const slug        = require('slug');
+const config      = require('config');
+const Controller  = require('controller');
+const escapeRegex = require('escape-string-regexp');
 
 // require models
+const Block    = model('block');
 const Image    = model('image');
 const Category = model('category');
 
-// require helpers
-const categoryHelper = helper('category');
-
-// add models
-const Block = model('block');
-
 // bind helpers
-const blockHelper = helper('cms/block');
+const formHelper     = helper('form');
+const modelHelper    = helper('model');
+const blockHelper    = helper('cms/block');
+const fieldHelper    = helper('form/field');
+const categoryHelper = helper('category');
 
 /**
  * build user admin controller
@@ -50,13 +50,17 @@ class AdminCategoryController extends Controller {
     this._grid = this._grid.bind(this);
 
     // build admin controller
-    this.build();
+    this.building = this.build();
   }
 
   /**
-   * builds admin category
+   * builds category admin controller
    */
   build() {
+    //
+    // PRIVATE FUNCTIONS
+    //
+
     // build slug function
     const slugify = async (category) => {
       // get title
@@ -80,7 +84,7 @@ class AdminCategoryController extends Controller {
         // check id
         if (check && (!category.get('_id') || category.get('_id').toString() !== check.get('_id').toString())) {
           // add to i
-          i++;
+          i += 1;
         } else {
           // set new slug
           slugifiedURL = (i ? `${slugifiedURL}-${i}` : slugifiedURL);
@@ -94,8 +98,8 @@ class AdminCategoryController extends Controller {
       category.set('slug', slugifiedURL);
 
       // set url
-      let url     = [category.get('slug')];
-      let parent  = await category.get('parent');
+      let url    = [category.get('slug')];
+      let parent = await category.get('parent');
       const parents = [];
 
       // set url
@@ -122,6 +126,10 @@ class AdminCategoryController extends Controller {
       return category;
     };
 
+    //
+    // HOOKS
+    //
+
     // on render
     this.eden.pre('category.update', slugify);
     this.eden.pre('category.create', slugify);
@@ -130,12 +138,16 @@ class AdminCategoryController extends Controller {
     this.eden.post('category.create', categoryHelper.list);
     this.eden.post('category.update', categoryHelper.list);
 
+    //
+    // REGISTER BLOCKS
+    //
+
     // register simple block
-    blockHelper.block('dashboard.cms.categories', {
-      acl         : ['admin.shop'],
+    blockHelper.block('shop.category.categories', {
+      acl         : ['admin.category'],
       for         : ['admin'],
-      title       : 'Categories Grid',
-      description : 'Shows grid of recent categories',
+      title       : 'Category Grid',
+      description : 'Shop category grid',
     }, async (req, block) => {
       // get notes block from db
       const blockModel = await Block.findOne({
@@ -154,7 +166,7 @@ class AdminCategoryController extends Controller {
       return {
         tag   : 'grid',
         name  : 'Categories',
-        grid  : await this._grid(req).render(fauxReq),
+        grid  : await (await this._grid(req)).render(fauxReq),
         class : blockModel.get('class') || null,
         title : blockModel.get('title') || '',
       };
@@ -175,13 +187,99 @@ class AdminCategoryController extends Controller {
       // save block
       await blockModel.save(req.user);
     });
+
+    //
+    // REGISTER FIELDS
+    //
+
+    // register simple field
+    fieldHelper.field('shop.category', {
+      for         : ['frontend', 'admin'],
+      title       : 'Category',
+      description : 'Category field',
+    }, async (req, field, value) => {
+      // set tag
+      field.tag = 'category';
+      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map(item => item.sanitise())) : await value.sanitise()) : null;
+      // return
+      return field;
+    }, async (req, field) => {
+      // save field
+    }, async (req, field, value, old) => {
+      // set value
+      try {
+        // set value
+        value = JSON.parse(value);
+      } catch (e) {}
+
+      // check value
+      if (!Array.isArray(value)) value = [value];
+
+      // return value map
+      return await Promise.all((value || []).filter(val => val).map(async (val, i) => {
+        // run try catch
+        try {
+          // buffer category
+          const category = await Category.findById(val);
+
+          // check category
+          if (category) return category;
+
+          // return null
+          return null;
+        } catch (e) {
+          // return old
+          return old[i];
+        }
+      }));
+    });
+  }
+
+  /**
+   * socket listen action
+   *
+   * @param  {String} id
+   * @param  {Object} opts
+   *
+   * @call   model.listen.category
+   * @return {Async}
+   */
+  async listenAction(id, uuid, opts) {
+    // / return if no id
+    if (!id) return;
+
+    // join room
+    opts.socket.join(`category.${id}`);
+
+    // add to room
+    return await modelHelper.listen(opts.sessionID, await Category.findById(id), uuid, true);
+  }
+
+  /**
+   * socket listen action
+   *
+   * @param  {String} id
+   * @param  {Object} opts
+   *
+   * @call   model.deafen.category
+   * @return {Async}
+   */
+  async deafenAction(id, uuid, opts) {
+    // / return if no id
+    if (!id) return;
+
+    // join room
+    opts.socket.leave(`category.${id}`);
+
+    // add to room
+    return await modelHelper.deafen(opts.sessionID, await Category.findById(id), uuid, true);
   }
 
   /**
    * index action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @icon    fa fa-filter
    * @menu    {ADMIN} Categories
@@ -198,10 +296,46 @@ class AdminCategoryController extends Controller {
   }
 
   /**
+   * index action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @acl   admin
+   * @fail  next
+   * @route {GET} /query
+   */
+  async queryAction(req, res) {
+    // find children
+    let categories = await Category;
+
+    // set query
+    if (req.query.q) {
+      categories = categories.where({
+        name : new RegExp(escapeRegex(req.query.q || ''), 'i'),
+      });
+    }
+
+    // add roles
+    categories = await categories.skip(((parseInt(req.query.page, 10) || 1) - 1) * 20).limit(20).sort('name', 1)
+      .find();
+
+    // get children
+    res.json((await Promise.all(categories.map(category => category.sanitise()))).map((sanitised) => {
+      // return object
+      return {
+        text  : sanitised.name,
+        data  : sanitised,
+        value : sanitised.id,
+      };
+    }));
+  }
+
+  /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route    {get} /create
    * @layout   admin
@@ -215,8 +349,8 @@ class AdminCategoryController extends Controller {
   /**
    * update action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/update
    * @layout  admin
@@ -233,18 +367,35 @@ class AdminCategoryController extends Controller {
       category = await Category.findById(req.params.id);
     }
 
-    // render page
+    // get form
+    const form = await formHelper.get('shop.category');
+
+    // digest into form
+    const sanitised = await formHelper.render(req, form, await Promise.all(form.get('fields').map(async (field) => {
+      // return fields map
+      return {
+        uuid  : field.uuid,
+        value : await category.get(field.name || field.uuid),
+      };
+    })));
+
+    // get form
+    if (!form.get('_id')) res.form('shop.category');
+
+    // Render page
     res.render('category/admin/update', {
-      title    : create ? 'Create category' : `Update ${category.get('_id').toString()}`,
-      category : await category.sanitise(),
+      item   : await category.sanitise(),
+      form   : sanitised,
+      title  : create ? 'Create category' : `Update ${category.get('_id').toString()}`,
+      fields : config.get('shop.category.fields'),
     });
   }
 
   /**
    * create submit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /create
    * @layout  admin
@@ -257,13 +408,14 @@ class AdminCategoryController extends Controller {
   /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
+   * @param {Function} next
    *
    * @route   {post} /:id/update
    * @layout  admin
    */
-  async updateSubmitAction(req, res) {
+  async updateSubmitAction(req, res, next) {
     // set website variable
     let create   = true;
     let category = new Category();
@@ -275,52 +427,39 @@ class AdminCategoryController extends Controller {
       category = await Category.findById(req.params.id);
     }
 
-    // load images
-    const images = req.body.images ? (await Promise.all((Array.isArray(req.body.images) ? req.body.images : [req.body.images]).map((id) => {
-      // load image
-      return Image.findById(id);
-    }))).filter((image) => {
-      // return image
-      return image;
-    }) : false;
+    // get form
+    const form = await formHelper.get('shop.category');
 
-    // get parent
-    let parent = null;
+    // digest into form
+    const fields = await formHelper.submit(req, form, await Promise.all(form.get('fields').map(async (field) => {
+      // return fields map
+      return {
+        uuid  : field.uuid,
+        value : await category.get(field.name || field.uuid),
+      };
+    })));
 
-    // check parent
-    if (req.body.parent && req.body.parent !== (category.get('_id') || '').toString() && req.body.parent.length === 24) {
-      // set parent
-      parent = await category.findById(req.body.parent);
+    // loop fields
+    for (const field of fields) {
+      // set value
+      category.set(field.name || field.uuid, field.value);
     }
 
-    // update category
-    category.set('meta', req.body.meta);
-    category.set('title', req.body.title);
-    category.set('short', req.body.short);
-    category.set('parent', parent || null);
-    category.set('images', images || await category.get('images'));
-    category.set('active', req.body.active === 'true');
-    category.set('promoted', req.body.promoted === 'true');
-    category.set('description', req.body.description);
-
-    // save category
+    // Save category
     await category.save(req.user);
 
-    // send alert
-    req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} category!`);
+    // set id
+    req.params.id = category.get('_id').toString();
 
-    // render page
-    res.render('category/admin/update', {
-      title    : create ? 'Create category' : `Update ${category.get('_id').toString()}`,
-      category : await category.sanitise(),
-    });
+    // return update action
+    return this.updateAction(req, res, next);
   }
 
   /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/remove
    * @layout  admin
@@ -345,8 +484,8 @@ class AdminCategoryController extends Controller {
   /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/remove
    * @title   Category Administration
@@ -375,8 +514,8 @@ class AdminCategoryController extends Controller {
   /**
    * user grid action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route {get}  /grid
    * @route {post} /grid
@@ -391,76 +530,76 @@ class AdminCategoryController extends Controller {
    *
    * @return {grid}
    */
-  _grid(req) {
-    // create new grid
+  async _grid(req) {
+    // Create new grid
     const categoryGrid = new Grid();
 
-    // set route
-    categoryGrid.route('/admin/shop/category/grid');
+    // Set route
+    categoryGrid.route('/admin/fleet/category/grid');
 
-    // set grid model
+    // get form
+    const form = await formHelper.get('shop.category');
+
+    // Set grid model
+    categoryGrid.id('shop.category');
     categoryGrid.model(Category);
+    categoryGrid.models(true);
 
-    // add grid columns
+    // Add grid columns
     categoryGrid.column('_id', {
-      title  : 'ID',
-      format : async (col) => {
-        return col ? col.toString() : 'N/A';
-      },
-    }).column('title', {
-      sort   : true,
-      title  : 'Title',
-      format : async (col, row) => {
-        return (col || {})[req.language] || 'N/A';
-      },
-    }).column('updated_at', {
-      sort   : true,
-      title  : 'Updated',
-      format : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          day   : 'numeric',
-          month : 'short',
-          year  : 'numeric',
-        });
-      },
-    }).column('created_at', {
-      sort   : true,
-      title  : 'Created',
-      format : async (col) => {
-        return col.toLocaleDateString('en-GB', {
-          day   : 'numeric',
-          month : 'short',
-          year  : 'numeric',
-        });
-      },
-    })
-      .column('actions', {
-        title  : 'Actions',
-        export : false,
-        format : async (col, row) => {
-          return [
-            '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/shop/category/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/shop/category/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
-            '</div>',
-          ].join('');
-        },
-      });
-
-    // add grid filters
-    categoryGrid.filter('title', {
-      title : 'Title',
-      type  : 'text',
-      query : async (param) => {
-        // another where
-        categoryGrid.match(`title.${req.language}`, new RegExp(param.toString().toLowerCase(), 'i'));
-      },
+      sort     : true,
+      title    : 'Id',
+      priority : 100,
     });
 
-    // set default sort order
+    // branch fields
+    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.category.fields').slice(0)).map(async (field, i) => {
+      // set found
+      const found = config.get('shop.category.fields').find(f => f.name === field.name);
+
+      // add config field
+      await formHelper.column(req, form, categoryGrid, field, {
+        hidden   : !(found && found.grid),
+        priority : 100 - i,
+      });
+    }));
+
+    // add extra columns
+    categoryGrid.column('updated_at', {
+      tag      : 'grid-date',
+      sort     : true,
+      title    : 'Updated',
+      priority : 4,
+    }).column('created_at', {
+      tag      : 'grid-date',
+      sort     : true,
+      title    : 'Created',
+      priority : 3,
+    }).column('actions', {
+      tag      : 'category-actions',
+      type     : false,
+      width    : '1%',
+      title    : 'Actions',
+      priority : 1,
+    });
+
+    // branch filters
+    config.get('shop.category.fields').slice(0).filter(field => field.grid).forEach((field) => {
+      // add config field
+      categoryGrid.filter(field.name, {
+        type  : 'text',
+        title : field.label,
+        query : (param) => {
+          // Another where
+          categoryGrid.match(field.name, new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
+        },
+      });
+    });
+
+    // Set default sort order
     categoryGrid.sort('created_at', 1);
 
-    // return grid
+    // Return grid
     return categoryGrid;
   }
 }

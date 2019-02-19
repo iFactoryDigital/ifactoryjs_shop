@@ -1,6 +1,10 @@
 
 // import local dependencies
-const Model = require('model');
+const Model  = require('model');
+const config = require('config');
+
+// require helpers
+const formHelper = helper('form');
 
 /**
  * create address class
@@ -28,22 +32,29 @@ class Category extends Model {
    * @return {Object}
    */
   async sanitise(small) {
-    // set children
-    const parent    = await this.get('parent');
-    const children  = null;
+    // return object
     const sanitised = {
-      id     : this.get('_id') ? this.get('_id').toString() : null,
-      url    : this.get('url') || this.get('slug'),
-      slug   : this.get('slug') || '',
-      short  : this.get('short') || {},
-      title  : this.get('title') || {},
-      parent : parent ? parent.get('_id').toString() : false,
-      images : await Promise.all((await this.get('images') || []).map((image) => {
-        // return sanitised images
-        return image.sanitise();
-      })),
-      promoted : !!this.get('promoted'),
+      id         : this.get('_id') ? this.get('_id').toString() : null,
+      created_at : this.get('created_at'),
+      updated_at : this.get('updated_at'),
     };
+
+    // get form
+    const form = await formHelper.get('shop.category');
+
+    // add other fields
+    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.category.fields').slice(0)).map(async (field, i) => {
+      // set field name
+      const fieldName = field.name || field.uuid;
+
+      // set sanitised
+      sanitised[fieldName] = await this.get(fieldName);
+      sanitised[fieldName] = sanitised[fieldName] && sanitised[fieldName].sanitise ? await sanitised[fieldName].sanitise() : sanitised[fieldName];
+      sanitised[fieldName] = Array.isArray(sanitised[fieldName]) ? await Promise.all(sanitised[fieldName].map((val) => {
+        // return sanitised value
+        if (val.sanitise) return val.sanitise();
+      })) : sanitised[fieldName];
+    }));
 
     // check if small
     if (!small) {
@@ -53,13 +64,17 @@ class Category extends Model {
       }) : [];
 
       // set children
-      sanitised.active = this.get('active') || false;
       sanitised.children = children && children.length ? await Promise.all(children.map((child) => {
         // return sanitised child category
         return child.sanitise(small);
       })) : [];
-      sanitised.description = this.get('description') || {};
     }
+
+    // await hook
+    await this.eden.hook('category.sanitise', {
+      sanitised,
+      category : this,
+    });
 
     // return sanitised
     return sanitised;
