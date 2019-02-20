@@ -70,7 +70,7 @@ class AdminOrderController extends Controller {
       return {
         tag   : 'grid',
         name  : 'Orders',
-        grid  : await this._grid(req).render(fauxReq),
+        grid  : await (await this._grid(req, blockModel.get('_id') ? blockModel.get('_id').toString() : null)).render(fauxReq),
         class : blockModel.get('class') || null,
         title : blockModel.get('title') || '',
       };
@@ -280,9 +280,12 @@ class AdminOrderController extends Controller {
   /**
    * renders grid
    *
+   * @param {Request} req
+   * @param {String}  id
+   *
    * @return {grid}
    */
-  _grid(req) {
+  async _grid(req, id) {
     // create new grid
     const orderGrid = new Grid();
 
@@ -291,6 +294,9 @@ class AdminOrderController extends Controller {
 
     // set grid model
     orderGrid.model(Order);
+
+    // set id
+    if (id) orderGrid.id(id);
 
     // add grid columns
     orderGrid.column('_id', {
@@ -518,6 +524,12 @@ class AdminOrderController extends Controller {
           status : param,
         });
       },
+    });
+
+    // do hook
+    await this.eden.hook('shop.admin.order.grid', {
+      req,
+      grid : orderGrid,
     });
 
     // set default sort order
