@@ -51,6 +51,15 @@ class CartStore extends Events {
 
     // listen to room
     socket.on('cart', this._cart);
+
+    // pre cart
+    store.pre('set', (data) => {
+      // Check key
+      if (data.key !== 'cart') return;
+
+      // Set val
+      data.val = this;
+    });
   }
 
   /**
