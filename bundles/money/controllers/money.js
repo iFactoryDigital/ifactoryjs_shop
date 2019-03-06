@@ -44,6 +44,9 @@ class MoneyController extends Controller {
   async build() {
     // on render
     this.eden.pre('view.compile', async (render) => {
+      // not in json
+      if (render.isJSON) return;
+
       // await building
       await this.building;
 

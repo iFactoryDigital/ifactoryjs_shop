@@ -120,13 +120,7 @@ class PaymentController extends Controller {
     };
 
     // check error
-    if (order.get('error')) return;
-
-    // sanitise order
-    const sanitisedOrder = {
-      user  : await order.get('user'),
-      lines : order.get('lines'),
-    };
+    if (order.get('error')) return null;
 
     // do hook
     await this.eden.hook('payment.init', order, check);
@@ -152,10 +146,19 @@ class PaymentController extends Controller {
     if (invoice.get('error')) return order.set('error', invoice.get('error'));
 
     // init invoice
-    await this.eden.hook('order.invoice', order, invoice, () => {});
+    await this.eden.hook('order.invoice', order, invoice, async () => {
+      // save invoice
+      await invoice.save();
+    });
 
     // do payment
     const payment = await PaymentHelper.payment(invoice, action.value);
+
+    // init invoice
+    await this.eden.hook('order.invoice.payment', order, invoice, payment, async () => {
+      // save payment
+      await payment.save();
+    });
 
     // check payment
     if (payment.get('error')) return order.set('error', payment.get('error'));

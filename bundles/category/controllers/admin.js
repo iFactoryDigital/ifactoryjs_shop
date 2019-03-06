@@ -535,7 +535,7 @@ class AdminCategoryController extends Controller {
     const categoryGrid = new Grid();
 
     // Set route
-    categoryGrid.route('/admin/fleet/category/grid');
+    categoryGrid.route('/admin/shop/category/grid');
 
     // get form
     const form = await formHelper.get('shop.category');

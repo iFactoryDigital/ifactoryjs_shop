@@ -44,7 +44,7 @@ class CartController extends Controller {
     // on render
     this.eden.pre('view.compile', (render) => {
       // move menus
-      if (render.state.cart) render.cart = render.state.cart;
+      if (render.state.cart && !render.isJSON) render.cart = render.state.cart;
 
       // delete from state
       delete render.state.cart;
@@ -192,6 +192,9 @@ class CartController extends Controller {
    * @param {Function} next
    */
   async _middleware(req, res, next) {
+    // check locals
+    if (res.locals.isJSON) return next();
+
     // load cart
     const cart = await this.eden.call('cart', req.sessionID, req.user);
 

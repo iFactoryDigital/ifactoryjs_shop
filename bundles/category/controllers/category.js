@@ -37,6 +37,9 @@ class CategoryController extends Controller {
   async build() {
     // on render
     this.eden.pre('view.compile', async (render) => {
+      // not required by json
+      if (render.isJSON) return;
+
       // set categories
       render.categories = categoryHelper.sanitised;
     });
