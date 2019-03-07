@@ -5,6 +5,7 @@ const socket     = require('socket');
 const Controller = require('controller');
 
 // require models
+const Sold    = model('sold');
 const Order   = model('order');
 const Product = model('product');
 
@@ -228,6 +229,43 @@ class OrderController extends Controller {
 
         // do in product helper
         await ProductHelper.complete(product, item, orderStatus);
+
+        // update product
+        await this.eden.hook('product.sold', product, item, async () => {
+          // set qty
+          const qty = parseInt(item.qty, 10);
+
+          // check qty
+          if (!qty) return;
+
+          // lock product
+          await product.lock();
+
+          // do try/catch
+          try {
+            // create new sold entry for stats
+            const sold = new Sold({
+              qty     : item.qty,
+              order   : orderStatus,
+              product : {
+                id    : item.product,
+                model : 'product',
+              },
+            });
+
+            // save sold
+            await sold.save();
+
+            // set new qty
+            product.set('availability.quantity', parseInt(product.get('availability.quantity') || 0, 10) - qty);
+
+            // save product
+            await product.save();
+          } catch (e) {}
+
+          // unlock product
+          product.unlock();
+        });
       }
     }
   }

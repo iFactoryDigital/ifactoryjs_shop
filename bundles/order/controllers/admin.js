@@ -63,6 +63,7 @@ class AdminOrderController extends Controller {
 
       // create new req
       const fauxReq = {
+        user  : req.user,
         query : blockModel.get('state') || {},
       };
 

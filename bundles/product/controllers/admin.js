@@ -6,8 +6,9 @@ const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
 // Require models
+const Sold     = model('sold');
 const Image    = model('image');
-const Block   = model('block');
+const Block    = model('block');
 const Product  = model('product');
 const Category = model('category');
 
@@ -142,6 +143,7 @@ class AdminProductController extends Controller {
 
       // Create new req
       const fauxReq = {
+        user  : req.user,
         query : blockModel.get('state') || {},
       };
 
@@ -534,7 +536,10 @@ class AdminProductController extends Controller {
       .column('sold', {
         title  : 'Sold',
         format : async (col, row) => {
-          return col ? col.toString() : '<i>N/A</i>';
+          // return sold amount
+          return (await Sold.where({
+            'product.id' : row.get('_id').toString()
+          }).sum('qty')).toLocaleString();
         },
       })
       .column('published', {
