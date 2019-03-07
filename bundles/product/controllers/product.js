@@ -72,14 +72,23 @@ class ProductController extends Controller {
       description : 'Lets list product cards in a block',
     }, async (req, block) => {
       // get products
-      const products = await Product.where({
+      const query = await Product.where({
         promoted : true,
-      }).find();
+      });
+
+      // set data
+      const data = {
+        query,
+        req
+      };
+
+      // hook
+      await this.eden.hook('frontend.products.query', data);
 
       // return
       return {
         tag      : 'products',
-        products : await Promise.all(products.map(product => product.sanitise())),
+        products : await Promise.all((await data.query.find()).map(product => product.sanitise())),
       };
     }, async (req, block) => { });
 
