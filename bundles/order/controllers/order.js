@@ -198,7 +198,7 @@ class OrderController extends Controller {
       }, true);
 
       // complete order
-      this.eden.hook('order.complete', orderStatus);
+      await this.eden.hook('order.complete', orderStatus);
 
       // set address to null
       let address = null;
