@@ -7,8 +7,8 @@ const Controller = require('controller');
 const Product = model('product');
 
 // get helpers
-const BlockHelper   = helper('cms/block');
-const ProductHelper = helper('product');
+const blockHelper   = helper('cms/block');
+const productHelper = helper('product');
 
 /**
  * build product controller
@@ -66,7 +66,7 @@ class ProductController extends Controller {
     });
 
     // register simple block
-    BlockHelper.block('frotend.products', {
+    blockHelper.block('frotend.products', {
       for         : ['frontend'],
       title       : 'Products List',
       description : 'Lets list product cards in a block',
@@ -93,7 +93,7 @@ class ProductController extends Controller {
     }, async (req, block) => { });
 
     // register simple block
-    BlockHelper.block('frotend.product', {
+    blockHelper.block('frotend.product', {
       for         : ['frontend'],
       title       : 'Product Card',
       description : 'Shows a single product card',
@@ -109,7 +109,7 @@ class ProductController extends Controller {
     }, async (req, block) => { });
 
     // register simple block
-    BlockHelper.block('frotend.product.filter', {
+    blockHelper.block('frotend.product.filter', {
       for         : ['frontend'],
       title       : 'Product Filter',
       description : 'Filters the current page products',
@@ -119,6 +119,61 @@ class ProductController extends Controller {
         tag : 'product-filter',
       };
     }, async (req, block) => { });
+
+    // Register product types
+    productHelper.register('simple', {
+      options  : ['availability'],
+      sections : ['simple-pricing', 'display'],
+    }, async (product, opts) => {
+      // return price
+      return {
+        amount    : parseFloat(product.get('pricing.price')),
+        currency  : config.get('shop.currency') || 'USD',
+        available : product.get('availability.quantity') > 0,
+      };
+    }, async (product, line, req) => {
+
+    }, async (product, line, order) => {
+
+    });
+
+    // Register variable product
+    productHelper.register('variable', {
+      options  : ['availability'],
+      sections : ['variable-pricing', 'variations', 'display'],
+    }, async (product, opts) => {
+      // set price
+      let price = parseFloat(product.get('pricing.price'));
+
+      // get variations
+      const variations = await product.get('variations');
+
+      // loop for variations
+      Object.keys(variations).forEach((type) => {
+        // check found option
+        const found = variations[type].options.find(option => opts.includes(option.sku));
+
+        // check found
+        if (!found) {
+          // throw error
+          throw new Error('Variation missing options');
+        }
+
+        // add to price
+        price += parseFloat(found.price);
+      });
+
+      // return price
+      return {
+        amount    : parseFloat(price),
+        currency  : config.get('shop.currency') || 'USD',
+        available : product.get('availability.quantity') > 0,
+      };
+    }, async (product, line, req) => {
+
+    }, async (product, line, order) => {
+
+    });
   }
 
   /**

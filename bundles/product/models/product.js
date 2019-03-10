@@ -7,11 +7,15 @@
 
 
 // import local dependencies
-const eden  = require('eden');
-const Model = require('model');
+const Model  = require('model');
+const config = require('config');
 
 // get product helper
-const ProductHelper = helper('product');
+const formHelper    = helper('form');
+const productHelper = helper('product');
+
+// require models
+const Category = model('category');
 
 /**
  * create address class
@@ -83,39 +87,58 @@ class Product extends Model {
    *
    * @return {Object}
    */
-  async sanitise() {
+  async sanitise(small) {
     // get helper
     const type = this.get('type') || 'simple';
 
     // sanitise
     const sanitised = {
-      id     : this.get('_id') ? this.get('_id').toString() : null,
-      is     : 'product',
-      sku    : this.get('sku') || '',
-      type   : this.get('type') || '',
-      slug   : this.get('slug') || '',
-      title  : this.get('title') || {},
-      short  : this.get('short') || {},
-      images : await Promise.all((await this.get('images') || []).map((image) => {
-        // return sanitised images
-        return image.sanitise();
-      })),
-      categories  : await Promise.all((await this.get('categories') || []).map((category) => {
-        // return sanitised category
-        return category.sanitise(true);
-      })),
-      price        : await ProductHelper.price(this, {}),
+      type,
+      id           : this.get('_id') ? this.get('_id').toString() : null,
+      is           : 'product',
+      sku          : this.get('sku') || '',
+      price        : await productHelper.price(this, {}),
       pricing      : this.get('pricing') || 0,
       promoted     : this.get('promoted') || false,
       published    : this.get('published') || false,
-      description  : this.get('description') || {},
       availability : this.get('availability') || {},
     };
 
-    // return sanitised bot
-    await eden.hook('product.sanitise', {
-      product   : this,
+    // get form
+    const form = await formHelper.get('shop.product');
+
+    // add other fields
+    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.product.fields').slice(0)).map(async (field, i) => {
+      // set field name
+      const fieldName = field.name || field.uuid;
+
+      // set sanitised
+      sanitised[fieldName] = await this.get(fieldName);
+      sanitised[fieldName] = sanitised[fieldName] && sanitised[fieldName].sanitise ? await sanitised[fieldName].sanitise() : sanitised[fieldName];
+      sanitised[fieldName] = Array.isArray(sanitised[fieldName]) ? await Promise.all(sanitised[fieldName].map((val) => {
+        // return sanitised value
+        if (val.sanitise) return val.sanitise();
+      })) : sanitised[fieldName];
+    }));
+
+    // check if small
+    if (!small) {
+      // let children
+      const children = this.get('_id') ? await Category.find({
+        'parent.id' : this.get('_id').toString(),
+      }) : [];
+
+      // set children
+      sanitised.children = children && children.length ? await Promise.all(children.map((child) => {
+        // return sanitised child category
+        return child.sanitise(small);
+      })) : [];
+    }
+
+    // await hook
+    await this.eden.hook('category.sanitise', {
       sanitised,
+      product : this,
     });
 
     // return sanitised

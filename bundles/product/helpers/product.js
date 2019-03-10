@@ -22,7 +22,7 @@ class ProductHelper extends Helper {
 
     // bind methods
     this.order = this.order.bind(this);
-    this.product = this.product.bind(this);
+    this.register = this.register.bind(this);
     this.complete = this.complete.bind(this);
     this.quantity = this.quantity.bind(this);
     this.products = this.products.bind(this);
@@ -123,7 +123,7 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  product(type, opts, price, order, complete) {
+  register(type, opts, price, order, complete) {
     // check found
     const found = this.__products.find(product => product.type === type);
 

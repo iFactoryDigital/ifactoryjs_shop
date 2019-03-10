@@ -1,13 +1,12 @@
 {
   "left"   : "Left",
   "simple" : {
-    "plural" : "Products"
+    "title"  : "Simple",
+    "plural" : "Simple Products"
   },
   "variable" : {
-    "plural" : "Customised Products"
-  },
-  "server"   : {
-    "plural" : "Servers"
+    "title"  : "Variable",
+    "plural" : "Variable Products"
   },
   "promoted" : "Promoted"
 }
