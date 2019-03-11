@@ -1,5 +1,6 @@
 
 // require dependencies
+const money  = require('money-math');
 const colors = require('colors');
 const config = require('config');
 const Helper = require('helper');
@@ -105,10 +106,10 @@ class OrderHelper extends Helper {
     line = Object.assign({}, line);
 
     // get price
-    const price = await productHelper.price(product, line.opts || {});
+    const price = parseFloat(money.floatToAmount(await productHelper.price(product, line.opts || {})));
 
     // return value
-    const amount = parseFloat(price.amount) * parseInt(line.qty || 1, 10);
+    const amount = parseFloat(money.floatToAmount(parseFloat(price.amount) * parseInt(line.qty || 1, 10)));
 
     // hook
     await this.eden.hook('line.price', {

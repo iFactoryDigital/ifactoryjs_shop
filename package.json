@@ -8,6 +8,7 @@
     "escape-string-regexp": "^1.0.5",
     "is-type": "0.0.1",
     "moment": "^2.22.2",
+    "money-math": "^2.5.1",
     "slug": "^0.9.2"
   },
   "engines": {
