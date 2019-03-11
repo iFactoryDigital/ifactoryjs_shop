@@ -101,6 +101,9 @@ class OrderHelper extends Helper {
     // get product
     if (!product) product = await Product.findById(line.product);
 
+    // clone line
+    line = Object.assign({}, line);
+
     // get price
     const price = await productHelper.price(product, line.opts || {});
 
@@ -120,6 +123,8 @@ class OrderHelper extends Helper {
     });
 
     // set price
+    line.sku = product.get('sku') + (Object.values(line.opts || {})).join('_');
+    line.title = Object.values(product.get('title'))[0];
     line.price = price;
     line.total = amount;
 
