@@ -3,7 +3,7 @@
 const Controller = require('controller');
 
 // require helpers
-const PaymentHelper = helper('payment');
+const paymentHelper = helper('payment');
 
 /**
  * create payment controller
@@ -137,7 +137,7 @@ class PaymentController extends Controller {
     }
 
     // hook payment
-    const invoice = await PaymentHelper.invoice(order);
+    const invoice = await paymentHelper.invoice(order);
 
     // set to order
     order.set('invoice', invoice);
@@ -152,7 +152,7 @@ class PaymentController extends Controller {
     });
 
     // do payment
-    const payment = await PaymentHelper.payment(invoice, action.value);
+    const payment = await paymentHelper.payment(invoice, action.value);
 
     // init invoice
     await this.eden.hook('order.invoice.payment', order, invoice, payment, async () => {

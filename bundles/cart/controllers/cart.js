@@ -8,8 +8,8 @@ const Cart    = model('cart');
 const Product = model('product');
 
 // require helpers
-const BlockHelper   = helper('cms/block');
-const ProductHelper = helper('product');
+const blockHelper   = helper('cms/block');
+const productHelper = helper('product');
 
 /**
  * build cart controller
@@ -26,13 +26,21 @@ class CartController extends Controller {
 
     // bind methods
     this.build = this.build.bind(this);
+    this.cartEndpoint = this.cartEndpoint.bind(this);
 
     // bind private methods
     this._middleware = this._middleware.bind(this);
 
     // build
-    this.build();
+    this.building = this.build();
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * builds cart controller
@@ -51,24 +59,7 @@ class CartController extends Controller {
     });
 
     // add cart endpoint
-    this.eden.endpoint('cart', async (session, user) => {
-      // return found or new cart
-      const cart = await Cart.or({
-        sessionID : session,
-      },
-      {
-        'user.id' : user && user.get('_id') ? user.get('_id').toString() : 'false',
-      }).findOne() || new Cart({
-        user,
-        sessionID : session,
-      });
-
-      // save cart
-      await cart.save(user);
-
-      // return cart
-      return cart;
-    });
+    this.eden.endpoint('cart', this.cartEndpoint);
 
     // add cart endpoint
     this.eden.post('order.complete', async (order) => {
@@ -93,7 +84,7 @@ class CartController extends Controller {
     });
 
     // register simple block
-    BlockHelper.block('cart.dropdown', {
+    blockHelper.block('cart.dropdown', {
       for         : ['frontend'],
       title       : 'Cart Dropdown',
       description : 'Cart Dropdown block',
@@ -106,6 +97,13 @@ class CartController extends Controller {
       };
     }, async (req, block) => {});
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * cart action
@@ -140,7 +138,7 @@ class CartController extends Controller {
       // run try/catch
       try {
         // check can add
-        if (await ProductHelper.order(product, line, req) === false) {
+        if (await productHelper.order(product, line, req) === false) {
           // return null
           continue;
         }
@@ -185,6 +183,40 @@ class CartController extends Controller {
   }
 
   /**
+   * returns cart
+   *
+   * @param  {String} session
+   * @param  {User}   user
+   *
+   * @return {Promise}
+   */
+  async cartEndpoint(session, user) {
+    // return found or new cart
+    const cart = await Cart.or({
+      sessionID : session,
+    },
+    {
+      'user.id' : user && user.get('_id') ? user.get('_id').toString() : 'false',
+    }).findOne() || new Cart({
+      user,
+      sessionID : session,
+    });
+
+    // save cart
+    await cart.save(user);
+
+    // return cart
+    return cart;
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
    * Adds user to locals
    *
    * @param {Request} req
@@ -196,7 +228,7 @@ class CartController extends Controller {
     if (res.locals.isJSON) return next();
 
     // load cart
-    const cart = await this.eden.call('cart', req.sessionID, req.user);
+    const cart = await this.cartEndpoint(req.sessionID, req.user);
 
     // add to user
     res.locals.cart = await cart.sanitise();

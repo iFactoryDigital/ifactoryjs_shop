@@ -222,17 +222,17 @@ class OrderController extends Controller {
       }
 
       // loop items
-      for (const item of (orderStatus.get('lines') || [])) {
+      await Promise.all((await orderHelper.lines(orderStatus.get('lines') || [])).map(async (line) => {
         // get product
-        const product = await Product.findById(item.product);
+        const product = await Product.findById(line.product);
 
         // do in product helper
-        await productHelper.complete(product, item, orderStatus);
+        await productHelper.complete(product, line, orderStatus);
 
         // update product
-        await this.eden.hook('product.sold', product, item, async () => {
+        await this.eden.hook('product.sold', product, line, async () => {
           // set qty
-          const qty = parseInt(item.qty, 10);
+          const qty = parseInt(line.qty, 10);
 
           // check qty
           if (!qty) return;
@@ -244,10 +244,12 @@ class OrderController extends Controller {
           try {
             // create new sold entry for stats
             const sold = new Sold({
-              qty     : item.qty,
+              qty     : line.qty,
+              price   : line.price,
               order   : orderStatus,
+              total   : line.total,
               product : {
-                id    : item.product,
+                id    : line.product,
                 model : 'product',
               },
             });
@@ -265,7 +267,7 @@ class OrderController extends Controller {
           // unlock product
           product.unlock();
         });
-      }
+      }));
     }
   }
 

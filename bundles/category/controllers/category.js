@@ -1,6 +1,5 @@
 
 // bind dependencies
-const config     = require('config');
 const Controller = require('controller');
 
 // require models

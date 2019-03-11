@@ -1,20 +1,15 @@
 
 // bind dependencies
-const config     = require('config');
-const crypto     = require('crypto');
 const Controller = require('controller');
 
-// require helpers
-const orderHelper = helper('order');
-
 // require models
-const User    = model('user');
 const Block   = model('block');
 const Order   = model('order');
 const Product = model('product');
 
 // require helpers
-const BlockHelper = helper('cms/block');
+const orderHelper = helper('order');
+const blockHelper = helper('cms/block');
 
 /**
  * build checkout controller
@@ -47,7 +42,7 @@ class CheckoutController extends Controller {
       const upper = type.charAt(0).toUpperCase() + type.slice(1);
 
       // register simple block
-      BlockHelper.block(`checkout.${type}`, {
+      blockHelper.block(`checkout.${type}`, {
         for         : ['frontend'],
         title       : `Checkout ${upper} Block`,
         description : `Checkout ${upper} Block`,

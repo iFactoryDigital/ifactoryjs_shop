@@ -8,7 +8,6 @@ const escapeRegex = require('escape-string-regexp');
 
 // require models
 const Block    = model('block');
-const Image    = model('image');
 const Category = model('category');
 
 // bind helpers

@@ -4,6 +4,12 @@ const colors = require('colors');
 const config = require('config');
 const Helper = require('helper');
 
+// require helpers
+const productHelper = helper('product');
+
+// get product
+const Product = model('product');
+
 /**
  * build order helper
  */
@@ -21,6 +27,13 @@ class OrderHelper extends Helper {
     // bind private methods
     this._log = this._log.bind(this);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * creates order
@@ -61,6 +74,65 @@ class OrderHelper extends Helper {
     // save order
     await order.save(await order.get('user'));
   }
+
+  /**
+   * gets order lines prices
+   *
+   * @param  {Order}  order
+   * @param  {Array}  lines
+   *
+   * @return {Promise}
+   */
+  lines(order, lines) {
+    // return promised lines
+    return Promise.all(lines.map(line => this.line(order, null, line)));
+  }
+
+  /**
+   * gets order line price
+   *
+   * @param  {Order}  order
+   * @param  {*}      product
+   * @param  {Object} line
+   *
+   * @return {Promise}
+   */
+  async line(order, product, line) {
+    // get product
+    if (!product) product = await Product.findById(line.product);
+
+    // get price
+    const price = await productHelper.price(product, line.opts || {});
+
+    // return value
+    const amount = parseFloat(price.amount) * parseInt(line.qty || 1, 10);
+
+    // hook
+    await this.eden.hook('line.price', {
+      qty  : line.qty,
+      user : await order.get('user'),
+      opts : line.opts,
+
+      order,
+      price,
+      amount,
+      product,
+    });
+
+    // set price
+    line.price = price;
+    line.total = amount;
+
+    // return price
+    return line;
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * logs product transaction

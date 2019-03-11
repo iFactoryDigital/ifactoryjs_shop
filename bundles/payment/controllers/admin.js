@@ -10,7 +10,7 @@ const Block   = model('block');
 const Payment = model('payment');
 
 // require helpers
-const BlockHelper = helper('cms/block');
+const blockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -41,7 +41,7 @@ class AdminPaymentController extends Controller {
     this._grid = this._grid.bind(this);
 
     // register simple block
-    BlockHelper.block('dashboard.cms.payments', {
+    blockHelper.block('dashboard.cms.payments', {
       acl         : ['admin.shop'],
       for         : ['admin'],
       title       : 'Payments Grid',

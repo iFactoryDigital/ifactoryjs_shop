@@ -13,10 +13,9 @@ const Helper = require('helper');
 // require models
 const Invoice = model('invoice');
 const Payment = model('payment');
-const Product = model('product');
 
 // get helpers
-const ProductHelper = helper('product');
+const orderHelper = helper('order');
 
 /**
  * build payment helper
@@ -56,35 +55,10 @@ class PaymentHelper extends Helper {
       order,
 
       user  : await order.get('user'),
-      total : (await Promise.all(lines.map(async (line) => {
-        // get product
-        const product = await Product.findById(line.product);
-
-        // get price
-        const price = await ProductHelper.price(product, line.opts || {});
-
+      total : (await orderHelper.lines(order, lines)).reduce((total, x) => {
         // return value
-        const amount = parseFloat(price.amount) * parseInt(line.qty || 1);
-
-        // hook
-        await this.eden.hook('line.price', {
-          qty  : line.qty,
-          user : await order.get('user'),
-          opts : line.opts,
-
-          order,
-          price,
-          amount,
-          product,
-        });
-
-        // set price
-        line.price = price;
-        line.total = amount;
-
-        // return price
-        return price.amount * parseInt(line.qty || 1);
-      }))).reduce((total, x) => total += x, 0),
+        return total.total += x;
+      }, 0),
       lines : order.get('lines'),
     });
 
@@ -158,10 +132,13 @@ class PaymentHelper extends Helper {
    * @param  {Boolean}  success
    */
   _log(user, way, message, success) {
-    // log with log function
-    this.logger.log((success ? 'info' : 'error'), ` [${colors.green(user.get('username'))}] ${message}`, {
-      class : 'payment',
-    });
+    // try/catch
+    try {
+      // log with log function
+      this.logger.log((success ? 'info' : 'error'), ` [${colors.green(user.get('username'))}] ${message}`, {
+        class : 'PaymentHelper',
+      });
+    } catch (e) {}
   }
 }
 
