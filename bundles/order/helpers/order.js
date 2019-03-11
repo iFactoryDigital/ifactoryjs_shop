@@ -106,10 +106,10 @@ class OrderHelper extends Helper {
     line = Object.assign({}, line);
 
     // get price
-    const price = parseFloat(money.floatToAmount(await productHelper.price(product, line.opts || {})));
+    const price = await productHelper.price(product, line.opts || {});
 
     // return value
-    const amount = parseFloat(money.floatToAmount(parseFloat(price.amount) * parseInt(line.qty || 1, 10)));
+    const amount = parseFloat(price.amount) * parseInt(line.qty || 1, 10);
 
     // hook
     await this.eden.hook('line.price', {
@@ -126,8 +126,8 @@ class OrderHelper extends Helper {
     // set price
     line.sku = product.get('sku') + (Object.values(line.opts || {})).join('_');
     line.title = Object.values(product.get('title'))[0];
-    line.price = price;
-    line.total = amount;
+    line.price = parseFloat(money.floatToAmount(price));
+    line.total = parseFloat(money.floatToAmount(amount));
 
     // return price
     return line;
