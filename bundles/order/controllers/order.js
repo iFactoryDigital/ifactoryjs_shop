@@ -1,7 +1,6 @@
 
 // bind dependencies
 const config     = require('config');
-const socket     = require('socket');
 const Controller = require('controller');
 
 // require models
@@ -10,11 +9,11 @@ const Order   = model('order');
 const Product = model('product');
 
 // require helpers
-const GridHelper    = helper('grid');
-const OrderHelper   = helper('order');
-const EmailHelper   = helper('email');
-const ModelHelper   = helper('model');
-const ProductHelper = helper('product');
+const gridHelper    = helper('grid');
+const orderHelper   = helper('order');
+const emailHelper   = helper('email');
+const modelHelper   = helper('model');
+const productHelper = helper('product');
 
 /**
  * build cart controller
@@ -68,7 +67,7 @@ class OrderController extends Controller {
     opts.socket.join(`order.${id}`);
 
     // Add to room
-    return await ModelHelper.listen(opts.sessionID, viewOrder, uuid);
+    return await modelHelper.listen(opts.sessionID, viewOrder, uuid);
   }
 
   /**
@@ -91,7 +90,7 @@ class OrderController extends Controller {
     opts.socket.leave(`order.${id}`);
 
     // Add to room
-    return await ModelHelper.deafen(opts.sessionID, viewOrder, uuid);
+    return await modelHelper.deafen(opts.sessionID, viewOrder, uuid);
   }
 
   /**
@@ -150,7 +149,7 @@ class OrderController extends Controller {
    */
   async createAction(lines, actions, opts) {
     // create order for user
-    return await (await OrderHelper.create(opts.user, lines, actions)).sanitise();
+    return await (await orderHelper.create(opts.user, lines, actions)).sanitise();
   }
 
   /**
@@ -216,7 +215,7 @@ class OrderController extends Controller {
       // send email
       if (address) {
         // email
-        await EmailHelper.send(address, 'order', {
+        await emailHelper.send(address, 'order', {
           order   : await orderStatus.sanitise(),
           subject : `${config.get('domain')} - order #${orderStatus.get('_id').toString()}`,
         });
@@ -228,7 +227,7 @@ class OrderController extends Controller {
         const product = await Product.findById(item.product);
 
         // do in product helper
-        await ProductHelper.complete(product, item, orderStatus);
+        await productHelper.complete(product, item, orderStatus);
 
         // update product
         await this.eden.hook('product.sold', product, item, async () => {
@@ -277,7 +276,7 @@ class OrderController extends Controller {
    */
   _grid(req) {
     // create new grid
-    const orderGrid = new GridHelper(req);
+    const orderGrid = new gridHelper(req);
 
     // set route
     orderGrid.route('/order/grid');

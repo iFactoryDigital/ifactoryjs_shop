@@ -6,6 +6,7 @@
 
 
 // require dependencies
+const colors = require('colors');
 const config = require('config');
 const Helper = require('helper');
 
@@ -62,15 +63,30 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  order(product, line, req) {
+  async order(product, line, req) {
     // get type
     const type = product.get('type') || 'simple';
 
     // get product type
     const registered = this.__products.find(p => p.type === type);
 
+    // log
+    this._log(product, `[${type}] ${line.qty.toLocaleString()} ordered`, true);
+
     // await price
-    return registered.order(product, line, req);
+    const rtn = await registered.order(product, line, req);
+
+    // emit to eden
+    this.eden.emit('product.ordered', {
+      line,
+      product,
+
+      qty  : line.qty,
+      user : req.user,
+    });
+
+    // return
+    return rtn;
   }
 
   /**
@@ -82,15 +98,31 @@ class ProductHelper extends Helper {
    *
    * @return {*}
    */
-  complete(product, line, order) {
+  async complete(product, line, order) {
     // get type
     const type = product.get('type') || 'simple';
 
     // get product type
     const registered = this.__products.find(p => p.type === type);
 
+    // log
+    this._log(product, `[${type}] ${line.qty.toLocaleString()} purchased`, true);
+
     // await price
-    return registered.complete(product, line, order);
+    const rtn = await registered.complete(product, line, order);
+
+    // emit to eden
+    this.eden.emit('product.completed', {
+      line,
+      order,
+      product,
+
+      qty  : line.qty,
+      user : await order.get('user'),
+    });
+
+    // return
+    return rtn;
   }
 
   /**
@@ -165,10 +197,13 @@ class ProductHelper extends Helper {
    * @param  {Boolean}  success
    */
   _log(product, message, success) {
-    // log with log function
-    this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
-      class : 'product',
-    });
+    // prevent errors
+    try {
+      // log with log function
+      this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
+        class : 'ProductHelper',
+      });
+    } catch (e) {}
   }
 }
 

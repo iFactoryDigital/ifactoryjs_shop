@@ -1,5 +1,6 @@
 
 // require dependencies
+const colors = require('colors');
 const config = require('config');
 const Helper = require('helper');
 
@@ -30,13 +31,13 @@ class OrderHelper extends Helper {
    */
   async complete(order, body) {
     // set actions
-    for (const key in body.actions) {
+    Object.keys(body.actions).forEach((key) => {
       // set meta
       order.set(`actions.${key}.meta`, body.actions[key].meta);
 
       // set value
       order.set(`actions.${key}.value`, body.actions[key].value);
-    }
+    });
 
     // run actions
     const actions = Object.values(order.get('actions') || []).sort((a, b) => {
@@ -49,7 +50,7 @@ class OrderHelper extends Helper {
     });
 
     // loop actions
-    for (let i = 0; i < actions.length; i++) {
+    for (let i = 0; i < actions.length; i += 1) {
       // run hook
       await this.eden.hook(`order.${actions[i].type}`, order, actions[i], actions);
     }
@@ -71,7 +72,7 @@ class OrderHelper extends Helper {
   _log(product, message, success) {
     // log with log function
     this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
-      class : 'product',
+      class : 'OrderHelper',
     });
   }
 }
