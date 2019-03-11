@@ -1,4 +1,4 @@
-<product-variable-variation>
+<product-variations>
   <div class="card mb-3">
     <div class="card-header">
       Variations
@@ -25,7 +25,7 @@
               <div class="col-3">
                 <input type="text" name="variation[{ i }][options][{ a }][sku]" class="form-control" id="variation-{ i }-options-{ a }-sku" placeholder="Option SKU" value={ (option || {}).sku }>
               </div>
-              <div class="col-3">
+              <div class="col-4">
                 <input type="text" name="variation[{ i }][options][{ a }][name]" class="form-control" id="variation-{ i }-options-{ a }-name" placeholder="Option name" value={ (option || {}).name }>
               </div>
               <div class="col-4">
@@ -35,13 +35,13 @@
                   </div>
                   <input type="number" name="variation[{ i }][options][{ a }][price]" step="0.01" class="form-control" id="variation-{ i }-options-{ a }-price" placeholder="Option price" value={ (option || {}).price }>
                   <div class="input-group-append">
-                    <span class="input-group-text">USD</span>
+                    <span class="input-group-text">{ this.eden.get('shop.currency') }</span>
                   </div>
                 </div>
               </div>
-              <div class="col-2">
+              <div class="col-1">
                 <button data-variation={ i } type="button" class="btn btn-block btn-danger" onclick={ onRemoveOption }>
-                  <fa i="times" />
+                  <i class="fa fa-times" />
                 </button>
               </div>
             </div>
@@ -133,4 +133,4 @@
     }
 
   </script>
-</product-variable-variation>
+</product-variations>

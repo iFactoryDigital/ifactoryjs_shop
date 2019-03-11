@@ -1,5 +1,5 @@
 <product-variable-price>
-  <span itemprop="price" content={ this.pricing.min.toFixed (2) }><money amount={ this.pricing.min } /></span><span itemprop="priceCurrency" content="USD" /><span if={ this.pricing.min !== this.pricing.max }>+</span>
+  <span itemprop="price" content={ this.pricing.min.toFixed(2) }><money amount={ this.pricing.min } /></span><span itemprop="priceCurrency" content="USD" /><span if={ this.pricing.min !== this.pricing.max }>+</span>
   <link itemprop="availability" href="http://schema.org/InStock" if={ opts.product.available > 0 } />
 
   <script>
@@ -9,8 +9,8 @@
 
     // set pricing
     this.pricing = {
-      'min' : parseFloat(opts.product.pricing.price) || 0,
-      'max' : parseFloat(opts.product.pricing.price) || 0
+      'min' : parseFloat(opts.product.price.amount) || 0,
+      'max' : parseFloat(opts.product.price.amount) || 0
     };
 
     /**

@@ -43,6 +43,15 @@ class ProductController extends Controller {
     // await hooks
     this.eden.pre('product.order', this._order);
 
+    // sanitise product
+    this.eden.pre('product.sanitise', ({ sanitised, product }) => {
+      // check variable
+      if (product.get('type') !== 'variable') return;
+
+      // get variations
+      sanitised.variations = product.get('variations');
+    });
+
     // get categories
     (await Product.find({
       published : true,
@@ -142,6 +151,12 @@ class ProductController extends Controller {
       options  : ['availability'],
       sections : ['variable-pricing', 'variations', 'display'],
     }, async (product, opts) => {
+      // set opts
+      if (!opts) opts = [];
+
+      // remove object
+      opts = Object.values(opts);
+
       // set price
       let price = parseFloat(product.get('pricing.price'));
 
@@ -151,13 +166,7 @@ class ProductController extends Controller {
       // loop for variations
       Object.keys(variations).forEach((type) => {
         // check found option
-        const found = variations[type].options.find(option => opts.includes(option.sku));
-
-        // check found
-        if (!found) {
-          // throw error
-          throw new Error('Variation missing options');
-        }
+        let found = variations[type].options.find(option => (opts || []).includes(option.sku)) || variations[type].options[0];
 
         // add to price
         price += parseFloat(found.price);
@@ -165,6 +174,7 @@ class ProductController extends Controller {
 
       // return price
       return {
+        base      : parseFloat(product.get('pricing.price')),
         amount    : parseFloat(price),
         currency  : config.get('shop.currency') || 'USD',
         available : product.get('availability.quantity') > 0,

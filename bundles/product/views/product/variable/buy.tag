@@ -10,7 +10,7 @@
               </label>
               <select name="variation-{ i }" data-variation={ i } class="form-control" onchange={ onChange }>
                 <option each={ option, a in variation.options } value={ option.sku } no-reorder>
-                  { option.name } { parseFloat (option.price) > 0 ? '+' + format (parseFloat (option.price)) : '' }
+                  { option.name } { parseFloat(option.price) > 0 ? '+' + format(parseFloat(option.price)) : '' }
                 </option>
               </select>
             </div>
@@ -21,62 +21,40 @@
         <span class="btn btn-link px-0">
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
+        
+        <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product, Object.values(skus())) }>
+          { this.t('checkout.proceed') }
+        </a>
+        
         <span class="btn-group float-right">
-          <a href="#!" if={ this.cart.line (opts.product, Object.values (skus ())) } onclick={ onRemove } class="btn btn-danger">
+          <a href="#!" if={ this.cart.has(opts.product, Object.values(skus())) } onclick={ onRemove } class="btn btn-danger">
             <i class="fa fa-times" />
           </a>
-          <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.available }>
-            <money amount={ price () } /> { this.t('cart.add') }
+          <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.price.available }>
+            <span if={ this.cart.line(opts.product, Object.values(skus())) }>{ this.cart.line(opts.product, Object.values(skus())).qty }</span> { this.t(this.cart.has(opts.product, Object.values(skus())) ? 'cart.added' : 'cart.add') }
           </a>
         </span>
-        <span class="float-right btn btn-link" if={ this.cart.line (opts.product, Object.values(skus())) }>
-          <span>{ this.cart.line (opts.product, Object.values (skus ())).qty }</span>
-        </span>
+        
+        <button class="btn btn-link float-right mr-2">
+          <money amount={ this.product.price(opts.product, Object.values(skus())) } />
+        </button>
       </div>
     </div>
   </div>
 
   <script>
     // do mixins
-    this.mixin ('i18n');
-    this.mixin ('cart');
-    this.mixin ('settings');
-
-    /**
-     * returns price
-     *
-     * @return {Float}
-     */
-    price () {
-      // check frontend
-      if (!this.eden.frontend) return opts.product.price;
-
-      // return price
-      let base = parseFloat (opts.product.price);
-      let skus = this.skus ();
-
-      // get prices
-      for (let key in skus) {
-        // get value
-        let option = opts.product.variations[key].options.find ((opt) => {
-          // return found
-          return opt.sku === skus[key];
-        });
-
-        // add to base
-        base += parseFloat (option.price);
-      }
-
-      // return base
-      return base;
-    }
+    this.mixin('i18n');
+    this.mixin('cart');
+    this.mixin('product');
+    this.mixin('settings');
 
     /**
      * skus
      *
      * @return {Array}
      */
-    skus () {
+    skus() {
       // set array
       let skus = {};
 
@@ -84,9 +62,9 @@
       if (!this.eden.frontend) return skus;
 
       // loop options
-      jQuery ('[data-variation]').each (function () {
+      jQuery('[data-variation]').each(function () {
         // get sku
-        skus[jQuery (this).attr ('data-variation')] = jQuery (this).val ();
+        skus[jQuery(this).attr('data-variation')] = jQuery(this).val();
       });
 
       // return skus
@@ -98,12 +76,12 @@
      *
      * @param  {Event} e
      */
-    onAdd (e) {
+    onAdd(e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // get product
-      this.cart.add (opts.product, Object.values (this.skus ()));
+      this.cart.add(opts.product, Object.values(this.skus()));
     }
 
     /**
@@ -111,12 +89,12 @@
      *
      * @param  {Event} e
      */
-    onRemove (e) {
+    onRemove(e) {
       // prevent default
-      e.preventDefault ();
+      e.preventDefault();
 
       // get product
-      this.cart.remove (this.cart.line (opts.product, Object.values (this.skus ())));
+      this.cart.remove(this.cart.line(opts.product, Object.values(this.skus())));
     }
 
     /**
@@ -124,9 +102,9 @@
      *
      * @param  {Event} e
      */
-    onChange (e) {
+    onChange(e) {
       // update view
-      this.update ();
+      this.update();
     }
 
     /**
@@ -134,25 +112,34 @@
      *
      * @return {String}
      */
-    format (amount) {
+    format(amount) {
       // require currency
-      let currency = require ('currency-formatter');
+      let currency = require('currency-formatter');
       
       // get value
-      let value = opts.convert !== false ? (parseFloat (amount) * this.eden.get ('rates')[opts.currency || this.settings.currency || this.eden.get('shop.currency')]) : amount;
+      let value = opts.convert !== false ? (parseFloat(amount) * this.eden.get('shop.rates')[opts.currency || this.settings.currency || this.eden.get('shop.currency')]) : amount;
 
       // check value
       if (this.settings.currency === 'JPY') {
         // round to nearest 10
-        value = Math.ceil (value / 10) * 10;
+        value = Math.ceil(value / 10) * 10;
       } else {
-        value = Math.ceil (value * 10) / 10;
+        value = Math.ceil(value * 10) / 10;
       }
 
       // return formatted currency
-      return this.eden.frontend ? currency.format (value, {
+      return this.eden.frontend ? currency.format(value, {
         'code' : opts.currency || this.settings.currency || this.eden.get('shop.currency')
-      }) : value.toLocaleString ();
+      }) : value.toLocaleString();
     }
+    
+    // on mount function
+    this.on('mount', () => {
+      // check frontend
+      if (!this.eden.frontend) return;
+      
+      // update view
+      this.update();
+    });
   </script>
 </product-variable-buy>

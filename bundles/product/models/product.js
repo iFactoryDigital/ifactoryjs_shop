@@ -98,7 +98,6 @@ class Product extends Model {
       is           : 'product',
       sku          : this.get('sku') || '',
       price        : await productHelper.price(this, {}),
-      pricing      : this.get('pricing') || 0,
       promoted     : this.get('promoted') || false,
       published    : this.get('published') || false,
       availability : this.get('availability') || {},
@@ -136,7 +135,7 @@ class Product extends Model {
     }
 
     // await hook
-    await this.eden.hook('category.sanitise', {
+    await this.eden.hook('product.sanitise', {
       sanitised,
       product : this,
     });

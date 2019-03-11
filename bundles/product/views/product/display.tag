@@ -4,7 +4,7 @@
       Display
     </div>
     <div class="card-body">
-      <form-render action="/admin/shop/category/{ opts.product && opts.product.id ? opts.product.id + '/update' : 'create' }" method="post" ref="form" form={ opts.form } placement="shop.product" positions={ this.positions } preview={ opts.preview } class="d-block mb-3" />
+      <form-render ref="form" form={ opts.form } placement="shop.product" positions={ this.positions } preview={ opts.preview } class="d-block mb-3" />
     </div>
   </div>
   

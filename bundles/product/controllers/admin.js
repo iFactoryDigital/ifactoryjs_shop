@@ -62,7 +62,7 @@ class AdminProductController extends Controller {
     // Build slug function
     const slugify = async (product) => {
       // Get title
-      const title = Object.values(product.get('title'))[0];
+      const title = Object.values(product.get('title') || {})[0];
 
       // Slugify
       let slugifiedTitle = slug(title || '', {
@@ -101,30 +101,12 @@ class AdminProductController extends Controller {
     this.eden.pre('product.create', slugify);
 
     // Pre pricing submit
-    this.eden.pre('product.pricing', (data) => {
-      // Check type
-      if (data.type !== 'simple' && data.type !== 'variable') return;
-
-      // Set pricing
-      data.pricing.price = parseFloat(data.pricing.price);
-    });
-
-    // Pre pricing submit
     this.eden.pre('product.submit', (req, product) => {
       // Check type
       if (product.get('type') !== 'variable') return;
 
       // Set pricing
       product.set('variations', req.body.variation || []);
-    });
-
-    // Pre pricing submit
-    this.eden.pre('product.availability', (data) => {
-      // Check type
-      if (data.type !== 'simple') return;
-
-      // Set pricing
-      data.availability.quantity = parseInt(data.availability.quantity, 10);
     });
 
     // Register simple block
@@ -302,23 +284,23 @@ class AdminProductController extends Controller {
       product = await Product.findById(req.params.id);
     }
 
-    // Load images
-    const images = req.body.images ? (await Promise.all((Array.isArray(req.body.images) ? req.body.images : [req.body.images]).map((id) => {
-      // Load image
-      return Image.findById(id);
-    }))).filter((image) => {
-      // Return image
-      return image;
-    }) : false;
+    // get form
+    const form = await formHelper.get('shop.product');
 
-    // Load categories
-    const categories = req.body.categories ? (await Promise.all(req.body.categories.split(',').map((id) => {
-      // Load image
-      return id.length === 24 ? Category.findById(id) : null;
-    }))).filter((category) => {
-      // Return image
-      return category;
-    }) : false;
+    // digest into form
+    const fields = await formHelper.submit(req, form, await Promise.all(form.get('fields').map(async (field) => {
+      // return fields map
+      return {
+        uuid  : field.uuid,
+        value : await product.get(field.name || field.uuid),
+      };
+    })));
+
+    // loop fields
+    for (const field of fields) {
+      // set value
+      product.set(field.name || field.uuid, field.value);
+    }
 
     // Load pricing
     const pricing = req.body.pricing;
@@ -341,17 +323,11 @@ class AdminProductController extends Controller {
     // Update product
     product.set('sku', req.body.sku);
     product.set('type', req.body.type);
-    product.set('title', req.body.title);
-    product.set('short', req.body.short);
-    product.set('images', images || product.get('images'));
     product.set('updator', req.user);
     product.set('pricing', pricing);
     product.set('shipping', shipping);
-    product.set('priority', parseInt(req.body.priority) || 0);
     product.set('promoted', req.body.promoted === 'true');
     product.set('published', req.body.published === 'true');
-    product.set('categories', categories || product.get('categories'));
-    product.set('description', req.body.description);
     product.set('availability', availability);
 
     // Run hook
@@ -367,11 +343,10 @@ class AdminProductController extends Controller {
     req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} product!`);
 
     // Render page
-    res.render('product/admin/update', {
-      title   : create ? 'Create Product' : `Update ${product.get('sku')}`,
-      types   : productHelper.types,
-      product : await product.sanitise(),
-    });
+    req.params.id = product.get('_id').toString();
+
+    // return update action
+    return this.updateAction(req, res);
   }
 
   /**
@@ -530,26 +505,14 @@ class AdminProductController extends Controller {
         },
       })
       .column('updated_at', {
-        sort   : true,
-        title  : 'Updated',
-        format : async (col) => {
-          return col.toLocaleDateString('en-GB', {
-            day   : 'numeric',
-            month : 'short',
-            year  : 'numeric',
-          });
-        },
+        tag   : 'grid-date',
+        sort  : true,
+        title : 'Updated'
       })
       .column('created_at', {
-        sort   : true,
-        title  : 'Created',
-        format : async (col) => {
-          return col.toLocaleDateString('en-GB', {
-            day   : 'numeric',
-            month : 'short',
-            year  : 'numeric',
-          });
-        },
+        tag   : 'grid-date',
+        sort  : true,
+        title : 'Created',
       })
       .column('actions', {
         width  : '1%',

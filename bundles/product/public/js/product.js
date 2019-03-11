@@ -47,7 +47,7 @@ class ProductStore extends Events {
 
     }, (product, opts) => {
       // let price
-      let price = product.price.amount;
+      let price = product.price.base;
 
       // get opts
       for (let i = 0; i < (product.variations || []).length; i++) {
