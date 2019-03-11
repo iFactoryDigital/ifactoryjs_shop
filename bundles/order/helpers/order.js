@@ -85,6 +85,9 @@ class OrderHelper extends Helper {
    * @return {Promise}
    */
   lines(order, lines) {
+    // get lines
+    if (!lines) lines = order.get('lines') || [];
+
     // return promised lines
     return Promise.all(lines.map(line => this.line(order, null, line)));
   }
@@ -124,9 +127,9 @@ class OrderHelper extends Helper {
     });
 
     // set price
-    line.sku = product.get('sku') + (Object.values(line.opts || {})).join('_');
+    line.sku = ((product.get('sku') || '').length ? product.get('sku') : product.get('_id').toString()) + (Object.values(line.opts || {})).join('_');
     line.title = Object.values(product.get('title'))[0];
-    line.price = parseFloat(money.floatToAmount(price));
+    line.price = parseFloat(money.floatToAmount(price.amount));
     line.total = parseFloat(money.floatToAmount(amount));
 
     // return price
@@ -149,7 +152,7 @@ class OrderHelper extends Helper {
    */
   _log(product, message, success) {
     // log with log function
-    this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
+    this.logger.log((success ? 'info' : 'error'), `[${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
       class : 'OrderHelper',
     });
   }

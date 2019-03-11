@@ -214,15 +214,30 @@ class OrderController extends Controller {
 
       // send email
       if (address) {
-        // email
-        await emailHelper.send(address, 'order', {
-          order   : await orderStatus.sanitise(),
-          subject : `${config.get('domain')} - order #${orderStatus.get('_id').toString()}`,
-        });
+        // try/catch
+        try {
+          // email
+          emailHelper.send(address, 'order', {
+            order   : await orderStatus.sanitise(),
+            subject : `${config.get('domain')} - order #${orderStatus.get('_id').toString()}`,
+          }).then(async (email) => {
+            // lock
+            await orderStatus.lock();
+
+            // set order email
+            orderStatus.set('emails.ordered', email);
+
+            // save order
+            await orderStatus.save();
+
+            // unlock
+            orderStatus.unlock();
+          });
+        } catch (e) { console.log(e) }
       }
 
       // loop items
-      await Promise.all((await orderHelper.lines(orderStatus.get('lines') || [])).map(async (line) => {
+      await Promise.all((await orderHelper.lines(orderStatus)).map(async (line) => {
         // get product
         const product = await Product.findById(line.product);
 

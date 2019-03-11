@@ -78,7 +78,7 @@ class ProductHelper extends Helper {
     const registered = this.__products.find(p => p.type === type);
 
     // log
-    this._log(product, `[${type}] ${line.qty.toLocaleString()} ordered`, true);
+    this._log(product, `${line.qty.toLocaleString()} ordered`, true);
 
     // await price
     const rtn = await registered.order(product, line, req);
@@ -113,7 +113,7 @@ class ProductHelper extends Helper {
     const registered = this.__products.find(p => p.type === type);
 
     // log
-    this._log(product, `[${type}] ${line.qty.toLocaleString()} purchased`, true);
+    this._log(product, `${line.qty.toLocaleString()} purchased`, true);
 
     // await price
     const rtn = await registered.complete(product, line, order);
@@ -221,7 +221,7 @@ class ProductHelper extends Helper {
     // prevent errors
     try {
       // log with log function
-      this.logger.log((success ? 'info' : 'error'), ` [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
+      this.logger.log((success ? 'info' : 'error'), `[${colors.cyan(product.get('type') || 'simple')}] [${colors.green(product.get(`title.${config.get('i18n.fallbackLng')}`))}] ${message}`, {
         class : 'ProductHelper',
       });
     } catch (e) {}

@@ -57,7 +57,7 @@ class PaymentHelper extends Helper {
       user  : await order.get('user'),
       total : (await orderHelper.lines(order, lines)).reduce((total, x) => {
         // return value
-        return total.total += x;
+        return total += x.total;
       }, 0),
       lines : order.get('lines'),
     });
