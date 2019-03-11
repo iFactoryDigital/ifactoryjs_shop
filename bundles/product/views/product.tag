@@ -4,7 +4,7 @@
       <div class="col-md-4 product-media" if={ this.thumbnail }>
         <div class="card card-product-image mb-3">
           <a class="card-body" href={ this.media.url(this.thumbnail) } target="_blank">
-            <img class="img-responsive" itemprop="image" src={ this.media.url(this.thumbnail, 'md-sq') } alt={ title() }>
+            <img class="img-fluid" itemprop="image" src={ this.media.url(this.thumbnail, 'md-sq') } alt={ title() }>
           </a>
         </div>
         <div class="row row-img-gallery mb-3">
