@@ -98,6 +98,7 @@ class Product extends Model {
       is           : 'product',
       sku          : this.get('sku') || '',
       price        : await productHelper.price(this, {}),
+      pricing      : this.get('pricing') || {},
       promoted     : this.get('promoted') || false,
       published    : this.get('published') || false,
       availability : this.get('availability') || {},
