@@ -107,7 +107,7 @@
             </table>
           </div>
 
-          <div class="text-right mt-4">
+          <div class="text-right mt-5">
             <button class={ 'btn btn-lg btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
               { this.saving ? 'Saving...' : 'Save Invoice' }
             </button>
