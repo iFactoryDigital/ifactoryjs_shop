@@ -149,8 +149,15 @@ class AdminInvoiceController extends Controller {
     // invoice company placement
     req.placement('invoice.company');
 
+    // get payment grid
+    const paymentController = await this.eden.controller('payment/controllers/admin');
+
+    // get payment grid
+    const paymentGrid = await paymentController._grid(req, invoice);
+
     // render page
     res.render('invoice/admin/update', {
+      grid   : await paymentGrid.render(req, invoice),
       title  : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
       orders : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
     });

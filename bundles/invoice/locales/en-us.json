@@ -1,8 +1,9 @@
 {
   "invoice" : {
     "status" : {
-      "paid"   : "Paid",
-      "unpaid" : "Unpaid"
+      "paid"    : "Paid",
+      "unpaid"  : "Unpaid",
+      "partial" : "Partially Paid"
     }
   }
 }

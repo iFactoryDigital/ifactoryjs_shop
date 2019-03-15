@@ -287,6 +287,8 @@ class AdminPaymentController extends Controller {
    *
    * @route {get}  /grid
    * @route {post} /grid
+   * @route {get}  /:invoice/grid
+   * @route {post} /:invoice/grid
    */
   async gridAction(req, res) {
     // return post grid request
@@ -298,12 +300,21 @@ class AdminPaymentController extends Controller {
    *
    * @return {grid}
    */
-  _grid(req) {
+  async _grid(req, invoice) {
     // create new grid
     const paymentGrid = new Grid();
 
+    // check invoice
+    if (req.params.invoice) {
+      // set id
+      invoice = req.params.invoice;
+    } else if (invoice) {
+      // set id
+      invoice = invoice.get('_id').toString();
+    }
+
     // set route
-    paymentGrid.route('/admin/shop/payment/grid');
+    paymentGrid.route(`/admin/shop/payment/${invoice ? `${invoice}/` : ''}grid`);
 
     // set grid model
     paymentGrid.model(Payment);
@@ -335,15 +346,22 @@ class AdminPaymentController extends Controller {
       format : async (col, row) => {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
-    })
-      .column('invoice', {
+    });
+
+    // check invoice
+    if (!invoice) {
+      // add invoice column
+      paymentGrid.column('invoice', {
         sort   : true,
         title  : 'Invoice',
         format : async (col) => {
           return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
         },
       })
-      .column('error', {
+    }
+
+    // continue grid
+    paymentGrid.column('error', {
         sort   : true,
         title  : 'Error',
         format : async (col) => {
@@ -431,6 +449,14 @@ class AdminPaymentController extends Controller {
 
     // set default sort order
     paymentGrid.sort('created_at', -1);
+
+    // check invoice
+    if (invoice) {
+      // by invoice
+      paymentGrid.where({
+        'invoice.id' : invoice
+      });
+    }
 
     // return grid
     return paymentGrid;

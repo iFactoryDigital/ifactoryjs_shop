@@ -10,7 +10,7 @@
     </admin-header>
 
     <div class="container-fluid">
-      <div class="card">
+      <div class="card mb-5">
         <div class="card-header">
           Invoice:
           <b>
@@ -106,16 +106,25 @@
               </tfoot>
             </table>
           </div>
-        </div>
 
-        <div class="card-footer text-right">
-          <button class={ 'btn btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
-            { this.saving ? 'Saving...' : 'Save Invoice' }
-          </button>
+          <div class="text-right mt-4">
+            <button class={ 'btn btn-lg btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
+              { this.saving ? 'Saving...' : 'Save Invoice' }
+            </button>
+          </div>
         </div>
       </div>
+      
+      <div class="card">
+        <div class="card-header">
+          Invoice Payments
+        </div>
+        <div class="card-body">
+          <grid grid={ opts.grid } />
+        </div>
+      </div>
+      
     </div>
-
   </div>
 
   <script>
