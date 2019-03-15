@@ -229,7 +229,10 @@ class AdminInvoiceController extends Controller {
     await Promise.all(orders.map(order => order.save(req.user)));
 
     // render page
-    res.redirect(`/admin/shop/invoice/${invoice.get('_id').toString()}/update`);
+    res.json({
+      result  : await Promise.all(orders.map(order => order.sanitise())),
+      success : true,
+    });
   }
 
   /**

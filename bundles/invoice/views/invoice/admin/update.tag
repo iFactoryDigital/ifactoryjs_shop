@@ -49,8 +49,13 @@
               </thead>
               
               <tbody each={ order, a in opts.orders }>
-                <tr if={ opts.orders.length > 1 }>
-                  <th colspan="6">Order #{ order.id }</th>
+                <tr>
+                  <td colspan="3" class="border-right-0">
+                    Order: <b>#{ order.id }</b>
+                  </td>
+                  <td colspan="3" class="text-right border-left-0">
+                    Status: <b>{ this.t('order.status.' + order.status) }</b>
+                  </td>
                 </tr>
                 <tr each={ line, i in order.lines }>
                   <td class="text-center">{ (i + 1) }</td>
@@ -66,8 +71,8 @@
                   <td class="text-center" contenteditable={ this.user.acl.validate('admin') } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
                   <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
                 </tr>
-                <tr if={ this.user.acl.validate('admin') }>
-                  <td colspan="6" class="border-0 text-right">
+                <tr if={ this.user.acl.validate('admin') } class="bg-transparent">
+                  <td colspan="6" class="border-0 text-right bg-transparent">
                     <button class="btn btn-primary">
                       <i class="fa fa-plus" />
                     </button>
@@ -108,8 +113,11 @@
           </div>
 
           <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
+            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving } onclick={ onSave } disabled={ this.emailing || this.saving }>
               { this.saving ? 'Saving...' : 'Save Invoice' }
+            </button>
+            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.emailing || this.saving } onclick={ onEmail } disabled={ this.emailing || this.saving }>
+              { this.emailing ? 'Emailing...' : 'Email Invoice' }
             </button>
           </div>
         </div>
@@ -230,10 +238,25 @@
       this.update();
 
       // post
-      await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
+      const orders = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
         lines    : [].concat(...(opts.orders.map((order) => order.lines))),
         discount : this.discount,
+      })).result;
+      
+      // loop orders
+      opts.orders.forEach((o) => {
+        // get found
+        const find = orders.find((or) => or.id === o.id);
+        
+        // loop keys
+        for (const key in find) {
+          // set value
+          o[key] = find[key];
+        }
       });
+      
+      // set invoice
+      this.invoice = orders[0].invoice;
 
       // set saving
       this.saving = false;
