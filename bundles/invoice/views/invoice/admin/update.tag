@@ -113,10 +113,10 @@
           </div>
 
           <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving } onclick={ onSave } disabled={ this.emailing || this.saving }>
+            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onSave } disabled={ this.emailing || this.saving || this.recording }>
               { this.saving ? 'Saving...' : 'Save Invoice' }
             </button>
-            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.emailing || this.saving } onclick={ onEmail } disabled={ this.emailing || this.saving }>
+            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onEmail } disabled={ this.emailing || this.saving || this.recording }>
               { this.emailing ? 'Emailing...' : 'Email Invoice' }
             </button>
           </div>
@@ -129,6 +129,12 @@
         </div>
         <div class="card-body">
           <grid grid={ opts.grid } />
+
+          <div class="text-right mt-5">
+            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onSave } disabled={ this.emailing || this.saving || this.recording }>
+              { this.recording ? 'Recording Payment...' : 'Record Payment' }
+            </button>
+          </div>
         </div>
       </div>
       
