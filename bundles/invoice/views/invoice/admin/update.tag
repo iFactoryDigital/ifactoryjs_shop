@@ -10,107 +10,108 @@
     </admin-header>
 
     <div class="container-fluid">
-      <div class="container">
-        <div class="card">
-          <div class="card-header">
-            Invoice:
+      <div class="card">
+        <div class="card-header">
+          Invoice:
+          <b>
+            #{ this.invoice.id }
+          </b>
+          <span class="float-right">
+            Status:
             <b>
-              #{ this.invoice.id }
+              { this.t('invoice.status.' + (this.invoice.status || 'unpaid')) }
             </b>
-            <span class="float-right">
-              Status:
-              <b>
-                { this.t('invoice.status.' + (this.invoice.status || 'unpaid')) }
-              </b>
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="row mb-4">
-              <div class="col-sm-6">
-                <div>
-                  <b>
-                    { this.config.title }
-                  </b>
-                </div>
-                <img src={ this.config.logo } />
-              </div>
-              <div class="col-sm-6">
-                <div>
-                  <b>{ (opts.orders[0].user || {}).username || (opts.orders[0].address || {}).name }</b>
-                </div>
-                <div if={ (opts.orders[0].address || {}).formatted }>{ (opts.orders[0].address || {}).formatted }</div>
-              </div>
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-sm-6">
+              <cms-placement placement="invoice.company" />
             </div>
-            <div class="table-responsive-sm">
-              <table class="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th>Item</th>
-                    <th>Description</th>
-                    <th class="text-right">Unit Cost</th>
-                    <th class="text-center">Qty</th>
-                    <th class="text-right">Total</th>
-                  </tr>
-                </thead>
-                <tbody each={ order, a in opts.orders }>
-                  <tr if={ opts.orders.length > 1 }>
-                    <th colspan="6">Order #{ order.id }</th>
-                  </tr>
-                  <tr each={ line, i in order.lines }>
-                    <td class="text-center">{ (i + 1) }</td>
-                    <td contenteditable={ true } onblur={ onLineTitle }>
-                      { line.title || getProduct(line).title[this.i18n.lang()] }
-                    </td>
-                    <td contenteditable={ true } onblur={ onLineShort }>
-                      { line.short || getProduct(line).short[this.i18n.lang()] }
-                    </td>
-                    <td class="text-right">
-                      $<span contenteditable={ true } onblur={ onLinePrice }>{ line.price.toFixed(2) }</span> { this.invoice.currency }
-                    </td>
-                    <td class="text-center" contenteditable={ true } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
-                    <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="row">
-              <div class="col-lg-4 col-sm-5">
+            <div class="col-sm-6">
+              <div>
+                <b>{ (opts.orders[0].user || {}).username || (opts.orders[0].address || {}).name }</b>
               </div>
-              <div class="col-lg-4 col-sm-5 ml-auto">
-                <table class="table table-clear">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <b>Subtotal</b>
-                      </td>
-                      <td class="text-right">${ getSubtotal().toFixed(2) } { this.invoice.currency }</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <b>Discount</b>
-                      </td>
-                      <td class="text-right">$<span contenteditable={ true } onblur={ onDiscount }>{ this.discount.toFixed(2) }</span> { this.invoice.currency }</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <b>Total</b>
-                      </td>
-                      <td class="text-right">
-                        <b>${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <div if={ (opts.orders[0].address || {}).formatted }>{ (opts.orders[0].address || {}).formatted }</div>
             </div>
           </div>
+          <div class="table-responsive-sm">
+            <table class="table table-striped table-bordered border-0">
+              <thead>
+                <tr>
+                  <th class="text-center">#</th>
+                  <th>Item</th>
+                  <th>Description</th>
+                  <th class="text-right">Unit Cost</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              
+              <tbody each={ order, a in opts.orders }>
+                <tr if={ opts.orders.length > 1 }>
+                  <th colspan="6">Order #{ order.id }</th>
+                </tr>
+                <tr each={ line, i in order.lines }>
+                  <td class="text-center">{ (i + 1) }</td>
+                  <td contenteditable={ this.user.acl.validate('admin') } onblur={ onLineTitle }>
+                    { line.title || getProduct(line).title[this.i18n.lang()] }
+                  </td>
+                  <td contenteditable={ this.user.acl.validate('admin') } onblur={ onLineShort }>
+                    { line.short || getProduct(line).short[this.i18n.lang()] }
+                  </td>
+                  <td class="text-right">
+                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onLinePrice }>{ line.price.toFixed(2) }</span> { this.invoice.currency }
+                  </td>
+                  <td class="text-center" contenteditable={ this.user.acl.validate('admin') } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
+                  <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
+                </tr>
+                <tr if={ this.user.acl.validate('admin') }>
+                  <td colspan="6" class="border-0 text-right">
+                    <button class="btn btn-primary">
+                      <i class="fa fa-plus" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="border-0 bg-transparent" />
+                  <td class="text-right border-left-0 border-right-0">
+                    <b>Subtotal</b>
+                  </td>
+                  <td class="text-right border-left-0 border-right-0">
+                    ${ getSubtotal().toFixed(2) } { this.invoice.currency }
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="4" class="border-0 bg-transparent" />
+                  <td class="text-right border-left-0 border-right-0">
+                    <b>Discount</b>
+                  </td>
+                  <td class="text-right border-left-0 border-right-0">
+                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onDiscount }>{ this.discount.toFixed(2) }</span> { this.invoice.currency }
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="4" class="border-0 bg-transparent" />
+                  <td class="text-right border-left-0 border-right-0">
+                    <b>Total</b>
+                  </td>
+                  <td class="text-right border-left-0 border-right-0">
+                    <b>${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
 
-          <div class="card-footer text-right">
-            <button class={ 'btn btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
-              { this.saving ? 'Saving...' : 'Save Invoice' }
-            </button>
-          </div>
+        <div class="card-footer text-right">
+          <button class={ 'btn btn-success' : true, 'disabled' : this.saving } onclick={ onSave } disabled={ this.saving }>
+            { this.saving ? 'Saving...' : 'Save Invoice' }
+          </button>
         </div>
       </div>
     </div>
@@ -120,6 +121,7 @@
   <script>
     // do mixin
     this.mixin('i18n');
+    this.mixin('user');
     this.mixin('config');
 
     // set initial discount

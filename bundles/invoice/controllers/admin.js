@@ -146,6 +146,9 @@ class AdminInvoiceController extends Controller {
       invoice = await Invoice.findById(req.params.id);
     }
 
+    // invoice company placement
+    req.placement('invoice.company');
+
     // render page
     res.render('invoice/admin/update', {
       title  : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
