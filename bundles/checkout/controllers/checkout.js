@@ -118,11 +118,10 @@ class CheckoutController extends Controller {
    * @param req
    * @param res
    *
-   * @acl    true
-   * @fail   /login?redirect=/checkout
-   * @title  Cart
-   * @route  {get} /:id
-   * @layout no-user
+   * @acl   true
+   * @fail  /login?redirect=/checkout
+   * @title Cart
+   * @route {get} /:id
    */
   async continueAction(req, res, next) {
     // let order
@@ -292,7 +291,7 @@ class CheckoutController extends Controller {
       });
 
       // set cart lines
-      order.set('lines', cart.get('lines') || []);
+      order.set('lines', await orderHelper.lines(order, cart.get('lines')));
 
       // save order
       await order.save(req.user);

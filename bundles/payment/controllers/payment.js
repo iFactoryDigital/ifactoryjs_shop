@@ -4,6 +4,7 @@ const Controller = require('controller');
 
 // require helpers
 const paymentHelper = helper('payment');
+const invoiceHelper = helper('invoice');
 
 /**
  * create payment controller
@@ -137,7 +138,7 @@ class PaymentController extends Controller {
     }
 
     // hook payment
-    const invoice = await paymentHelper.invoice(order);
+    const invoice = await invoiceHelper.invoice(order);
 
     // set to order
     order.set('invoice', invoice);

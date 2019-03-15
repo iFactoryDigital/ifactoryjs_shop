@@ -49,6 +49,7 @@ class Invoice extends Model {
         return a + b;
       }),
       total    : this.get('total'),
+      discount : this.get('discount') || 0,
       currency : this.get('currency'),
       payments : await Promise.all(invoicePayments.map((invoicePayment) => {
         // return sanitised images

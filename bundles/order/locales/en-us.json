@@ -2,7 +2,6 @@
   "order" : {
     "title"      : "Order",
     "items"      : "items totalling",
-    "status"     : "Status",
     "number"     : "Number",
     "payment"    : "Payment",
     "mailing"    : "Mailing",

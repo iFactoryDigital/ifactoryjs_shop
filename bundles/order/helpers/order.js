@@ -72,6 +72,9 @@ class OrderHelper extends Helper {
     // load actions
     await this.eden.hook('order.init', order);
 
+    // set lines properly
+    order.set('lines', await this.lines(order));
+
     // save order
     await order.save(await order.get('user'));
   }

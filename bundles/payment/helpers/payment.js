@@ -11,7 +11,6 @@ const colors = require('colors');
 const Helper = require('helper');
 
 // require models
-const Invoice = model('invoice');
 const Payment = model('payment');
 
 // get helpers
@@ -30,55 +29,9 @@ class PaymentHelper extends Helper {
 
     // bind methods
     this.payment = this.payment.bind(this);
-    this.invoice = this.invoice.bind(this);
 
     // bind private methods
     this._log = this._log.bind(this);
-  }
-
-  /**
-   * create payment function
-   *
-   * @param  {order}  Order
-   * @param  {Object} method
-   *
-   * @return  {Promise}
-   * @resolve {invoice}
-   */
-  async invoice(order) {
-    // get lines
-    const user  = await order.get('user');
-    const lines = order.get('lines');
-
-    // create new invoice
-    const invoice = new Invoice({
-      order,
-
-      user  : await order.get('user'),
-      total : (await orderHelper.lines(order, lines)).reduce((total, x) => {
-        // return value
-        return total += x.total;
-      }, 0),
-      lines : order.get('lines'),
-    });
-
-    // get lines
-    order.set('lines', lines);
-
-    // save order
-    await order.save(user);
-
-    // save invoice
-    await invoice.save(user);
-
-    // hook invoice
-    await this.eden.hook('invoice.init', invoice);
-
-    // save invoice
-    await invoice.save(user);
-
-    // return invoice
-    return invoice;
   }
 
   /**
@@ -98,7 +51,7 @@ class PaymentHelper extends Helper {
       user,
       invoice,
       rate     : invoice.get('rate') || 1,
-      order    : await invoice.get('order'),
+      orders   : [await invoice.get('order')],
       amount   : total,
       currency : invoice.get('currency') || config.get('shop.currency') || 'USD',
       complete : false,

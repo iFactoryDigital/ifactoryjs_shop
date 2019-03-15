@@ -228,7 +228,7 @@ class OrderController extends Controller {
             orderStatus.set('emails.ordered', email);
 
             // save order
-            await orderStatus.save();
+            await orderStatus.save(await orderStatus.get('user'));
 
             // unlock
             orderStatus.unlock();
@@ -237,7 +237,7 @@ class OrderController extends Controller {
       }
 
       // loop items
-      await Promise.all((await orderHelper.lines(orderStatus)).map(async (line) => {
+      await Promise.all(orderStatus.get('lines').map(async (line) => {
         // get product
         const product = await Product.findById(line.product);
 
