@@ -109,32 +109,6 @@ class AdminInvoiceController extends Controller {
   }
 
   /**
-   * view action
-   *
-   * @param req
-   * @param res
-   *
-   * @route   {get} /:id/view
-   * @layout  admin
-   */
-  async viewAction(req, res) {
-    // set website variable
-    let invoice = false;
-
-    // check for website model
-    if (req.params.id) {
-      // load user
-      invoice = await Invoice.findById(req.params.id);
-    }
-
-    // render page
-    res.render('invoice/admin/view', {
-      title : `View ${invoice.get('_id').toString()}`,
-      order : await (await invoice.get('order')).sanitise(),
-    });
-  }
-
-  /**
    * add/edit action
    *
    * @param req
@@ -174,8 +148,8 @@ class AdminInvoiceController extends Controller {
 
     // render page
     res.render('invoice/admin/update', {
-      title   : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
-      invoice : await invoice.sanitise(),
+      title  : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
+      orders : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
     });
   }
 
@@ -215,12 +189,15 @@ class AdminInvoiceController extends Controller {
     }
 
     // get order
-    const order = await invoice.get('order');
+    const orders = await invoice.get('orders');
 
     // check body
     if (req.body.lines) {
       // set lines
-      order.set('lines', req.body.lines);
+      orders.forEach((order) => {
+        // set lines
+        order.set('lines', req.body.lines.filter(line => line.order === order.get('_id').toString()));
+      });
     }
 
     // check discount
@@ -230,7 +207,7 @@ class AdminInvoiceController extends Controller {
     }
 
     // update totals
-    invoice.set('total', order.get('lines').reduce((accum, line) => {
+    invoice.set('total', ([].concat(...(orders.map(order => order.get('lines'))))).reduce((accum, line) => {
       // return accum
       return line.total + accum;
     }, 0) - (invoice.get('discount') || 0));
@@ -239,13 +216,10 @@ class AdminInvoiceController extends Controller {
     await invoice.save(req.user);
 
     // save order
-    await order.save(req.user);
+    await Promise.all(orders.map(order => order.save(req.user)));
 
     // render page
-    res.render('invoice/admin/update', {
-      title   : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
-      invoice : await invoice.sanitise(),
-    });
+    res.redirect(`/admin/shop/invoice/${invoice.get('_id').toString()}/update`);
   }
 
   /**
@@ -349,10 +323,13 @@ class AdminInvoiceController extends Controller {
         // get name
         return user ? user.name() : '<i>N/A</i>';
       },
-    }).column('order', {
-      title  : 'Order',
+    }).column('orders', {
+      title  : 'Orders',
       format : async (col, row) => {
-        return col ? `<a href="/admin/shop/order/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
+        return col && col.length ? col.map((item) => {
+          // return item
+          return `<a href="/admin/shop/order/${item.get('_id').toString()}/update">${item.get('_id').toString()}</a>`;
+        }).join(', ') : '<i>N/A</i>';
       },
     }).column('total', {
       title  : 'Total',
@@ -395,7 +372,6 @@ class AdminInvoiceController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
@@ -447,7 +423,7 @@ class AdminInvoiceController extends Controller {
     });
 
     // set default sort order
-    invoiceGrid.sort('created_at', 1);
+    invoiceGrid.sort('created_at', -1);
 
     // return grid
     return invoiceGrid;

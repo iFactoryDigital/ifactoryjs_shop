@@ -336,6 +336,13 @@ class AdminPaymentController extends Controller {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
     })
+      .column('invoice', {
+        sort   : true,
+        title  : 'Invoice',
+        format : async (col) => {
+          return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
+        },
+      })
       .column('error', {
         sort   : true,
         title  : 'Error',
@@ -423,7 +430,7 @@ class AdminPaymentController extends Controller {
     });
 
     // set default sort order
-    paymentGrid.sort('created_at', 1);
+    paymentGrid.sort('created_at', -1);
 
     // return grid
     return paymentGrid;

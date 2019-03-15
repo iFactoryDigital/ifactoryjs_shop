@@ -185,9 +185,11 @@ class OrderController extends Controller {
     // set status
     if (orderStatus.get('status') !== 'paid' && sanitised.paid) {
       // emit paid
+      invoice.set('status', 'paid');
       orderStatus.set('status', 'paid');
 
       // save order
+      await invoice.save(await invoice.get('user'));
       await orderStatus.save(await orderStatus.get('user'));
 
       // emit create

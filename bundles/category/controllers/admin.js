@@ -597,7 +597,7 @@ class AdminCategoryController extends Controller {
     });
 
     // Set default sort order
-    categoryGrid.sort('created_at', 1);
+    categoryGrid.sort('created_at', -1);
 
     // Return grid
     return categoryGrid;
