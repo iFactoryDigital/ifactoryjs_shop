@@ -10,7 +10,8 @@
     </admin-header>
 
     <div class="container-fluid">
-      <div class="card mb-5">
+
+      <div class="card mb-4">
         <div class="card-header">
           Invoice:
           <b>
@@ -47,7 +48,7 @@
                   <th class="text-right">Total</th>
                 </tr>
               </thead>
-              
+
               <tbody each={ order, a in opts.orders }>
                 <tr>
                   <td colspan="3" class="border-right-0">
@@ -79,7 +80,7 @@
                   </td>
                 </tr>
               </tbody>
-              
+
               <tfoot>
                 <tr>
                   <td colspan="4" class="border-0 bg-transparent" />
@@ -113,16 +114,16 @@
           </div>
 
           <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onSave } disabled={ this.emailing || this.saving || this.recording }>
-              { this.saving ? 'Saving...' : 'Save Invoice' }
+            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+              { this.loading('save') ? 'Saving...' : 'Save Invoice' }
             </button>
-            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onEmail } disabled={ this.emailing || this.saving || this.recording }>
-              { this.emailing ? 'Emailing...' : 'Email Invoice' }
+            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
+              { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
             </button>
           </div>
         </div>
       </div>
-      
+
       <div class="card">
         <div class="card-header">
           Invoice Payments
@@ -131,13 +132,65 @@
           <grid grid={ opts.grid } />
 
           <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.emailing || this.saving || this.recording } onclick={ onSave } disabled={ this.emailing || this.saving || this.recording }>
-              { this.recording ? 'Recording Payment...' : 'Record Payment' }
+            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onPayment } disabled={ this.loading() }>
+              { this.loading('record') ? 'Recording Payment...' : 'Record Payment' }
             </button>
           </div>
         </div>
       </div>
-      
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-payment" ref="payment">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Record Payment
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          Modal body..
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-email" ref="email">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Email Invoice
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          Modal body..
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -146,6 +199,7 @@
     this.mixin('i18n');
     this.mixin('user');
     this.mixin('config');
+    this.mixin('loading');
 
     // set initial discount
     this.invoice  = opts.orders[0].invoice;
@@ -237,36 +291,62 @@
       e.stopPropagation();
 
       // check saving
-      if (this.saving) return;
+      if (this.loading('save')) return;
 
       // set saving
-      this.saving = true;
-      this.update();
+      this.loading('save', true);
 
       // post
       const orders = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
         lines    : [].concat(...(opts.orders.map((order) => order.lines))),
         discount : this.discount,
       })).result;
-      
+
       // loop orders
       opts.orders.forEach((o) => {
         // get found
         const find = orders.find((or) => or.id === o.id);
-        
+
         // loop keys
         for (const key in find) {
           // set value
           o[key] = find[key];
         }
       });
-      
+
       // set invoice
       this.invoice = orders[0].invoice;
 
       // set saving
-      this.saving = false;
-      this.update();
+      this.loading('save', false);
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    async onEmail(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.email).modal('show');
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    async onPayment(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.payment).modal('show');
     }
 
     /**
