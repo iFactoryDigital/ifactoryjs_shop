@@ -1,0 +1,8 @@
+{
+  "invoice" : {
+    "status" : {
+      "paid"   : "Paid",
+      "unpaid" : "Unpaid"
+    }
+  }
+}

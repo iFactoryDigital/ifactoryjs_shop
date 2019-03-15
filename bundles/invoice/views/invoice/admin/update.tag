@@ -20,31 +20,25 @@
             <span class="float-right">
               Status:
               <b>
-                { this.t('invoice.status.' + this.invoice.status) }
+                { this.t('invoice.status.' + (this.invoice.status || 'unpaid')) }
               </b>
             </span>
           </div>
           <div class="card-body">
             <div class="row mb-4">
               <div class="col-sm-6">
-                <h6 class="mb-3">From:</h6>
                 <div>
-                  <b>Webz Poland</b>
+                  <b>
+                    { this.config.title }
+                  </b>
                 </div>
-                <div>Madalinskiego 8</div>
-                <div>71-101 Szczecin, Poland</div>
-                <div>Email: info@webz.com.pl</div>
-                <div>Phone: +48 444 666 3333</div>
+                <img src={ this.config.logo } />
               </div>
               <div class="col-sm-6">
-                <h6 class="mb-3">To:</h6>
                 <div>
-                  <b>Bob Mart</b>
+                  <b>{ (opts.orders[0].user || {}).username || (opts.orders[0].address || {}).name }</b>
                 </div>
-                <div>Attn: Daniel Marek</div>
-                <div>43-190 Mikolow, Poland</div>
-                <div>Email: marek@daniel.com</div>
-                <div>Phone: +48 123 456 789</div>
+                <div if={ (opts.orders[0].address || {}).formatted }>{ (opts.orders[0].address || {}).formatted }</div>
               </div>
             </div>
             <div class="table-responsive-sm">
@@ -126,6 +120,7 @@
   <script>
     // do mixin
     this.mixin('i18n');
+    this.mixin('config');
 
     // set initial discount
     this.invoice  = opts.orders[0].invoice;

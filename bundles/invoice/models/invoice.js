@@ -48,7 +48,11 @@ class Invoice extends Model {
         // return a + b
         return a + b;
       }),
-      total    : this.get('total'),
+      total  : this.get('total'),
+      status : this.get('total') <= (payments.length ? payments : [0]).reduce((a, b) => {
+        // return a + b
+        return a + b;
+      }) ? 'paid' : 'unpaid',
       discount : this.get('discount') || 0,
       currency : this.get('currency'),
       payments : await Promise.all(invoicePayments.map((invoicePayment) => {
