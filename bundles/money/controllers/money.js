@@ -108,9 +108,6 @@ class MoneyController extends Controller {
     if (currency === 'JPY') {
       // round to nearest 10
       invoice.set('total', Math.ceil(invoice.get('total') / 10) * 10);
-    } else {
-      // round to nearest 10
-      invoice.set('total', Math.ceil(invoice.get('total') * 10) / 10);
     }
   }
 }

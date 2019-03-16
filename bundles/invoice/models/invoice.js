@@ -30,9 +30,9 @@ class Invoice extends Model {
    */
   async sanitise() {
     // load payments
-    const invoicePayments = (await Payment.find({
+    const invoicePayments = (await Payment.where({
       'invoice.id' : this.get('_id').toString(),
-    }) || []);
+    }).ne('method.type', null).find() || []);
 
     // load payments
     const payments = invoicePayments.map((invoicePayment) => {

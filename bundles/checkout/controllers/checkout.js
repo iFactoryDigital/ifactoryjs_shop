@@ -211,6 +211,9 @@ class CheckoutController extends Controller {
       continued : new Date(),
     });
 
+    // check user
+    if (!await order.get('user')) order.set('user', req.user);
+
     // set lines
     order.set('lines', req.body.lines);
 
@@ -278,6 +281,7 @@ class CheckoutController extends Controller {
     try {
       // create order
       const order = await Order.findOne({
+        status    : null,
         'cart.id' : (cart.get('_id') || '').toString(),
       }) || new Order({
         cart,

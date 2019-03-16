@@ -6,6 +6,7 @@
 
 
 // require dependencies
+const money  = require('money-math');
 const config = require('config');
 const colors = require('colors');
 const Helper = require('helper');
@@ -49,28 +50,32 @@ class InvoiceHelper extends Helper {
     const lines = order.get('lines');
 
     // create new invoice
-    const invoice = new Invoice({
-
-      user  : await order.get('user'),
-      total : (await orderHelper.lines(order, lines)).reduce((total, x) => {
-        // return value
-        return total += x.total;
-      }, 0),
-      lines : order.get('lines').map((line) => {
-        // set order
-        line.order = order.get('_id').toString();
-
-        // return line
-        return line;
-      }),
+    const invoice = await order.get('invoice') || new Invoice({
+      user   : await order.get('user'),
       orders : [order],
     });
 
-    // save order
-    await order.save(user);
+    // set lines
+    invoice.set('lines', (await orderHelper.lines(order)).map((line) => {
+      // set order
+      line.order = order.get('_id').toString();
+
+      // return line
+      return line;
+    }));
+    invoice.set('total', parseFloat(invoice.get('lines').reduce((accum, item) => {
+      // add amount
+      return money.add(accum, money.floatToAmount(item.total));
+    }, '0.00')));
+
+    // set invoice
+    order.set('invoice', invoice);
 
     // save invoice
     await invoice.save(user);
+
+    // save order
+    await order.save(user);
 
     // hook invoice
     await this.eden.hook('invoice.init', invoice);
