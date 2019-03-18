@@ -239,7 +239,7 @@ class OrderController extends Controller {
       }
 
       // loop items
-      await Promise.all(orderStatus.get('lines').map(async (line) => {
+      await Promise.all(orderStatus.get('lines').map(async (line, i) => {
         // get product
         const product = await Product.findById(line.product);
 
