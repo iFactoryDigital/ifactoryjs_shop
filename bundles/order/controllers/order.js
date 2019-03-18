@@ -301,9 +301,9 @@ class OrderController extends Controller {
     orderGrid.route('/order/grid');
 
     // set grid model
-    orderGrid.live(true);
-    orderGrid.type('sanitise');
+    orderGrid.row('order-row');
     orderGrid.model(Order);
+    orderGrid.models(true);
 
     // add grid filters
     orderGrid.filter('status', {

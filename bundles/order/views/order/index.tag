@@ -4,7 +4,7 @@
   <page-title description="Your Orders" />
   <!-- / product title -->
 
-  <order-grid grid={ opts.grid } title="Your Orders" />
+  <grid grid={ opts.grid } title="Your Orders" />
 
   <script>
     // do mixins
