@@ -166,7 +166,7 @@ class ProductController extends Controller {
       // loop for variations
       Object.keys(variations).forEach((type) => {
         // check found option
-        let found = variations[type].options.find(option => (opts || []).includes(option.sku)) || variations[type].options[0];
+        let found = (variations[type].options || []).find(option => (opts || []).includes(option.sku)) || variations[type].options[0];
 
         // add to price
         price += parseFloat(found.price);
