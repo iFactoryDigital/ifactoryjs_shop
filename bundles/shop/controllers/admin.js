@@ -173,8 +173,9 @@ class ShopAdminController extends Controller {
       next.setDate(next.getDate() + 1);
 
       // return amount sum
-      const total = await Payment.where('complete', true).gte('created_at', current).lte('created_at', next).gte('amount', 0)
-        .sum('amount');
+      const total = await Payment.where({
+        complete : true
+      }).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
 
       // add to totals
       totals.push(total);
@@ -229,8 +230,9 @@ class ShopAdminController extends Controller {
       next.setDate(next.getDate() + 1);
 
       // return amount sum
-      const total = await Credit.where('credited', true).gte('created_at', current).lte('created_at', next).gte('amount', 0)
-        .sum('amount');
+      const total = await Credit.where({
+        credited : true
+      }).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
 
       // add to totals
       totals.push(total);
