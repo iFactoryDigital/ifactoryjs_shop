@@ -53,16 +53,16 @@
               <p class="lead mb-2">
                 Invoice Number
               </p>
-              <h6 class="mb-4">
+              <b class="d-block mb-3">
                 { this.invoice.id }
-              </h6>
+              </b>
 
               <p class="lead mb-2">
                 Invoice Date
               </p>
-              <h6>
+              <b class="d-block">
                 { new Date(this.invoice.created).toLocaleString() }
-              </h6>
+              </b>
             </div>
             <div class="col-lg-4">
               <cms-placement placement="invoice.company" />
@@ -73,27 +73,27 @@
         <div class="card-body">
           <div class="row mb-5">
             <div class="col-sm-4">
-              <p class="lead">
+              <p class="lead mb-2">
                 Bill To
               </p>
-              <h6 class="mb-4">
+              <b class="d-block mb-3">
                 { (opts.orders[0].address || {}).name || (opts.orders[0].user || {}).username }
-              </h6>
+              </b>
             </div>
             <div class="col-sm-4">
-              <p class="lead">
+              <p class="lead mb-2">
                 Total Amount
               </p>
-              <h6 class="mb-4">
+              <b class="d-block mb-3">
                 <money amount={ (getSubtotal() - this.discount) } />
-              </h6>
+              </b>
 
-              <p class="lead">
+              <p class="lead mb-2">
                 Total Paid
               </p>
-              <h6>
+              <b class="d-block">
                 <money amount={ this.invoice.paid || 0 } />
-              </h6>
+              </b>
             </div>
             <div class="col-sm-4">
               <p class="lead m-0">
@@ -152,7 +152,7 @@
                 <tr>
                   <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
-                    <b>Subtotal</b>
+                    <b class="d-block">Subtotal</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
                     ${ getSubtotal().toFixed(2) } { this.invoice.currency }
@@ -161,7 +161,7 @@
                 <tr>
                   <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
-                    <b>Discount</b>
+                    <b class="d-block">Discount</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
                     $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onDiscount }>{ this.discount.toFixed(2) }</span> { this.invoice.currency }
@@ -170,10 +170,10 @@
                 <tr>
                   <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
-                    <b>Total</b>
+                    <b class="d-block">Total</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
-                    <b>${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
+                    <b class="d-block">${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
                   </td>
                 </tr>
               </tfoot>
@@ -192,7 +192,7 @@
           Invoice Payments
         </div>
         <div class="card-body">
-          <grid grid={ opts.grid } />
+          <grid grid={ opts.grid } table-class="table table-bordered table-striped" />
 
           <div class="text-right mt-5">
             <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onPayment } disabled={ this.loading() }>
