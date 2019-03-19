@@ -44,7 +44,7 @@ class Invoice extends Model {
     return {
       id   : this.get('_id') ? this.get('_id').toString() : false,
       rate : this.get('rate'),
-      paid : this.get('total') <= (payments.length ? payments : [0]).reduce((a, b) => {
+      paid : (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
       }),
@@ -62,6 +62,8 @@ class Invoice extends Model {
         // return sanitised images
         return invoicePayment.sanitise();
       })),
+      updated : this.get('updated_at'),
+      created : this.get('created_at'),
     };
   }
 }

@@ -9,31 +9,103 @@
       </yield>
     </admin-header>
 
-    <div class="container-fluid">
+    <div class="container">
 
       <div class="card mb-4">
-        <div class="card-header">
-          Invoice:
-          <b>
-            #{ this.invoice.id }
-          </b>
-          <span class="float-right">
-            Status:
-            <b>
-              { this.t('invoice.status.' + (this.invoice.status || 'unpaid')) }
-            </b>
-          </span>
+        <div class="card-body">
+          <span class="btn btn-{ this.colors[(this.invoice.status || 'pending')] }">Status: { this.t('invoice.status.' + (this.invoice.status || 'pending')) }</span>
+          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+            { this.loading('save') ? 'Saving...' : 'Save Invoice' }
+          </button>
+          <div class="dropdown float-right mr-2">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-bars mr-2" />
+              Actions
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <button class={ 'dropdown-item' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
+                { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
+              </button>
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </div>
+          <div class="dropdown float-right mr-2">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-bars mr-2" />
+              Export
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </div>
         </div>
         <div class="card-body">
-          <div class="row mb-4">
-            <div class="col-sm-6">
+          <div class="row">
+            <div class="col-lg-8">
+              <h3 class="mb-4">
+                Invoice: { this.invoice.id }
+              </h3>
+
+              <p class="lead mb-2">
+                Invoice Number
+              </p>
+              <h6 class="mb-4">
+                { this.invoice.id }
+              </h6>
+
+              <p class="lead mb-2">
+                Invoice Date
+              </p>
+              <h6>
+                { new Date(this.invoice.created).toLocaleString() }
+              </h6>
+            </div>
+            <div class="col-lg-4">
               <cms-placement placement="invoice.company" />
             </div>
-            <div class="col-sm-6">
-              <div>
-                <b>{ (opts.orders[0].user || {}).username || (opts.orders[0].address || {}).name }</b>
-              </div>
-              <div if={ (opts.orders[0].address || {}).formatted }>{ (opts.orders[0].address || {}).formatted }</div>
+          </div>
+        </div>
+        <hr />
+        <div class="card-body">
+          <div class="row mb-5">
+            <div class="col-sm-4">
+              <p class="lead">
+                Bill To
+              </p>
+              <h6 class="mb-4">
+                { (opts.orders[0].address || {}).name || (opts.orders[0].user || {}).username }
+              </h6>
+            </div>
+            <div class="col-sm-4">
+              <p class="lead">
+                Total Amount
+              </p>
+              <h6 class="mb-4">
+                <money amount={ (getSubtotal() - this.discount) } />
+              </h6>
+
+              <p class="lead">
+                Total Paid
+              </p>
+              <h6>
+                <money amount={ this.invoice.paid || 0 } />
+              </h6>
+            </div>
+            <div class="col-sm-4">
+              <p class="lead m-0">
+                Balance Due
+              </p>
+              <h1 class="my-3">
+                <money amount={ (getSubtotal() - this.discount) - (this.invoice.paid || 0) } />
+              </h1>
+
+              <span class="btn btn-light">
+                Due Date: { new Date(this.invoice.created).toLocaleString() }
+              </span>
             </div>
           </div>
           <div class="table-responsive-sm">
@@ -55,7 +127,9 @@
                     Order: <b>#{ order.id }</b>
                   </td>
                   <td colspan="3" class="text-right border-left-0">
-                    Status: <b>{ this.t('order.status.' + order.status) }</b>
+                    <button class="btn btn-sm btn-primary" onclick={ onProduct }>
+                      <i class="fa fa-plus mr-2" /> Add Line Item
+                    </button>
                   </td>
                 </tr>
                 <tr each={ line, i in order.lines }>
@@ -71,13 +145,6 @@
                   </td>
                   <td class="text-center" contenteditable={ this.user.acl.validate('admin') } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
                   <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
-                </tr>
-                <tr if={ this.user.acl.validate('admin') } class="bg-transparent">
-                  <td colspan="6" class="border-0 text-right bg-transparent">
-                    <button class="btn btn-primary">
-                      <i class="fa fa-plus" />
-                    </button>
-                  </td>
                 </tr>
               </tbody>
 
@@ -112,15 +179,11 @@
               </tfoot>
             </table>
           </div>
-
-          <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
-              { this.loading('save') ? 'Saving...' : 'Save Invoice' }
-            </button>
-            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
-              { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
-            </button>
-          </div>
+        </div>
+        <div class="card-body">
+          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+            { this.loading('save') ? 'Saving...' : 'Save Invoice' }
+          </button>
         </div>
       </div>
 
@@ -194,16 +257,60 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modal-product" ref="product">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Add Product Line
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <eden-select ref="select" class={ 'd-block' : true, 'mb-4' : this.item } url="/admin/shop/product/query" name="product" label={ 'Search by Name' } data={ { 'value' : null } } on-change={ onSelectProduct }>
+            <option each={ product, i in opts.data.value || [] } selected="true" value={ product.id }>
+              { product.title[this.i18n.lang()] }
+            </option>
+          </eden-select>
+
+          <h1 class="text-center" if={ this.loading('product') }>
+            <i class="fa fa-spinner fa-spin" />
+          </h1>
+          <div if={ this.item && !this.loading('product') } data-is="product-{ this.item.type }-buy" product={ this.item } on-add={ onAddProduct }/>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <script>
     // do mixin
     this.mixin('i18n');
     this.mixin('user');
     this.mixin('config');
+    this.mixin('product');
     this.mixin('loading');
 
     // set initial discount
+    this.item     = null;
     this.invoice  = opts.orders[0].invoice;
     this.discount = (this.invoice || {}).discount || 0;
+    this.colors   = {
+      'paid'    : 'success',
+      'sent'    : 'primary',
+      'partial' : 'warning',
+      'unpaid'  : 'danger',
+      'pending' : 'info',
+    };
 
     /**
      * get line title
@@ -285,6 +392,91 @@
      *
      * @param  {Event} e
      */
+    onEmail(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.email).modal('show');
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onPayment(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.payment).modal('show');
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onProduct(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // set order
+      this.order = e.item.order;
+
+      // show modal
+      jQuery(this.refs.product).modal('show');
+    }
+
+    /**
+     * on select product
+     *
+     * @param  {Event} e
+     */
+    async onSelectProduct(e) {
+      // get product
+      const productID = e.target.value;
+
+      // loading product
+      this.loading('product', true);
+
+      // get product
+      this.item = (await eden.router.get(`/admin/shop/product/${productID}/get`)).result;
+
+      // loading product
+      this.loading('product', false);
+    }
+
+    /**
+     * adds product line
+     *
+     * @param  {Event} e
+     */
+    onAddProduct(product, o) {
+      // add product
+      this.order.products.push(product);
+      this.order.lines.push({
+        qty     : 1,
+        opts    : o,
+        order   : this.order.id,
+        price   : this.product.price(product, o),
+        total   : this.product.price(product, o),
+        product : product.id,
+      });
+
+      // update view
+      this.update();
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
     async onSave(e) {
       // prevent default
       e.preventDefault();
@@ -319,34 +511,6 @@
 
       // set saving
       this.loading('save', false);
-    }
-
-    /**
-     * on save
-     *
-     * @param  {Event} e
-     */
-    async onEmail(e) {
-      // prevent default
-      e.preventDefault();
-      e.stopPropagation();
-
-      // show modal
-      jQuery(this.refs.email).modal('show');
-    }
-
-    /**
-     * on save
-     *
-     * @param  {Event} e
-     */
-    async onPayment(e) {
-      // prevent default
-      e.preventDefault();
-      e.stopPropagation();
-
-      // show modal
-      jQuery(this.refs.payment).modal('show');
     }
 
     /**

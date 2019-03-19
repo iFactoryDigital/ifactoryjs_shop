@@ -46,7 +46,7 @@ class OrderHelper extends Helper {
    */
   async complete(order, body) {
     // set actions
-    Object.keys(body.actions).forEach((key) => {
+    if (body.actions) Object.keys(body.actions).forEach((key) => {
       // set meta
       order.set(`actions.${key}.meta`, body.actions[key].meta);
 

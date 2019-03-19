@@ -22,16 +22,16 @@
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
         
-        <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product, Object.values(skus())) }>
+        <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd }>
           { this.t('checkout.proceed') }
         </a>
         
         <span class="btn-group float-right">
-          <a href="#!" if={ this.cart.has(opts.product, Object.values(skus())) } onclick={ onRemove } class="btn btn-danger">
+          <a href="#!" if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd } onclick={ onRemove } class="btn btn-danger">
             <i class="fa fa-times" />
           </a>
           <a href="#!" onclick={ onAdd } class={ 'btn btn-success' : true, 'disabled' : !opts.product.price.available }>
-            <span if={ this.cart.line(opts.product, Object.values(skus())) }>{ this.cart.line(opts.product, Object.values(skus())).qty }</span> { this.t(this.cart.has(opts.product, Object.values(skus())) ? 'cart.added' : 'cart.add') }
+            <span if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd }>{ this.cart.line(opts.product, Object.values(skus())).qty }</span> { this.t(this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd ? 'cart.added' : 'cart.add') }
           </a>
         </span>
         
@@ -81,7 +81,13 @@
       e.preventDefault();
 
       // get product
-      this.cart.add(opts.product, Object.values(this.skus()));
+      if (opts.onAdd) {
+        // on add
+        opts.onAdd(opts.product, Object.values(this.skus()));
+      } else {
+        // add cart
+        this.cart.add(opts.product, Object.values(this.skus()));
+      }
     }
 
     /**

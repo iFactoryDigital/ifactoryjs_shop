@@ -160,8 +160,8 @@ class AdminProductController extends Controller {
   /**
    * Index action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @icon    fa fa-gift
    * @menu    {ADMIN} Products
@@ -178,10 +178,73 @@ class AdminProductController extends Controller {
   }
 
   /**
+   * index action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @acl   admin
+   * @fail  next
+   * @route {GET} /query
+   */
+  async queryAction(req, res) {
+    // find children
+    let products = Product;
+
+    // set query
+    if (req.query.q) {
+      products = products.where({
+        [`title.${req.language}`] : new RegExp(escapeRegex(req.query.q || ''), 'i'),
+      });
+    }
+
+    // add roles
+    products = await products.skip(((parseInt(req.query.page, 10) || 1) - 1) * 20).limit(20).sort('name', 1)
+      .find();
+
+    // get children
+    res.json((await Promise.all(products.map(product => product.sanitise()))).map((sanitised) => {
+      // return object
+      return {
+        text  : sanitised.title[req.language],
+        data  : sanitised,
+        value : sanitised.id,
+      };
+    }));
+  }
+
+  /**
+   * Update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {get} /:id/get
+   */
+  async getAction(req, res) {
+    // Set website variable
+    let create  = true;
+    let product = new Product();
+
+    // Check for website model
+    if (req.params.id) {
+      // Load by id
+      create = false;
+      product = await Product.findById(req.params.id);
+    }
+
+    // return json
+    return res.json({
+      result  : await product.sanitise(),
+      success : true,
+    });
+  }
+
+  /**
    * Add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route    {get} /create
    * @layout   admin
@@ -195,8 +258,8 @@ class AdminProductController extends Controller {
   /**
    * Update action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/update
    * @layout  admin
@@ -250,8 +313,8 @@ class AdminProductController extends Controller {
   /**
    * Create submit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /create
    * @layout  admin
@@ -264,8 +327,8 @@ class AdminProductController extends Controller {
   /**
    * Add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/update
    * @layout  admin
@@ -352,8 +415,8 @@ class AdminProductController extends Controller {
   /**
    * Delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/remove
    * @layout  admin
@@ -378,8 +441,8 @@ class AdminProductController extends Controller {
   /**
    * Delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/remove
    * @title   product Administration
@@ -408,8 +471,8 @@ class AdminProductController extends Controller {
   /**
    * User grid action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route {get}  /grid
    * @route {post} /grid
