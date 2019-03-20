@@ -332,7 +332,7 @@ class AdminOrderController extends Controller {
 
             // return value
             return `${line.qty || 1}x <a href="/admin/shop/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
-          }))).join(', ');
+          }))).join(',<br>');
         },
         export : async (col, row) => {
           // get invoice
@@ -371,28 +371,16 @@ class AdminOrderController extends Controller {
           return req.t(`order.status.${col || 'pending'}`);
         },
       })
-      .column('payments', {
+      .column('invoice', {
         sort   : false,
-        title  : 'Payments',
+        title  : 'Invoice',
         format : async (col, row) => {
-        // get invoice
-          const invoice  = await row.get('invoice');
-          const payments = await Payment.find({
-            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
-          });
-
           // get paid
-          return payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id').toString()}/update">${payment.get('_id').toString()}</a>`);
+          return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
         },
         export : async (col, row) => {
-        // get invoice
-          const invoice  = await row.get('invoice');
-          const payments = await Payment.find({
-            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
-          });
-
-          // get paid
-          return payments.map(payment => payment.get('_id').toString());
+          // get invoice
+          return col ? col.get('_id').toString() : '';
         },
       })
       .column('paid', {
