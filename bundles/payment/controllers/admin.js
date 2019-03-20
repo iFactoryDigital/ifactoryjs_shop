@@ -188,9 +188,6 @@ class AdminPaymentController extends Controller {
       payment = await Payment.findById(req.params.id);
     }
 
-    // get order
-    const order = await (await payment.get('invoice')).get('order');
-
     // set details
     if (!payment.get('complete') && req.body.paid === 'paid') {
       // set details
@@ -199,9 +196,21 @@ class AdminPaymentController extends Controller {
         type : 'manual',
       });
       payment.set('manual', {
-        by      : req.user,
         updated : new Date(),
       });
+      payment.set('manual.by', req.user);
+
+      // unset data
+      payment.unset('data');
+    } else {
+      // set complete false
+      payment.set('complete', false);
+
+      // set manual
+      payment.set('manual', {
+        updated : new Date(),
+      });
+      payment.set('manual.by', req.user);
 
       // unset data
       payment.unset('data');
@@ -209,12 +218,6 @@ class AdminPaymentController extends Controller {
 
     // save payment
     await payment.save(req.user);
-
-    // run hook
-    order.set('state', 'paid');
-
-    // save order
-    await order.save(req.user);
 
     // render page
     res.render('payment/admin/update', {
@@ -300,7 +303,7 @@ class AdminPaymentController extends Controller {
    *
    * @return {grid}
    */
-  async _grid(req, invoice) {
+  async _grid(req, invoice, omitActions) {
     // create new grid
     const paymentGrid = new Grid();
 
@@ -314,7 +317,7 @@ class AdminPaymentController extends Controller {
     }
 
     // set route
-    paymentGrid.route(`/admin/shop/payment/${invoice ? `${invoice}/` : ''}grid`);
+    paymentGrid.route(`/admin/shop/${invoice ? `invoice/${invoice}` : 'payment'}/grid`);
 
     // set grid model
     paymentGrid.model(Payment);
@@ -345,6 +348,18 @@ class AdminPaymentController extends Controller {
       title  : 'Status',
       format : async (col, row) => {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
+      },
+    }).column('method.type', {
+      sort   : true,
+      title  : 'Method',
+      format : async (col, row) => {
+        return col ? col : '<i>N/A</i>';
+      },
+    }).column('details', {
+      sort   : true,
+      title  : 'Details',
+      format : async (col, row) => {
+        return col ? col : '<i>N/A</i>';
       },
     });
 
@@ -389,8 +404,12 @@ class AdminPaymentController extends Controller {
             year  : 'numeric',
           });
         },
-      })
-      .column('actions', {
+      });
+
+    // omit actions
+    if (!omitActions) {
+      // add actions column
+      paymentGrid.column('actions', {
         width  : '1%',
         title  : 'Actions',
         export : false,
@@ -403,6 +422,7 @@ class AdminPaymentController extends Controller {
           ].join('');
         },
       });
+    }
 
     // add grid filters
     paymentGrid.filter('username', {

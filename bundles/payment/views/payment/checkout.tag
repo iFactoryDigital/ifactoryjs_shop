@@ -7,7 +7,7 @@
     <div class="card-body p-0">
       <div class="list-group list-group-flush">
         <virtual each={ method, i in methods() }>
-          <li class={ 'list-group-item list-group-item-method' : true, 'list-group-item-active' : isActive(method.type) } data-is="{ method.type }-method" method={ method } val={ (action().value || {}) } on-ready={ onMethod } />
+          <li class={ 'list-group-item list-group-item-method' : true, 'list-group-item-active' : isActive(method.type) } data-is="{ method.type }-method" action={ action() } method={ method } val={ (action().value || {}) } on-ready={ onMethod } />
         </virtual>
       </div>
     </div>
@@ -48,7 +48,13 @@
       opts.action.value = method;
 
       // update checkout
-      opts.checkout.update();
+      if (opts.checkout) {
+        // add checkout
+        opts.checkout.update();
+      } else {
+        // update view
+        this.update();
+      }
     }
 
     /**

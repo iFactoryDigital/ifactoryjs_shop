@@ -8,6 +8,7 @@ const escapeRegex = require('escape-string-regexp');
 const User    = model('user');
 const Block   = model('block');
 const Invoice = model('invoice');
+const Payment = model('payment');
 
 // require helpers
 const blockHelper = helper('cms/block');
@@ -91,8 +92,8 @@ class AdminInvoiceController extends Controller {
   /**
    * index action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @icon    fa fa-file-invoice
    * @menu    {ADMIN} Invoices
@@ -111,8 +112,8 @@ class AdminInvoiceController extends Controller {
   /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route    {get} /create
    * @route    {get} /:id/edit
@@ -128,8 +129,88 @@ class AdminInvoiceController extends Controller {
   /**
    * update action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {get} /:id/view
+   * @layout  admin
+   */
+  async viewAction(req, res) {
+    // set website variable
+    let create  = true;
+    let invoice = new Invoice();
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      create = false;
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // invoice company placement
+    req.placement('invoice.company');
+
+    // get payment grid
+    const paymentController = await this.eden.controller('payment/controllers/admin');
+
+    // get payment grid
+    const paymentGrid = await paymentController._grid(req, invoice, true);
+
+    // render page
+    res.render('invoice/admin/view', {
+      grid     : await paymentGrid.render(req, invoice),
+      title    : `View ${invoice.get('_id').toString()}`,
+      orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      invoice  : await invoice.sanitise(),
+      payments : true,
+    });
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route  {get} /:id/print
+   * @layout print
+   */
+  async printAction(req, res) {
+    // set website variable
+    let create  = true;
+    let invoice = new Invoice();
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      create = false;
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // invoice company placement
+    req.placement('invoice.company');
+
+    // get payment grid
+    const paymentController = await this.eden.controller('payment/controllers/admin');
+
+    // get payment grid
+    const paymentGrid = await paymentController._grid(req, invoice, true);
+
+    // render page
+    res.render('invoice/admin/view', {
+      grid     : await paymentGrid.render(req, invoice),
+      title    : `View ${invoice.get('_id').toString()}`,
+      orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      invoice  : await invoice.sanitise(),
+      payments : !!req.query.payments,
+    });
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/update
    * @layout  admin
@@ -157,17 +238,18 @@ class AdminInvoiceController extends Controller {
 
     // render page
     res.render('invoice/admin/update', {
-      grid   : await paymentGrid.render(req, invoice),
-      title  : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
-      orders : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      grid    : await paymentGrid.render(req, invoice),
+      title   : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
+      orders  : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      invoice : await invoice.sanitise(),
     });
   }
 
   /**
    * create submit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /create
    * @layout  admin
@@ -180,8 +262,8 @@ class AdminInvoiceController extends Controller {
   /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/update
    * @layout  admin
@@ -236,10 +318,62 @@ class AdminInvoiceController extends Controller {
   }
 
   /**
+   * add/edit action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {post} /:id/payment/create
+   * @layout  admin
+   */
+  async paymentCreateAction(req, res) {
+    // set website variable
+    let create  = true;
+    let invoice = new Invoice();
+    let payment = null;
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      create = false;
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // create manual payment
+    if (req.body.type === 'manual') {
+      // save payment
+      payment = new Payment({
+        invoice,
+        method : {
+          type : req.body.method
+        },
+        rate     : 1,
+        admin    : req.user,
+        amount   : parseFloat(req.body.amount),
+        details  : req.body.details,
+        currency : req.body.currency,
+        complete : true,
+      });
+
+      // save payment
+      await payment.save();
+    } else {
+
+    }
+
+    // render page
+    res.json({
+      result  : await payment.sanitise(),
+      invoice : await invoice.sanitise(),
+      success : true,
+    });
+  }
+
+  /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/remove
    * @layout  admin
@@ -264,8 +398,8 @@ class AdminInvoiceController extends Controller {
   /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/remove
    * @title   Invoice Administration
@@ -294,8 +428,8 @@ class AdminInvoiceController extends Controller {
   /**
    * user grid action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route {get}  /grid
    * @route {post} /grid
@@ -303,6 +437,35 @@ class AdminInvoiceController extends Controller {
   async gridAction(req, res) {
     // return post grid request
     return (await this._grid(req)).post(req, res);
+  }
+
+  /**
+   * user grid action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {get}  /:id/grid
+   * @route {post} /:id/grid
+   */
+  async paymentGridAction(req, res) {
+    // set website variable
+    let invoice = false;
+
+    // check for website model
+    if (req.params.id) {
+      // load user
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // get payment grid
+    const paymentController = await this.eden.controller('payment/controllers/admin');
+
+    // get payment grid
+    const paymentGrid = await paymentController._grid(req, invoice, true);
+
+    // return post grid request
+    return paymentGrid.post(req, res);
   }
 
   /**
@@ -385,6 +548,8 @@ class AdminInvoiceController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
+            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
+            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/print" class="btn btn-info" target="_blank"><i class="fa fa-print"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',

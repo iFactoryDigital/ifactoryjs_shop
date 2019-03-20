@@ -26,26 +26,21 @@
               <button class={ 'dropdown-item' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
                 { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
               </button>
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-          <div class="dropdown float-right mr-2">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-bars mr-2" />
-              Export
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
+              <button class={ 'dropdown-item' : true, 'disabled' : this.loading() } onclick={ onUpdateCompany } disabled={ this.loading() }>
+                { this.update.company ? 'Save Update' : 'Update Company' }
+              </button>
+              <a href="/admin/shop/invoice/{ this.invoice.id }/view" class="dropdown-item">
+                View Invoice
+              </a>
+              <a href="/admin/shop/invoice/{ this.invoice.id }/print" target="_blank" class="dropdown-item">
+                Print Invoice
+              </a>
             </div>
           </div>
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-8">
+            <div class="col-md-7 col-lg-8">
               <h3 class="mb-4">
                 Invoice: { this.invoice.id }
               </h3>
@@ -64,8 +59,8 @@
                 { new Date(this.invoice.created).toLocaleString() }
               </b>
             </div>
-            <div class="col-lg-4">
-              <cms-placement placement="invoice.company" />
+            <div class="col-md-5 col-lg-4">
+              <cms-placement placement="invoice.company" preview={ !this.update.company } />
             </div>
           </div>
         </div>
@@ -186,19 +181,20 @@
           </button>
         </div>
       </div>
+    </div>
 
+    <div class="container-fluid">
       <div class="card">
         <div class="card-header">
           Invoice Payments
         </div>
         <div class="card-body">
-          <grid grid={ opts.grid } table-class="table table-bordered table-striped" />
-
-          <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onPayment } disabled={ this.loading() }>
-              { this.loading('record') ? 'Recording Payment...' : 'Record Payment' }
-            </button>
-          </div>
+          <grid grid={ opts.grid } ref="payments" table-class="table table-bordered table-striped" />
+        </div>
+        <div class="card-body text-right">
+          <button class={ 'btn btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onPayment } disabled={ this.loading() }>
+            { this.loading('record') ? 'Recording Payment...' : 'Record Payment' }
+          </button>
         </div>
       </div>
 
@@ -206,7 +202,7 @@
   </div>
 
   <div class="modal fade" id="modal-payment" ref="payment">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
         <!-- Modal Header -->
@@ -219,12 +215,50 @@
 
         <!-- Modal body -->
         <div class="modal-body">
-          Modal body..
+          <div class="mb-3">
+            <button class="btn btn-{ this.payment === 'normal' ? 'primary' : 'secondary' } mr-2" onclick={ onNormalPayment }>
+              Normal Payment
+            </button>
+            <button class="btn btn-{ this.payment === 'manual' ? 'primary' : 'secondary' }" onclick={ onManualPayment }>
+              Manual Payment
+            </button>
+          </div>
+          <div if={ this.payment === 'normal' }>
+            <payment-checkout action={ Object.assign(opts.orders[0].actions.payment, { 'manual' : true }) } />
+          </div>
+          <div if={ this.payment === 'manual' }>
+            <div class="card">
+              <div class="card-header">
+                Manual Payment
+              </div>
+              <div class="card-body">
+                <validate label="Method" required min-length={ 2 } name="method" type="text" ref="method" />
+                <validate label="Details" required min-length={ 2 } name="details" type="textarea" ref="details" />
+                <validate label="Amount" required name="amount" type="number" step="0.01" ref="amount">
+                  <yield to="prepend">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                  </yield>
+                  <yield to="append">
+                    <div class="input-group-append">
+                      <span class="input-group-text">
+                        { eden.get('shop.currency') }
+                      </span>
+                    </div>
+                  </yield>
+                </validate>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          <button type="button" class={ 'btn btn-danger mr-2' : true, 'disabled' : this.loading('payment') } disabled={ this.loading('payment') } data-dismiss="modal">Close</button>
+          <button type="button" class={ 'btn btn-success' : true, 'disabled' : this.loading('payment') } disabled={ this.loading('payment') } onclick={ onSubmitPayment }>
+            Submit { this.payment === 'normal' ? 'Normal' : 'Manual' } Payment
+          </button>
         </div>
 
       </div>
@@ -302,7 +336,9 @@
 
     // set initial discount
     this.item     = null;
-    this.invoice  = opts.orders[0].invoice;
+    this.update   = {};
+    this.invoice  = opts.invoice;
+    this.payment  = 'normal';
     this.discount = (this.invoice || {}).discount || 0;
     this.colors   = {
       'paid'    : 'success',
@@ -433,6 +469,57 @@
     }
 
     /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onNormalPayment(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // set order
+      this.payment = 'normal';
+
+      // show modal
+      this.update();
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onManualPayment(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // set order
+      this.payment = 'manual';
+
+      // show modal
+      this.update();
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onUpdateCompany(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      this.update.company = !this.update.company;
+
+      // update
+      this.update();
+    }
+
+    /**
      * on select product
      *
      * @param  {Event} e
@@ -473,6 +560,49 @@
     }
 
     /**
+     * on submit payment
+     *
+     * @param  {Event}  e
+     *
+     * @return {Promise}
+     */
+    async onSubmitPayment(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // check saving
+      if (this.loading('payment')) return;
+
+      // set saving
+      this.loading('payment', true);
+
+      // post
+      const result = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/payment/create`, {
+        type     : this.payment,
+        method   : this.refs.method.value,
+        amount   : parseFloat(this.refs.amount.value),
+        details  : this.refs.details.value,
+        currency : this.eden.get('shop.currency'),
+      }));
+
+      // success
+      if (result.success) {
+        // set invoice
+        this.invoice = result.invoice;
+
+        // update grid
+        this.refs.payments.grid.update();
+
+        // show modal
+        jQuery(this.refs.payment).modal('hide');
+      }
+
+      // set saving
+      this.loading('payment', false);
+    }
+
+    /**
      * on save
      *
      * @param  {Event} e
@@ -506,9 +636,6 @@
         }
       });
 
-      // set invoice
-      this.invoice = orders[0].invoice;
-
       // set saving
       this.loading('save', false);
     }
@@ -522,7 +649,7 @@
      */
     getProduct(line) {
       // return product
-      return opts.orders.find(o => o.id === line.order).products.find(p => p.id === line.product);
+      return ((opts.orders.find(o => o.id === line.order) || opts.orders[0]).products || []).find(p => p.id === line.product) || {};
     }
 
     /**
