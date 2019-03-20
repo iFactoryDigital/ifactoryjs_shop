@@ -339,26 +339,42 @@ class AdminInvoiceController extends Controller {
       invoice = await Invoice.findById(req.params.id);
     }
 
+    // save payment
+    payment = new Payment({
+      invoice,
+      user     : req.user,
+      rate     : 1,
+      admin    : req.user,
+      amount   : parseFloat(req.body.amount),
+      details  : req.body.details,
+      currency : req.body.currency,
+    });
+
     // create manual payment
     if (req.body.type === 'manual') {
-      // save payment
-      payment = new Payment({
-        invoice,
-        method : {
-          type : req.body.method
-        },
-        rate     : 1,
-        admin    : req.user,
-        amount   : parseFloat(req.body.amount),
-        details  : req.body.details,
-        currency : req.body.currency,
-        complete : true,
+      // set fields
+      payment.set('method', {
+        type : req.body.method
       });
+      payment.set('complete', true);
 
       // save payment
-      await payment.save();
+      await payment.save(req.user);
     } else {
+      // save payment
+      await payment.save(req.user);
 
+      // set fields
+      payment.set('method', req.body.action.value);
+
+      // pay
+      await this.eden.hook('payment.pay', payment);
+
+      // unset data
+      payment.unset('method.data');
+
+      // save payment
+      await payment.save(req.user);
     }
 
     // render page

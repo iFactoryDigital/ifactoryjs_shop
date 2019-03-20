@@ -223,8 +223,23 @@
               Manual Payment
             </button>
           </div>
+          <validate label="Amount" required name="amount" type="number" step="0.01" ref="amount">
+            <yield to="prepend">
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+            </yield>
+            <yield to="append">
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  { eden.get('shop.currency') }
+                </span>
+              </div>
+            </yield>
+          </validate>
+          <validate label="Details" required min-length={ 2 } name="details" type="textarea" ref="details" />
           <div if={ this.payment === 'normal' }>
-            <payment-checkout action={ Object.assign(opts.orders[0].actions.payment, { 'manual' : true }) } />
+            <payment-checkout ref="checkout" action={ this.action } />
           </div>
           <div if={ this.payment === 'manual' }>
             <div class="card">
@@ -233,21 +248,6 @@
               </div>
               <div class="card-body">
                 <validate label="Method" required min-length={ 2 } name="method" type="text" ref="method" />
-                <validate label="Details" required min-length={ 2 } name="details" type="textarea" ref="details" />
-                <validate label="Amount" required name="amount" type="number" step="0.01" ref="amount">
-                  <yield to="prepend">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">$</span>
-                    </div>
-                  </yield>
-                  <yield to="append">
-                    <div class="input-group-append">
-                      <span class="input-group-text">
-                        { eden.get('shop.currency') }
-                      </span>
-                    </div>
-                  </yield>
-                </validate>
               </div>
             </div>
           </div>
@@ -337,6 +337,7 @@
     // set initial discount
     this.item     = null;
     this.update   = {};
+    this.action   = Object.assign(opts.orders[0].actions.payment, { 'manual' : true });
     this.invoice  = opts.invoice;
     this.payment  = 'normal';
     this.discount = (this.invoice || {}).discount || 0;
@@ -580,7 +581,8 @@
       // post
       const result = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/payment/create`, {
         type     : this.payment,
-        method   : this.refs.method.value,
+        action   : this.action,
+        method   : (this.refs.method || {}).value,
         amount   : parseFloat(this.refs.amount.value),
         details  : this.refs.details.value,
         currency : this.eden.get('shop.currency'),
@@ -593,6 +595,9 @@
 
         // update grid
         this.refs.payments.grid.update();
+
+        // go redirect
+        if ((result.result.data || {}).redirect) eden.router.go((result.result.data || {}).redirect);
 
         // show modal
         jQuery(this.refs.payment).modal('hide');

@@ -188,6 +188,10 @@ class AdminPaymentController extends Controller {
       payment = await Payment.findById(req.params.id);
     }
 
+    // get orders on invoice
+    const invoice = await payment.get('invoice');
+    const orders = await invoice.get('orders') || [];
+
     // set details
     if (!payment.get('complete') && req.body.paid === 'paid') {
       // set details
@@ -218,6 +222,9 @@ class AdminPaymentController extends Controller {
 
     // save payment
     await payment.save(req.user);
+
+    // save all orders
+    await Promise.all(orders.map(order => order.save(req.user)));
 
     // render page
     res.render('payment/admin/update', {
