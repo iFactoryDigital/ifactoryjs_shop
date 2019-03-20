@@ -9,11 +9,11 @@
     <div hide={ this.checkout.loading } data-is="{ action.type }-checkout" if={ action.show !== false } action={ action } checkout={ this.checkout } />
   </virtual>
 
-  <div class="my-3">
+  <div class="my-3" hide={ this.checkout.loading }>
     By Checking out you agree to our <a href="/terms" target="_blank">Terms & Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> agreements
   </div>
 
-  <a show={ !this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-lg btn-success mt-4' : true, 'disabled' : !this.hasCheckout() } disabled={ !hasCheckout() }>
+  <a hide={ this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-lg btn-success mt-4' : true, 'disabled' : !this.hasCheckout() } disabled={ !hasCheckout() }>
     { this.t('checkout.complete') }
   </a>
 
@@ -33,6 +33,9 @@
     onCheckout (e) {
       // prevent default
       e.preventDefault();
+      
+      // return if loading
+      if (this.checkout.loading) return;
 
       // call checkout
       this.checkout.submit();
