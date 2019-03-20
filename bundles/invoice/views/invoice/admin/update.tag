@@ -145,7 +145,15 @@
 
               <tfoot>
                 <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
+                  <td colspan="3" rowspan="3" class="border-0 bg-transparent">
+                    <div class="form-group">
+                      <label>
+                        Note
+                      </label>
+                      <textarea class="form-control" ref="note" onkeyup={ onNote }>{ this.invoice.note }</textarea>
+                    </div>
+                  </td>
+                  <td rowspan="3" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Subtotal</b>
                   </td>
@@ -154,7 +162,6 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Discount</b>
                   </td>
@@ -163,7 +170,6 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Total</b>
                   </td>
@@ -348,6 +354,18 @@
       'unpaid'  : 'danger',
       'pending' : 'info',
     };
+
+    /**
+     * get line title
+     *
+     * @param  {Event} e
+     *
+     * @return {*}
+     */
+    onNote(e) {
+      // set value
+      this.invoice.note = e.target.value.trim();
+    }
 
     /**
      * get line title
@@ -625,6 +643,7 @@
 
       // post
       const orders = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
+        note     : this.invoice.note,
         lines    : [].concat(...(opts.orders.map((order) => order.lines))),
         discount : this.discount,
       })).result;

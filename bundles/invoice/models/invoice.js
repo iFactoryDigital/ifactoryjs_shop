@@ -48,6 +48,7 @@ class Invoice extends Model {
         // return a + b
         return a + b;
       }),
+      note   : this.get('note'),
       total  : this.get('total'),
       status : this.get('total') <= (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b

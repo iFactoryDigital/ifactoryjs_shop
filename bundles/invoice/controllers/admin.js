@@ -298,6 +298,12 @@ class AdminInvoiceController extends Controller {
       invoice.set('discount', req.body.discount);
     }
 
+    // check discount
+    if (typeof req.body.note !== 'undefined') {
+      // set discount
+      invoice.set('note', req.body.note);
+    }
+
     // update totals
     invoice.set('total', ([].concat(...(orders.map(order => order.get('lines'))))).reduce((accum, line) => {
       // return accum
