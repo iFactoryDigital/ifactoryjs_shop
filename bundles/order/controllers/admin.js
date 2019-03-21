@@ -192,6 +192,12 @@ class AdminOrderController extends Controller {
       create = false;
     }
 
+    // check body
+    if (req.body.lines) {
+      // set lines
+      order.set('lines', req.body.lines);
+    }
+
     // await hook
     await this.eden.hook('order.submit', req, order);
 
@@ -202,9 +208,9 @@ class AdminOrderController extends Controller {
     req.alert('success', `Successfully ${create ? 'Created' : 'Updated'} order!`);
 
     // render page
-    res.render('order/admin/update', {
-      title : create ? 'Create Order' : `Update ${order.get('_id').toString()}`,
-      order : await order.sanitise(),
+    res.json({
+      result  : await order.sanitise(),
+      success : true,
     });
   }
 

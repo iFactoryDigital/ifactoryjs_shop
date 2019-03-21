@@ -13,7 +13,10 @@
       <div class="card mb-4">
         <div class="card-body">
           <span class="btn btn-{ this.colors[(this.order.status || 'pending')] }">Status: { this.t('order.status.' + (this.order.status || 'pending')) }</span>
-          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+          <a class={ 'btn btn-info float-right' : true, 'disabled' : !this.invoice } href="/admin/shop/invoice/{ (this.invoice || {}).id }/update" disabled={ !this.invoice }>
+            View Invoice
+          </a>
+          <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
             { this.loading('save') ? 'Saving...' : 'Save Order' }
           </button>
           <div class="dropdown float-right mr-2">
@@ -148,7 +151,10 @@
           </div>
         </div>
         <div class="card-body">
-          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+          <a class={ 'btn btn-info float-right' : true, 'disabled' : !this.invoice } href="/admin/shop/invoice/{ (this.invoice || {}).id }/update" disabled={ !this.invoice }>
+            View Invoice
+          </a>
+          <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
             { this.loading('save') ? 'Saving...' : 'Save Order' }
           </button>
         </div>
@@ -315,25 +321,13 @@
       this.loading('save', true);
 
       // post
-      const orders = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
-        lines    : [].concat(...(opts.orders.map((order) => order.lines))),
-        discount : this.discount,
+      const order = (await eden.router.post(`/admin/shop/order/${this.order.id}/update`, {
+        lines : this.order.lines,
       })).result;
 
-      // loop orders
-      opts.orders.forEach((o) => {
-        // get found
-        const find = orders.find((or) => or.id === o.id);
-
-        // loop keys
-        for (const key in find) {
-          // set value
-          o[key] = find[key];
-        }
-      });
-
       // set invoice
-      this.invoice = orders[0].invoice;
+      this.order   = order;
+      this.invoice = order.invoice;
 
       // set saving
       this.loading('save', false);
