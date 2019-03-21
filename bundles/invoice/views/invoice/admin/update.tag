@@ -113,6 +113,7 @@
                   <th class="text-right">Unit Cost</th>
                   <th class="text-center">Qty</th>
                   <th class="text-right">Total</th>
+                  <th width="1%"></th>
                 </tr>
               </thead>
 
@@ -121,7 +122,7 @@
                   <td colspan="3" class="border-right-0">
                     Order: <b>#{ order.id }</b>
                   </td>
-                  <td colspan="3" class="text-right border-left-0">
+                  <td colspan="4" class="text-right border-left-0">
                     <button class="btn btn-sm btn-primary" onclick={ onProduct }>
                       <i class="fa fa-plus mr-2" /> Add Line Item
                     </button>
@@ -142,6 +143,11 @@
                   <td class="text-right">
                     <money show-currency={ true } amount={ line.total } currency={ (this.invoice || {}).currency } />
                   </td>
+                  <td class="text-right">
+                    <button class="btn btn-sm btn-danger" onclick={ onRemoveLine }>
+                      <i class="fa fa-times" />
+                    </button>
+                  </td>
                 </tr>
               </tbody>
 
@@ -159,7 +165,7 @@
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Subtotal</b>
                   </td>
-                  <td class="text-right border-left-0 border-right-0">
+                  <td colspan="2" class="text-right border-left-0 border-right-0">
                     <money show-currency={ true } amount={ getSubtotal() } currency={ (this.invoice || {}).currency } />
                   </td>
                 </tr>
@@ -167,7 +173,7 @@
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Discount</b>
                   </td>
-                  <td class="text-right border-left-0 border-right-0">
+                  <td colspan="2" class="text-right border-left-0 border-right-0">
                     <money amount={ this.discount } show-currency={ true } currency={ this.invoice.currency } editable={ true } on-change={ onDiscount } />
                   </td>
                 </tr>
@@ -175,7 +181,7 @@
                   <td class="text-right border-left-0 border-right-0">
                     <b class="d-block">Total</b>
                   </td>
-                  <td class="text-right border-left-0 border-right-0">
+                  <td colspan="2" class="text-right border-left-0 border-right-0">
                     <b class="d-block">
                       <money amount={ (getSubtotal() - this.discount) } show-currency={ true } currency={ this.invoice.currency } editable={ true } />
                     </b>
@@ -429,6 +435,9 @@
       e.item.line.qty = parseInt((e.target.innerText || '').replace(/[^\d.-]/g, ''));
       e.item.line.total = e.item.line.price * e.item.line.qty;
 
+      // remove on 0
+      if (!e.item.line.qty) return this.onRemoveLine(e);
+
       // update
       this.update();
     }
@@ -537,6 +546,22 @@
 
       // show modal
       this.updates.company = !this.updates.company;
+
+      // update
+      this.update();
+    }
+
+    /**
+     * on remove line
+     *
+     * @param  {Event} e
+     */
+    onRemoveLine(e) {
+      // get order
+      const order = opts.orders.find(o => o.id === e.item.line.order);
+
+      // remove line
+      order.lines.splice(e.item.i, 1);
 
       // update
       this.update();
