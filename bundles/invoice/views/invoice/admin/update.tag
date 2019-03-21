@@ -120,7 +120,7 @@
               <tbody each={ order, a in opts.orders }>
                 <tr>
                   <td colspan="3" class="border-right-0">
-                    Order: <b>#{ order.id }</b>
+                    Order: <a href="/admin/shop/order/{ order.id }/update"><b>#{ order.id }</b></a>
                   </td>
                   <td colspan="4" class="text-right border-left-0">
                     <button class="btn btn-sm btn-primary" onclick={ onProduct }>
