@@ -27,7 +27,7 @@
                 { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
               </button>
               <button class={ 'dropdown-item' : true, 'disabled' : this.loading() } onclick={ onUpdateCompany } disabled={ this.loading() }>
-                { this.update.company ? 'Save Update' : 'Update Company' }
+                { this.updates.company ? 'Save Update' : 'Update Company' }
               </button>
               <a href="/admin/shop/invoice/{ this.invoice.id }/view" class="dropdown-item">
                 View Invoice
@@ -60,7 +60,7 @@
               </b>
             </div>
             <div class="col-md-5 col-lg-4">
-              <cms-placement placement="invoice.company" preview={ !this.update.company } />
+              <cms-placement placement="invoice.company" preview={ !this.updates.company } />
             </div>
           </div>
         </div>
@@ -342,8 +342,8 @@
 
     // set initial discount
     this.item     = null;
-    this.update   = {};
     this.action   = Object.assign(opts.orders[0].actions.payment, { 'manual' : true });
+    this.updates  = {};
     this.invoice  = opts.invoice;
     this.payment  = 'normal';
     this.discount = (this.invoice || {}).discount || 0;
@@ -532,7 +532,7 @@
       e.stopPropagation();
 
       // show modal
-      this.update.company = !this.update.company;
+      this.updates.company = !this.updates.company;
 
       // update
       this.update();
