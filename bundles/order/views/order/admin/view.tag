@@ -28,6 +28,13 @@
                 { this.order.id }
               </b>
 
+              <p class="lead mb-2" if={ this.invoice }>
+                Invoice Number
+              </p>
+              <b class="d-block mb-3" if={ this.invoice }>
+                { this.invoice.id }
+              </b>
+
               <p class="lead mb-2">
                 Invoice Date
               </p>
