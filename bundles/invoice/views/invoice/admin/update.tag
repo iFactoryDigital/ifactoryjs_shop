@@ -1,7 +1,7 @@
 <invoice-admin-update-page>
 
   <div class="page page-shop">
-    <admin-header title="View Invoice">
+    <admin-header title="{ this.invoice.id ? 'Update' : 'Create' } Invoice">
       <yield to="right">
         <a href="/admin/shop/invoice" class="btn btn-lg btn-primary">
         Back

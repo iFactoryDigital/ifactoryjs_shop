@@ -97,8 +97,8 @@ class AdminOrderController extends Controller {
   /**
    * index action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @icon    fa fa-box-heart
    * @menu    {ADMIN} Orders
@@ -117,8 +117,8 @@ class AdminOrderController extends Controller {
   /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route    {get} /create
    * @layout   admin
@@ -132,8 +132,64 @@ class AdminOrderController extends Controller {
   /**
    * update action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {get} /:id/view
+   * @layout  admin
+   */
+  async viewAction(req, res) {
+    // set website variable
+    let order  = new Order();
+    let create = true;
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      order = await Order.findById(req.params.id);
+      create = false;
+    }
+
+    // render page
+    res.render('order/admin/view', {
+      title : `View ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
+    });
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {get} /:id/print
+   * @layout  print
+   */
+  async printAction(req, res) {
+    // set website variable
+    let order  = new Order();
+    let create = true;
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      order = await Order.findById(req.params.id);
+      create = false;
+    }
+
+    // render page
+    res.render('order/admin/view', {
+      title : `View ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
+    });
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/update
    * @layout  admin
@@ -160,8 +216,8 @@ class AdminOrderController extends Controller {
   /**
    * create submit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /create
    * @layout  admin
@@ -174,8 +230,8 @@ class AdminOrderController extends Controller {
   /**
    * add/edit action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/update
    * @layout  admin
@@ -217,8 +273,8 @@ class AdminOrderController extends Controller {
   /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {get} /:id/remove
    * @layout  admin
@@ -243,8 +299,8 @@ class AdminOrderController extends Controller {
   /**
    * delete action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route   {post} /:id/remove
    * @title   order Administration
@@ -273,8 +329,8 @@ class AdminOrderController extends Controller {
   /**
    * user grid action
    *
-   * @param req
-   * @param res
+   * @param {Request}  req
+   * @param {Response} res
    *
    * @route {get}  /grid
    * @route {post} /grid
@@ -440,6 +496,8 @@ class AdminOrderController extends Controller {
         format : async (col, row) => {
           return [
             '<div class="btn-group btn-group-sm" role="group">',
+            `<a href="/admin/shop/order/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
+            `<a href="/admin/shop/order/${row.get('_id').toString()}/print" class="btn btn-info" target="_blank"><i class="fa fa-print"></i></a>`,
             `<a href="/admin/shop/order/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
             `<a href="/admin/shop/order/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',

@@ -1,6 +1,6 @@
 <order-admin-update-page>
   <div class="page page-shop">
-    <admin-header title="View Invoice">
+    <admin-header title="{ this.order.id ? 'Update' : 'Create' } Order">
       <yield to="right">
         <a href="/admin/shop/order" class="btn btn-lg btn-primary">
         Back
