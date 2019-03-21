@@ -1,5 +1,4 @@
 <order-admin-update-page>
-
   <div class="page page-shop">
     <admin-header title="View Invoice">
       <yield to="right">
@@ -9,31 +8,73 @@
       </yield>
     </admin-header>
 
-    <div class="container-fluid">
+    <div class="container">
 
       <div class="card mb-4">
-        <div class="card-header">
-          Invoice:
-          <b>
-            #{ this.invoice.id }
-          </b>
-          <span class="float-right">
-            Status:
-            <b>
-              { this.t('order.status.' + (this.order.status || 'unpaid')) }
-            </b>
-          </span>
+        <div class="card-body">
+          <span class="btn btn-{ this.colors[(this.order.status || 'pending')] }">Status: { this.t('order.status.' + (this.order.status || 'pending')) }</span>
+          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+            { this.loading('save') ? 'Saving...' : 'Save Order' }
+          </button>
+          <div class="dropdown float-right mr-2">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-bars mr-2" />
+              Actions
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <button class={ 'dropdown-item' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
+                { this.loading('email') ? 'Emailing...' : 'Email Order' }
+              </button>
+              <a href="/admin/shop/order/{ this.order.id }/view" class="dropdown-item">
+                View Order
+              </a>
+              <a href="/admin/shop/order/{ this.order.id }/print" target="_blank" class="dropdown-item">
+                Print Order
+              </a>
+            </div>
+          </div>
         </div>
         <div class="card-body">
-          <div class="row mb-4">
-            <div class="col-sm-6">
-              <cms-placement placement="invoice.company" />
+          <div class="row">
+            <div class="col-md-7 col-lg-8">
+              <h3 class="mb-4">
+                Order: { this.order.id }
+              </h3>
+
+              <p class="lead mb-2">
+                Order Number
+              </p>
+              <b class="d-block mb-3">
+                { this.order.id }
+              </b>
+
+              <p class="lead mb-2">
+                Invoice Date
+              </p>
+              <b class="d-block">
+                { this.invoice ? new Date(this.invoice.created).toLocaleString() : 'N/A' }
+              </b>
             </div>
-            <div class="col-sm-6">
-              <div>
-                <b>{ (opts.order.user || {}).username || (opts.order.address || {}).name }</b>
-              </div>
-              <div if={ (opts.order.address || {}).formatted }>{ (opts.order.address || {}).formatted }</div>
+          </div>
+        </div>
+        <hr />
+        <div class="card-body">
+          <div class="row mb-5">
+            <div class="col-sm-8">
+              <p class="lead mb-2">
+                Bill To
+              </p>
+              <b class="d-block mb-3">
+                { (opts.order.address || {}).name || (opts.order.user || {}).username }
+              </b>
+            </div>
+            <div class="col-sm-4">
+              <p class="lead m-0">
+                Order Total
+              </p>
+              <h1 class="my-3">
+                <money show-currency={ true } amount={ (getSubtotal()) } currency={ (this.invoice || {}).currency } />
+              </h1>
             </div>
           </div>
           <div class="table-responsive-sm">
@@ -46,10 +87,19 @@
                   <th class="text-right">Unit Cost</th>
                   <th class="text-center">Qty</th>
                   <th class="text-right">Total</th>
+                  <th width="1%"></th>
                 </tr>
               </thead>
 
               <tbody>
+                <tr>
+                  <td colspan="3" class="border-right-0"></td>
+                  <td colspan="4" class="text-right border-left-0">
+                    <button class="btn btn-sm btn-primary" onclick={ onProduct }>
+                      <i class="fa fa-plus mr-2" /> Add Line Item
+                    </button>
+                  </td>
+                </tr>
                 <tr each={ line, i in order.lines }>
                   <td class="text-center">{ (i + 1) }</td>
                   <td contenteditable={ this.user.acl.validate('admin') } onblur={ onLineTitle }>
@@ -59,15 +109,15 @@
                     { line.short || getProduct(line).short[this.i18n.lang()] }
                   </td>
                   <td class="text-right">
-                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onLinePrice }>{ line.price.toFixed(2) }</span> { this.invoice.currency }
+                    <money show-currency={ true } amount={ line.price } currency={ (this.invoice || {}).currency } editable={ true } onchange={ onLinePrice } />
                   </td>
                   <td class="text-center" contenteditable={ this.user.acl.validate('admin') } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
-                  <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
-                </tr>
-                <tr if={ this.user.acl.validate('admin') } class="bg-transparent">
-                  <td colspan="6" class="border-0 text-right bg-transparent">
-                    <button class="btn btn-primary">
-                      <i class="fa fa-plus" />
+                  <td class="text-right">
+                    <money show-currency={ true } amount={ line.total } currency={ (this.invoice || {}).currency } />
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-danger" onclick={ onRemoveLine }>
+                      <i class="fa fa-times" />
                     </button>
                   </td>
                 </tr>
@@ -75,47 +125,69 @@
 
               <tfoot>
                 <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
+                  <td colspan="4" rowspan="2" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
-                    <b>Subtotal</b>
+                    <b class="d-block">Subtotal</b>
                   </td>
-                  <td class="text-right border-left-0 border-right-0">
-                    ${ getSubtotal().toFixed(2) } { this.invoice.currency }
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
-                  <td class="text-right border-left-0 border-right-0">
-                    <b>Discount</b>
-                  </td>
-                  <td class="text-right border-left-0 border-right-0">
-                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onDiscount }>{ this.discount.toFixed(2) }</span> { this.invoice.currency }
+                  <td colspan="2" class="text-right border-left-0 border-right-0">
+                    <money show-currency={ true } amount={ getSubtotal() } />
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="4" class="border-0 bg-transparent" />
                   <td class="text-right border-left-0 border-right-0">
-                    <b>Total</b>
+                    <b class="d-block">Total</b>
                   </td>
-                  <td class="text-right border-left-0 border-right-0">
-                    <b>${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
+                  <td colspan="2" class="text-right border-left-0 border-right-0">
+                    <b class="d-block">
+                      <money show-currency={ true } amount={ getSubtotal() } />
+                    </b>
                   </td>
                 </tr>
               </tfoot>
             </table>
           </div>
-
-          <div class="text-right mt-5">
-            <button class={ 'btn btn-lg btn-success mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
-              { this.loading('save') ? 'Saving...' : 'Save Invoice' }
-            </button>
-            <button class={ 'btn btn-lg btn-info' : true, 'disabled' : this.loading() } onclick={ onEmail } disabled={ this.loading() }>
-              { this.loading('email') ? 'Emailing...' : 'Email Invoice' }
-            </button>
-          </div>
+        </div>
+        <div class="card-body">
+          <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
+            { this.loading('save') ? 'Saving...' : 'Save Order' }
+          </button>
         </div>
       </div>
+    </div>
+  </div>
 
+  <div class="modal fade" id="modal-product" ref="product">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Add Product Line
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <eden-select ref="select" class={ 'd-block' : true, 'mb-4' : this.item } url="/admin/shop/product/query" name="product" label={ 'Search by Name' } data={ { 'value' : null } } on-change={ onSelectProduct }>
+            <option each={ product, i in opts.data.value || [] } selected="true" value={ product.id }>
+              { product.title[this.i18n.lang()] }
+            </option>
+          </eden-select>
+
+          <h1 class="text-center" if={ this.loading('product') }>
+            <i class="fa fa-spinner fa-spin" />
+          </h1>
+          <div if={ this.item && !this.loading('product') } data-is="product-{ this.item.type }-buy" product={ this.item } on-add={ onAddProduct }/>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -125,11 +197,18 @@
     this.mixin('user');
     this.mixin('config');
     this.mixin('loading');
+    this.mixin('product');
 
     // set initial discount
-    this.order    = opts.order;
-    this.invoice  = this.order.invoice;
-    this.discount = (this.invoice || {}).discount || 0;
+    this.order   = opts.order;
+    this.invoice = this.order.invoice;
+    this.colors  = {
+      'paid'    : 'success',
+      'sent'    : 'primary',
+      'partial' : 'warning',
+      'unpaid'  : 'danger',
+      'pending' : 'info',
+    };
 
     /**
      * get line title
@@ -188,6 +267,19 @@
       // set value
       e.item.line.qty = parseInt((e.target.innerText || '').trim());
       e.item.line.total = e.item.line.price * e.item.line.qty;
+
+      // update
+      this.update();
+    }
+
+    /**
+     * on remove line
+     *
+     * @param  {Event} e
+     */
+    onRemoveLine(e) {
+      // remove line
+      this.order.lines.splice(e.item.i, 1);
 
       // update
       this.update();
@@ -276,6 +368,60 @@
     }
 
     /**
+     * on save
+     *
+     * @param  {Event} e
+     */
+    onProduct(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.product).modal('show');
+    }
+
+    /**
+     * on select product
+     *
+     * @param  {Event} e
+     */
+    async onSelectProduct(e) {
+      // get product
+      const productID = e.target.value;
+
+      // loading product
+      this.loading('product', true);
+
+      // get product
+      this.item = (await eden.router.get(`/admin/shop/product/${productID}/get`)).result;
+
+      // loading product
+      this.loading('product', false);
+    }
+
+    /**
+     * adds product line
+     *
+     * @param  {Event} e
+     */
+    onAddProduct(product, o) {
+      // add product
+      this.order.products.push(product);
+      this.order.lines.push({
+        qty     : 1,
+        opts    : o,
+        order   : this.order.id,
+        price   : this.product.price(product, o),
+        total   : this.product.price(product, o),
+        product : product.id,
+      });
+
+      // update view
+      this.update();
+    }
+
+    /**
      * get line product
      *
      * @param  {Object} line
@@ -284,7 +430,7 @@
      */
     getProduct(line) {
       // return product
-      return opts.orders.find(o => o.id === line.order).products.find(p => p.id === line.product);
+      return this.order.products.find(p => p.id === line.product);
     }
 
     /**
@@ -293,13 +439,10 @@
      * @return {*}
      */
     getSubtotal() {
-      // reduce lines
-      return opts.orders.reduce((subtotal, order) => {
-        // return lines
-        return order.lines.reduce((accum, line) => {
-          // line total
-          return accum + line.total;
-        }, 0) + subtotal;
+      // return lines
+      return this.order.lines.reduce((accum, line) => {
+        // line total
+        return accum + line.total;
       }, 0);
     }
 
@@ -307,9 +450,6 @@
     this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
-
-      // set initial discount
-      this.discount = (this.getSubtotal() - this.invoice.total);
 
       // update
       this.update();

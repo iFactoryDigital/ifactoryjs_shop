@@ -1,6 +1,6 @@
 <money>
   <span>
-    { format() } { opts.showCurrency ? opts.currency || this.settings.currency  || this.eden.get('shop.currency') : '' }
+    <span contenteditable={ opts.editable } onblur={ opts.onChange }>{ format() }</span> { opts.showCurrency ? opts.currency || this.settings.currency  || this.eden.get('shop.currency') : '' }
   </span>
 
   <script>

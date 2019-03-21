@@ -80,14 +80,14 @@
                 Total Amount
               </p>
               <b class="d-block mb-3">
-                <money amount={ (getSubtotal() - this.discount) } />
+                <money amount={ (getSubtotal() - this.discount) } show-currency={ true } currency={ this.invoice.currency } />
               </b>
 
               <p class="lead mb-2">
                 Total Paid
               </p>
               <b class="d-block">
-                <money amount={ this.invoice.paid || 0 } />
+                <money amount={ this.invoice.paid || 0 } show-currency={ true } currency={ this.invoice.currency } />
               </b>
             </div>
             <div class="col-sm-4">
@@ -95,7 +95,7 @@
                 Balance Due
               </p>
               <h1 class="my-3">
-                <money amount={ (getSubtotal() - this.discount) - (this.invoice.paid || 0) } />
+                <money amount={ (getSubtotal() - this.discount) - (this.invoice.paid || 0) } show-currency={ true } currency={ this.invoice.currency } />
               </h1>
 
               <span class="btn btn-light">
@@ -136,10 +136,12 @@
                     { line.short || getProduct(line).short[this.i18n.lang()] }
                   </td>
                   <td class="text-right">
-                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onLinePrice }>{ line.price.toFixed(2) }</span> { this.invoice.currency }
+                    <money amount={ line.price } show-currency={ true } currency={ this.invoice.currency } editable={ true } on-change={ onLinePrice } />
                   </td>
                   <td class="text-center" contenteditable={ this.user.acl.validate('admin') } onblur={ onLineQty }>{ line.qty.toLocaleString() }</td>
-                  <td class="text-right">${ line.total.toFixed(2) } { this.invoice.currency }</td>
+                  <td class="text-right">
+                    <money show-currency={ true } amount={ line.total } currency={ (this.invoice || {}).currency } />
+                  </td>
                 </tr>
               </tbody>
 
@@ -158,7 +160,7 @@
                     <b class="d-block">Subtotal</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
-                    ${ getSubtotal().toFixed(2) } { this.invoice.currency }
+                    <money show-currency={ true } amount={ getSubtotal() } currency={ (this.invoice || {}).currency } />
                   </td>
                 </tr>
                 <tr>
@@ -166,7 +168,7 @@
                     <b class="d-block">Discount</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
-                    $<span contenteditable={ this.user.acl.validate('admin') } onblur={ onDiscount }>{ this.discount.toFixed(2) }</span> { this.invoice.currency }
+                    <money amount={ this.discount } show-currency={ true } currency={ this.invoice.currency } editable={ true } on-change={ onDiscount } />
                   </td>
                 </tr>
                 <tr>
@@ -174,7 +176,9 @@
                     <b class="d-block">Total</b>
                   </td>
                   <td class="text-right border-left-0 border-right-0">
-                    <b class="d-block">${ (getSubtotal() - this.discount).toFixed(2) } { this.invoice.currency }</b>
+                    <b class="d-block">
+                      <money amount={ (getSubtotal() - this.discount) } show-currency={ true } currency={ this.invoice.currency } editable={ true } />
+                    </b>
                   </td>
                 </tr>
               </tfoot>
@@ -406,7 +410,7 @@
      */
     onLinePrice(e) {
       // set value
-      e.item.line.price = parseFloat((e.target.innerText || '').trim());
+      e.item.line.price = parseFloat((e.target.innerText || '').replace(/[^\d.-]/g, ''));
       e.item.line.total = e.item.line.price * e.item.line.qty;
 
       // update
@@ -422,7 +426,7 @@
      */
     onLineQty(e) {
       // set value
-      e.item.line.qty = parseInt((e.target.innerText || '').trim());
+      e.item.line.qty = parseInt((e.target.innerText || '').replace(/[^\d.-]/g, ''));
       e.item.line.total = e.item.line.price * e.item.line.qty;
 
       // update
@@ -436,7 +440,7 @@
      */
     onDiscount(e) {
       // set value
-      this.discount = parseFloat((e.target.innerText || '').trim());
+      this.discount = parseFloat((e.target.innerText || '').replace(/[^\d.-]/g, ''));
 
       // update
       this.update();
