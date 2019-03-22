@@ -101,7 +101,7 @@
       this.loading('email', true);
 
       // get product
-      this.item = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/email`, {
+      const result = (await eden.router.post(`/admin/shop/invoice/${opts.invoice.id}/email`, {
         body  : this.refs['email-body'].value || '',
         email : this.refs['email-email'].value || '',
       })).result;

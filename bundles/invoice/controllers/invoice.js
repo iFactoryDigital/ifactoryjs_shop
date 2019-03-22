@@ -97,10 +97,8 @@ class InvoiceController extends Controller {
     res.setHeader('Content-type', 'application/pdf');
     res.setHeader('Content-disposition', `inline; filename="invoice-${invoice.get('_id').toString()}.pdf"`);
 
-    console.log(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/print?user=${req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`);
-
     // load pdf
-    res.send(await this._toPDF(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/print?user=${req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`));
+    res.send(await this._toPDF(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/print?user=${req.query.user || req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`));
   }
 
   /**

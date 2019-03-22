@@ -1,17 +1,20 @@
 
 // bind dependencies
 const Grid        = require('grid');
+const config      = require('config');
 const puppeteer   = require('puppeteer');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
 // require models
 const User    = model('user');
+const File    = model('file');
 const Block   = model('block');
 const Invoice = model('invoice');
 const Payment = model('payment');
 
 // require helpers
+const emailHelper = helper('email');
 const blockHelper = helper('cms/block');
 
 /**
@@ -204,6 +207,54 @@ class AdminInvoiceController extends Controller {
       orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
+    });
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {POST} /:id/email
+   */
+  async emailAction(req, res) {
+    // set website variable
+    let create  = true;
+    let invoice = new Invoice();
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      create = false;
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // load file
+    const file = new File();
+
+    // set file
+    file.set('ext', 'pdf');
+
+    // from file
+    await file.fromURL(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/pdf?user=${req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`);
+
+    // set name
+    file.set('name', `invoice-${invoice.get('_id').toString()}.pdf`);
+
+    // save file
+    await file.save();
+
+    // send email
+    await emailHelper.send(req.body.email.split(',').map(item => item.trim()), 'invoice', {
+      body        : req.body.body,
+      attachments : [file],
+    });
+
+    // get file
+    res.json({
+      result  : await file.sanitise(),
+      success : true,
     });
   }
 
