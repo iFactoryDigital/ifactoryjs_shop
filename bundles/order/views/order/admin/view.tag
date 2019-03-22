@@ -1,7 +1,13 @@
 <order-admin-view-page>
   <div class="page page-shop">
-    <admin-header title="View Order" if={ !this.mnt.layout.includes('print') }>
+    <admin-header title="View Order" if={ !this.mnt.layout.includes('print') } invoice={ this.invoice } order={ this.order }>
       <yield to="right">
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/update" disabled={ !opts.invoice }>
+          View Invoice
+        </a>
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.order } href="/admin/shop/order/{ (opts.order || {}).id }/update" disabled={ !opts.order }>
+          Update Order
+        </a>
         <a href="/admin/shop/order" class="btn btn-lg btn-primary">
         Back
         </a>

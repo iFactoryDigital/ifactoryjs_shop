@@ -1,7 +1,7 @@
 {
   "name": "@edenjs/shop",
   "description": "",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "dependencies": {
     "currency-converter": "^0.1.12",
     "currency-formatter": "^1.5.3",
@@ -9,6 +9,7 @@
     "is-type": "0.0.1",
     "moment": "^2.22.2",
     "money-math": "^2.5.1",
+    "puppeteer": "^1.13.0",
     "slug": "^0.9.2"
   },
   "engines": {

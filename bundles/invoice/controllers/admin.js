@@ -1,6 +1,7 @@
 
 // bind dependencies
 const Grid        = require('grid');
+const puppeteer   = require('puppeteer');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
@@ -627,6 +628,57 @@ class AdminInvoiceController extends Controller {
 
     // return grid
     return invoiceGrid;
+  }
+
+  /**
+   * create PDF
+   *
+   * @param  {String}  url
+   *
+   * @return {Promise}
+   */
+  _toPDF(url) {
+    // return promise
+    return new Promise(async (resolve, reject) => {
+      // create lock
+      const unlock = await this.eden.lock('invoice.pdf');
+
+      // run try/catch
+      try {
+        // require puppeteer
+        if (!this.__browser) {
+          // create browser
+          this.__browser = await puppeteer.launch({
+            args : ['--no-sandbox', '--disable-setuid-sandbox'],
+          });
+        }
+
+        // check page
+        if (!this.__page) {
+          // set page
+          this.__page = await this.__browser.newPage();
+
+          // set to print
+          await this.__page.emulateMedia('print');
+        }
+
+        // go to url
+        await this.__page.goto(url, {
+          waitUntil : 'networkidle0',
+        });
+
+        // create callback
+        await this.__page.pdf({
+          format : 'Letter',
+        }).then(resolve, (err) => {
+          // reject error
+          if (err) reject(err);
+        });
+      } catch (e) {}
+
+      // unlock
+      unlock();
+    });
   }
 }
 
