@@ -230,6 +230,9 @@ class AdminInvoiceController extends Controller {
       invoice = await Invoice.findById(req.params.id);
     }
 
+    // alert
+    req.alert('info', 'Generating invoice PDF');
+
     // load file
     const file = new File();
 
@@ -245,16 +248,23 @@ class AdminInvoiceController extends Controller {
     // save file
     await file.save();
 
-    // send email
-    await emailHelper.send(req.body.email.split(',').map(item => item.trim()), 'invoice', {
-      body        : req.body.body,
-      attachments : [file],
-    });
+    // alert
+    req.alert('info', 'Generated invoice PDF');
 
     // get file
     res.json({
       result  : await file.sanitise(),
       success : true,
+    });
+
+    // alert
+    req.alert('success', 'Successfully queued email send');
+
+    // send email
+    await emailHelper.send(req.body.email.split(',').map(item => item.trim()), 'invoice', {
+      body        : req.body.body,
+      invoice     : await invoice.sanitise(),
+      attachments : [file],
     });
   }
 
