@@ -315,7 +315,7 @@ class AdminPaymentController extends Controller {
     const paymentGrid = new Grid();
 
     // check invoice
-    if (req.params.invoice) {
+    if (((req || {}).params || {}).invoice) {
       // set id
       invoice = req.params.invoice;
     } else if (invoice) {
