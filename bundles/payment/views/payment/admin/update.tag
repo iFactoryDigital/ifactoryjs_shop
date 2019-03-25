@@ -22,7 +22,7 @@
               <label>
                 Payment Status
               </label>
-              <select class="form-control">
+              <select class="form-control" name="paid">
                 <option value="paid" selected={ opts.payment.complete }>Paid</option>
                 <option value="unpaid" selected={ !opts.payment.complete }>Unpaid</option>
               </select>
