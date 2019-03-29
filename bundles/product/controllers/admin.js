@@ -207,7 +207,6 @@ class AdminProductController extends Controller {
       // return object
       return {
         text  : sanitised.title[req.language],
-        data  : sanitised,
         value : sanitised.id,
       };
     }));

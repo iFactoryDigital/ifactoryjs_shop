@@ -17,6 +17,7 @@ const config = require('config');
 
 // require helpers
 const blockHelper = helper('cms/block');
+const fieldHelper = helper('form/field');
 
 /**
  * build user admin controller
@@ -92,6 +93,42 @@ class AdminOrderController extends Controller {
       // save block
       await blockModel.save(req.user);
     });
+
+    // register simple field
+    fieldHelper.field('admin.order', {
+      for         : ['frontend', 'admin'],
+      title       : 'User',
+      description : 'Order field',
+    }, async (req, field, value) => {
+      // set tag
+      field.tag = 'order';
+      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map(item => item.sanitise())) : await value.sanitise()) : null;
+      // return
+      return field;
+    }, async (req, field) => {
+      // save field
+    }, async (req, field, value, old) => {
+      // check value
+      if (!Array.isArray(value)) value = [value];
+
+      // return value map
+      return await Promise.all((value || []).filter(val => val).map(async (val, i) => {
+        // run try catch
+        try {
+          // buffer company
+          const acl = await Order.findById(val);
+
+          // check company
+          if (acl) return acl;
+
+          // return null
+          return null;
+        } catch (e) {
+          // return old
+          return old[i];
+        }
+      }));
+    });
   }
 
   /**
@@ -111,6 +148,68 @@ class AdminOrderController extends Controller {
     // render grid
     res.render('order/admin', {
       grid : await (await this._grid(req)).render(req),
+    });
+  }
+
+  /**
+   * index action
+   *
+   * @param req
+   * @param res
+   *
+   * @acl   admin
+   * @fail  next
+   * @route {GET} /query
+   */
+  async queryAction(req, res) {
+    // find children
+    let orders = Order.ne('status', 'paid');
+
+    // set query
+    if (req.query.q) {
+
+    }
+
+    // add roles
+    orders = await orders.skip(((parseInt(req.query.page, 10) || 1) - 1) * 20).limit(20).sort('name', 1)
+      .find();
+
+    // get children
+    res.json((await Promise.all(orders.map(order => order.sanitise()))).map((sanitised) => {
+      // return object
+      return {
+        text  : sanitised.id,
+        value : sanitised.id,
+      };
+    }));
+  }
+
+  /**
+   * index action
+   *
+   * @param req
+   * @param res
+   *
+   * @acl   admin
+   * @fail  next
+   * @route {GET} /:id/get
+   */
+  async getAction(req, res) {
+    // set website variable
+    let order  = new Order();
+    let create = true;
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      order = await Order.findById(req.params.id);
+      create = false;
+    }
+
+    // return json
+    return res.json({
+      result  : await order.sanitise(),
+      success : true,
     });
   }
 

@@ -1,11 +1,11 @@
 <invoice-update>
-  <div class="card mb-4">
+  <div class="{ opts.card || 'card mb-4' }">
     <div class="card-body">
       <span class="btn btn-{ this.colors[(this.invoice.status || 'pending')] }">Status: { this.t('invoice.status.' + (this.invoice.status || 'pending')) }</span>
       <button class={ 'btn btn-success float-right' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
         { this.loading('save') ? 'Saving...' : 'Save Invoice' }
       </button>
-      <div class="dropdown float-right mr-2">
+      <div class="dropdown float-right mr-2" if={ opts.actions !== false }>
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-bars mr-2" />
           Actions
@@ -50,7 +50,7 @@
           <p class="lead mb-2">
             Bill To
           </p>
-          <b class="d-block mb-3">
+          <b class="d-block mb-3" if={ (opts.orders || []).length }>
             { (opts.orders[0].address || {}).name || (opts.orders[0].user || {}).username }
           </b>
         </div>
@@ -96,7 +96,7 @@
             </tr>
           </thead>
 
-          <tbody each={ order, a in opts.orders }>
+          <tbody each={ order, a in (opts.orders || []) } show={ order.id }>
             <tr>
               <td colspan="3" class="border-right-0">
                 Order: <a href="/admin/shop/order/{ order.id }/update"><b>#{ order.id }</b></a>
@@ -125,6 +125,16 @@
               <td class="text-right">
                 <button class="btn btn-sm btn-danger" onclick={ onRemoveLine } data-order={ order.id }>
                   <i class="fa fa-times" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          
+          <tbody>
+            <tr>
+              <td colspan="7" class="text-right">
+                <button class="btn btn-sm btn-primary" onclick={ onOrder }>
+                  <i class="fa fa-plus mr-2" /> Add Order
                 </button>
               </td>
             </tr>
@@ -212,6 +222,38 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modal-order" ref="order">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Add Order
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <eden-select ref="select-order" class={ 'd-block' : true, 'mb-4' : this.item } url="{ opts.orderQuery || '/admin/shop/order/query' }" name="product" label={ 'Search by Name' } data={ { 'value' : null } }>
+            <option each={ order, i in opts.data.value || [] } selected="true" value={ order.id }>
+              { order.id }
+            </option>
+          </eden-select>
+          
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" onclick={ onSelectOrder }>Add Order</button>
+          <button type="button" class="btn btn-danger" data-target="#modal-order" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <script>
     // do mixin
     this.mixin('i18n');
@@ -222,7 +264,7 @@
 
     // set initial discount
     this.item     = null;
-    this.action   = Object.assign(opts.orders[0].actions.payment, { 'manual' : true });
+    this.action   = opts.orders ? Object.assign(opts.orders[0].actions.payment, { 'manual' : true }) : null;
     this.updates  = {};
     this.invoice  = opts.invoice;
     this.discount = (this.invoice || {}).discount || 0;
@@ -346,6 +388,20 @@
      *
      * @param  {Event} e
      */
+    onOrder(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      if (!jQuery(this.refs.order).is('.show')) jQuery(this.refs.order).modal('show');
+    }
+
+    /**
+     * on save
+     *
+     * @param  {Event} e
+     */
     onNormalPayment(e) {
       // prevent default
       e.preventDefault();
@@ -433,6 +489,30 @@
       // loading product
       this.loading('product', false);
     }
+    
+    /**
+     * on select order
+     *
+     * @param  {Event}  e
+     *
+     * @return {Promise}
+     */
+    async onSelectOrder(e) {
+      // get product
+      const orderID = this.refs['select-order'].val();
+
+      // loading product
+      this.loading('order', true);
+      
+      // set orders
+      if (!opts.orders) opts.orders = [];
+
+      // get product
+      opts.orders.push((await eden.router.get(`/admin/shop/order/${orderID}/get`)).result);
+
+      // loading product
+      this.loading('order', false);
+    }
 
     /**
      * adds product line
@@ -472,7 +552,7 @@
       this.loading('save', true);
 
       // post
-      const orders = (await eden.router.post(`/admin/shop/invoice/${this.invoice.id}/update`, {
+      const orders = (await eden.router.post(opts.submit || `/admin/shop/invoice/${this.invoice.id}/update`, {
         note     : this.invoice.note,
         lines    : [].concat(...(opts.orders.map((order) => order.lines))),
         discount : this.discount,
@@ -503,7 +583,7 @@
      */
     getProduct(line) {
       // return product
-      return ((opts.orders.find(o => o.id === line.order) || opts.orders[0]).products || []).find(p => p.id === line.product) || {};
+      return (((opts.orders || []).find(o => o.id === line.order) || (opts.orders || [])[0]).products || []).find(p => p.id === line.product) || {};
     }
 
     /**
@@ -513,7 +593,7 @@
      */
     getSubtotal() {
       // reduce lines
-      return opts.orders.reduce((subtotal, order) => {
+      return (opts.orders || []).reduce((subtotal, order) => {
         // return lines
         return order.lines.reduce((accum, line) => {
           // line total
@@ -531,7 +611,7 @@
       this.discount = (this.getSubtotal() - this.invoice.total);
       
       // fix lines
-      opts.orders.forEach((order) => {
+      (opts.orders || []).forEach((order) => {
         // check lines
         order.lines.forEach((line) => {
           // add order

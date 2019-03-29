@@ -15,6 +15,7 @@ const Payment = model('payment');
 
 // require helpers
 const emailHelper = helper('email');
+const fieldHelper = helper('form/field');
 const blockHelper = helper('cms/block');
 
 /**

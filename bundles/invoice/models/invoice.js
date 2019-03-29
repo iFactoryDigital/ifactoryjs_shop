@@ -31,7 +31,7 @@ class Invoice extends Model {
   async sanitise() {
     // load payments
     const invoicePayments = (await Payment.where({
-      'invoice.id' : this.get('_id').toString(),
+      'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
     }).ne('method.type', null).find() || []);
 
     // load payments
