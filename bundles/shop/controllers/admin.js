@@ -7,7 +7,6 @@ const Acl       = model('acl');
 const User      = model('user');
 const Order     = model('order');
 const Block     = model('block');
-const Credit    = model('credit');
 const Payment   = model('payment');
 const Dashboard = model('dashboard');
 
@@ -230,9 +229,7 @@ class ShopAdminController extends Controller {
       next.setDate(next.getDate() + 1);
 
       // return amount sum
-      const total = await Credit.where({
-        credited : true
-      }).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
+      const total = await Order.gte('created_at', current).lte('created_at', next).nin('status', [null, 'pending']).gt('expense.total', 0).sum('expense.total');
 
       // add to totals
       totals.push(total);
@@ -248,10 +245,10 @@ class ShopAdminController extends Controller {
 
     // return totals and values
     return {
-      total   : `$${(await Credit.gte('amount', 0).sum('amount')).toFixed(2)}`,
-      today   : `$${(await Credit.gte('amount', 0).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0))).sum('amount')).toFixed(2)}`,
-      weekly  : `$${(await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2)}`,
-      monthly : `$${(await Credit.gte('amount', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('amount')).toFixed(2)}`,
+      total   : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).count()).toLocaleString(),
+      today   : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0))).sum('expense.total')).toLocaleString(),
+      weekly  : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('expense.total')).toLocaleString(),
+      monthly : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('expense.total')).toLocaleString(),
 
       totals,
       values,

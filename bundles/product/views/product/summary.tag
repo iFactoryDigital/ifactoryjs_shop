@@ -46,7 +46,7 @@
      *
      * @return {Float}
      */
-    total () {
+    async total() {
       // let total
       let total = 0;
 
@@ -64,13 +64,16 @@
 
       // set total
       opts.total = total;
+      
+      // hook total
+      await eden.hook('checkout.total', opts);
 
       // return total
-      return total;
+      return opts.total;
     }
 
     // group products by type
-    groups () {
+    groups() {
       // let groups
       let groups = {};
 
@@ -106,12 +109,12 @@
      *
      * @return {Promise}
      */
-    calculate () {
+    async calculate() {
       // check frontend
       if (!this.eden.frontend) return;
 
       // set total
-      let total = this.total();
+      let total = await this.total();
 
       // update if total
       if (this.calculatedTotal !== total) {
