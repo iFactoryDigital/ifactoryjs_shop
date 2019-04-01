@@ -245,10 +245,10 @@ class ShopAdminController extends Controller {
 
     // return totals and values
     return {
-      total   : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).count()).toLocaleString(),
-      today   : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0))).sum('expense.total')).toLocaleString(),
-      weekly  : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('expense.total')).toLocaleString(),
-      monthly : (await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('expense.total')).toLocaleString(),
+      total   : `$${(await Order.nin('status', [null, 'pending']).gt('expense.total', 0).sum('expense.total')).toFixed(2)}`,
+      today   : `$${(await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0))).sum('expense.total')).toFixed(2)}`,
+      weekly  : `$${(await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (7 * 24 * 60 * 60 * 1000))).sum('expense.total')).toFixed(2)}`,
+      monthly : `$${(await Order.nin('status', [null, 'pending']).gt('expense.total', 0).gte('created_at', new Date(midnight.getTime() - (30 * 24 * 60 * 60 * 1000))).sum('expense.total')).toFixed(2)}`,
 
       totals,
       values,
