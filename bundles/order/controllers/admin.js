@@ -178,7 +178,10 @@ class AdminOrderController extends Controller {
     res.json((await Promise.all(orders.map(order => order.sanitise()))).map((sanitised) => {
       // return object
       return {
-        text  : sanitised.id,
+        text : `#${sanitised.id.substring(0, 4)}...${sanitised.id.substr(-4, 4)} | ${sanitised.lines.map((line) => {
+          // return text
+          return `${line.qty}x ${sanitised.products.find(prod => prod.id === line.product).title[req.language]} $${line.total.toFixed(2)}`;
+        }).join(', ')}`,
         value : sanitised.id,
       };
     }));
