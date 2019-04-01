@@ -506,9 +506,15 @@
       
       // set orders
       if (!opts.orders) opts.orders = [];
+      
+      // set order
+      const order = (await eden.router.get(`/admin/shop/order/${orderID}/get`)).result;
+      
+      // set order id
+      order.lines.forEach(l => l.order = order.id);
 
       // get product
-      opts.orders.push((await eden.router.get(`/admin/shop/order/${orderID}/get`)).result);
+      opts.orders.push(order);
 
       // loading product
       this.loading('order', false);
@@ -552,11 +558,14 @@
       this.loading('save', true);
 
       // post
-      const orders = (await eden.router.post(opts.submit || `/admin/shop/invoice/${this.invoice.id}/update`, {
+      const result = (await eden.router.post(opts.submit || `/admin/shop/invoice/${this.invoice.id}/update`, {
+        id       : this.invoice.id,
         note     : this.invoice.note,
         lines    : [].concat(...(opts.orders.map((order) => order.lines))),
         discount : this.discount,
-      })).result;
+      }));
+      const orders  = result.orders || result.result;
+      const invoice = result.invoice || null;
 
       // loop orders
       opts.orders.forEach((o) => {
@@ -569,6 +578,15 @@
           o[key] = find[key];
         }
       });
+      
+      // set to invoice
+      if (invoice) {
+        // loop keys
+        for (const key in invoice) {
+          // set value
+          this.invoice[key] = invoice[key];
+        }
+      }
 
       // set saving
       this.loading('save', false);

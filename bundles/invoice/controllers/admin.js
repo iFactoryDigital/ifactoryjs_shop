@@ -334,7 +334,9 @@ class AdminInvoiceController extends Controller {
   async updateSubmitAction(req, res) {
     // set website variable
     let create  = true;
-    let invoice = new Invoice();
+    let invoice = new Invoice({
+      currency : config.get('shop.currency') || 'USD',
+    });
 
     // check for website model
     if (req.params.id) {
@@ -344,7 +346,19 @@ class AdminInvoiceController extends Controller {
     }
 
     // get order
-    const orders = await invoice.get('orders');
+    const orders = await Promise.all(req.body.lines.reduce((accum, line) => {
+      // push order
+      if (!accum.includes(line.order)) accum.push(line.order);
+
+      // return accumulated
+      return accum;
+    }, []).map(id => Order.findById(id)));
+
+    // set orders
+    invoice.set('orders', orders);
+
+    // set user
+    if (!await invoice.get('user')) invoice.set('user', await orders[0].get('user'));
 
     // check body
     if (req.body.lines) {
@@ -368,6 +382,7 @@ class AdminInvoiceController extends Controller {
     }
 
     // update totals
+    invoice.set('lines', req.body.lines);
     invoice.set('total', ([].concat(...(orders.map(order => order.get('lines'))))).reduce((accum, line) => {
       // return accum
       return line.total + accum;
@@ -381,7 +396,8 @@ class AdminInvoiceController extends Controller {
 
     // render page
     res.json({
-      result  : await Promise.all(orders.map(order => order.sanitise())),
+      orders  : await Promise.all(orders.map(order => order.sanitise())),
+      invoice : await invoice.sanitise(),
       success : true,
     });
   }
