@@ -587,6 +587,9 @@
           this.invoice[key] = invoice[key];
         }
       }
+      
+      // on save
+      if (opts.onSave) opts.onSave(this.invoice, opts.orders);
 
       // set saving
       this.loading('save', false);
