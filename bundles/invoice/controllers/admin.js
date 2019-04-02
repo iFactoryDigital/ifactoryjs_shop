@@ -392,7 +392,13 @@ class AdminInvoiceController extends Controller {
     await invoice.save(req.user);
 
     // save order
-    await Promise.all(orders.map(order => order.save(req.user)));
+    await Promise.all(orders.map((order) => {
+      // set invoice
+      order.set('invoice', invoice);
+
+      // return save
+      return order.save(req.user);
+    }));
 
     // render page
     res.json({
@@ -423,6 +429,9 @@ class AdminInvoiceController extends Controller {
       create = false;
       invoice = await Invoice.findById(req.params.id);
     }
+
+    // get orders
+    const orders = await invoice.get('orders') || [];
 
     // save payment
     payment = new Payment({
@@ -461,6 +470,9 @@ class AdminInvoiceController extends Controller {
       // save payment
       await payment.save(req.user);
     }
+
+    // orders
+    await Promise.all(orders.map(order => order.save(req.user)));
 
     // render page
     res.json({
