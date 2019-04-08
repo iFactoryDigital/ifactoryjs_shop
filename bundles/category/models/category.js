@@ -56,20 +56,6 @@ class Category extends Model {
       })) : sanitised[fieldName];
     }));
 
-    // check if small
-    if (!small) {
-      // let children
-      const children = this.get('_id') ? await Category.find({
-        'parent.id' : this.get('_id').toString(),
-      }) : [];
-
-      // set children
-      sanitised.children = children && children.length ? await Promise.all(children.map((child) => {
-        // return sanitised child category
-        return child.sanitise(small);
-      })) : [];
-    }
-
     // await hook
     await this.eden.hook('category.sanitise', {
       sanitised,

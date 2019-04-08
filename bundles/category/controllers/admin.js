@@ -312,7 +312,7 @@ class AdminCategoryController extends Controller {
     // set query
     if (req.query.q) {
       categories = categories.where({
-        name : new RegExp(escapeRegex(req.query.q || ''), 'i'),
+        [`title.${req.language}`] : new RegExp(escapeRegex(req.query.q || ''), 'i'),
       });
     }
 
@@ -324,9 +324,8 @@ class AdminCategoryController extends Controller {
     res.json((await Promise.all(categories.map(category => category.sanitise()))).map((sanitised) => {
       // return object
       return {
-        text  : sanitised.name,
-        data  : sanitised,
-        value : sanitised.id,
+        text  : sanitised.title[req.language],
+        value : sanitised.id
       };
     }));
   }
