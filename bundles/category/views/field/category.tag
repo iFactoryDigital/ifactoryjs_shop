@@ -6,9 +6,9 @@
           { opts.field.label }
           <i if={ !opts.field.label }>Set Label</i>
         </label>
-        <eden-select ref="select" url="/admin/shop/category/query" required={ opts.field.required } name={ opts.field.uuid } multiple={ opts.field.multiple } label={ opts.field.label || 'Search by Name' } data={ opts.data }>
+        <eden-select ref="select" url="/admin/shop/category/query" required={ opts.field.required } name={ opts.field.uuid } multiple={ opts.field.multiple } label={ opts.field.label || 'Search by Name' } data={ opts.data } i18n={ this.i18n }>
           <option each={ category, i in opts.data.value || [] } selected="true" value={ category.id }>
-            { category.name }
+            { category.title[opts.i18n.lang()] }
           </option>
         </eden-select>
       </div>
@@ -18,6 +18,7 @@
   <script>
     // do mixins
     this.mixin('acl');
+    this.mixin('i18n');
     
     // set initialized
     this.categories = opts.data.value || [];
