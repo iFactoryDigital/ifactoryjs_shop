@@ -58,7 +58,7 @@ class ProductHelper extends Helper {
     const registered = this.__products.find(p => p.type === type);
 
     // await price
-    return registered.price(product, opts);
+    return registered ? registered.price(product, opts) : 0;
   }
 
   /**

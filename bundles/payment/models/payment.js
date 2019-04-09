@@ -39,6 +39,7 @@ class Payment extends Model {
       data     : this.get('data'),
       method   : this.get('method'),
       amount   : this.get('amount'),
+      details  : this.get('details'),
       complete : this.get('complete'),
     };
   }
