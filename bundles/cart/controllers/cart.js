@@ -199,6 +199,7 @@ class CartController extends Controller {
       'user.id' : user && user.get('_id') ? user.get('_id').toString() : 'false',
     }).findOne() || new Cart({
       user,
+
       sessionID : session,
     });
 

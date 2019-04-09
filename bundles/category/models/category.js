@@ -59,6 +59,7 @@ class Category extends Model {
     // await hook
     await this.eden.hook('category.sanitise', {
       sanitised,
+
       category : this,
     });
 

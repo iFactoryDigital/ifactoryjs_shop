@@ -41,7 +41,7 @@ class Invoice extends Model {
     });
 
     // return sanitised bot
-    return {
+    const sanitised = {
       id   : this.get('_id') ? this.get('_id').toString() : false,
       rate : this.get('rate'),
       paid : (payments.length ? payments : [0]).reduce((a, b) => {
@@ -66,6 +66,16 @@ class Invoice extends Model {
       updated : this.get('updated_at'),
       created : this.get('created_at'),
     };
+
+    // invoice sanitise
+    await this.eden.hook('invoice.sanitise', {
+      sanitised,
+
+      invoice : this,
+    });
+
+    // return sanitised
+    return sanitised;
   }
 }
 

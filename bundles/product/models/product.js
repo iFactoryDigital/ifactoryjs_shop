@@ -94,6 +94,7 @@ class Product extends Model {
     // sanitise
     const sanitised = {
       type,
+
       id           : this.get('_id') ? this.get('_id').toString() : null,
       is           : 'product',
       sku          : this.get('sku') || '',
@@ -138,6 +139,7 @@ class Product extends Model {
     // await hook
     await this.eden.hook('product.sanitise', {
       sanitised,
+
       product : this,
     });
 

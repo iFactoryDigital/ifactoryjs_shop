@@ -160,8 +160,9 @@ class CategoryController extends Controller {
 
     // render index page
     res.render('category', {
-      title  : category.get(`title.${req.language}`),
       trail,
+  
+      title  : category.get(`title.${req.language}`),
       banner : {
         view      : 'content',
         placement : `${category.get('slug')}.banner`,
