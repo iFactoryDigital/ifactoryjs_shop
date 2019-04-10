@@ -35,14 +35,6 @@
   
   <div each={ action, i in this.checkout.actions } type="checkout" action={ action } data-is="{ action.type }-summary-extra" lines={ this.checkout.lines } actions={ this.checkout.actions } products={ this.checkout.products } checkout={ this.checkout } />
 
-  <div class="my-3" hide={ this.checkout.loading }>
-    By Checking out you agree to our <a href="/terms" target="_blank">Terms & Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> agreements
-  </div>
-
-  <a hide={ this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-block btn-lg btn-success mt-4' : true, 'disabled' : !this.hasCheckout() } disabled={ !hasCheckout() }>
-    { this.t('checkout.complete') }
-  </a>
-
   <script>
     // do mixins
     this.mixin('user');
@@ -88,7 +80,7 @@
      *
      * @return {Boolean}
      */
-    hasCheckout () {
+    canCheckout () {
       // check actions
       if (!this.checkout.actions || !Object.values(this.checkout.actions).length) return false;
 

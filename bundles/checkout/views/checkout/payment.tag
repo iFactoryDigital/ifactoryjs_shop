@@ -4,10 +4,20 @@
       <i class="fa fa-spinner fa-spin" />
     </div>
   </div>
+  
   <div data-is="checkout-guest" show={ !this.checkout.loading && !this.user.exists() } checkout={ this.checkout } />
-  <virtual each={ action, key in this.checkout.getActions() }>
+  
+  <virtual each={ action, key in this.checkout.getActions() }> 
     <div hide={ this.checkout.loading } data-is="{ action.type }-checkout" if={ action.show !== false } action={ action } checkout={ this.checkout } />
   </virtual>
+
+  <div class="my-3" hide={ this.checkout.loading }>
+    By Checking out you agree to our <a href="/terms" target="_blank">Terms & Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a> agreements
+  </div>
+
+  <a hide={ this.checkout.loading } href="#!" onclick={ onCheckout } class={ 'btn btn-block btn-lg btn-success mt-4' : true, 'disabled' : !this.canCheckout() } disabled={ !canCheckout() }>
+    { this.t('checkout.complete') }
+  </a>
 
   <script>
     // do mixins
@@ -31,6 +41,22 @@
 
       // call checkout
       this.checkout.submit();
+    }
+
+    /**
+     * has checkout
+     *
+     * @return {Boolean}
+     */
+    canCheckout () {
+      // check actions
+      if (!this.checkout.actions || !Object.values(this.checkout.actions).length) return false;
+
+      // find action without value
+      return !Object.values(this.checkout.actions).find((action) => {
+        // return action value
+        return !action.value;
+      });
     }
 
     /**
