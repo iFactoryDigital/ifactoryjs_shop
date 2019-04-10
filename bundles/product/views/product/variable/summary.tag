@@ -1,20 +1,24 @@
 <product-variable-summary>
-  <div class="row mb-2">
+  <div class="row mb-2 row-eq-height">
     <div class="col-2 pr-0">
-      <img class="img-fluid cart-image" if={ opts.line.product.images && opts.line.product.images[0] } src={ this.media.url(opts.line.product.images[0], '3x-sq') } alt={ opts.line.product.title[this.language] }>
+      <img class="img-fluid img-thumbnail" if={ opts.line.product.images && opts.line.product.images[0] } src={ this.media.url(opts.line.product.images[0], '3x-sq') } alt={ opts.line.product.title[this.language] }>
     </div>
-    <div class="col-7">
-      <b class="d-block mb-0 text-overflow">
-        { opts.line.qty }x { opts.line.product.title[this.language] }
-      </b>
-      <div class="options">
-        <span class="badge mr-2 bg-primary" each={ opt, i in opts.line.opts }>
-          { this.option(opt).name }
-        </span>
+    <div class="col-7 d-flex align-items-center">
+      <div class="w-100">
+        <b class="d-block mb-0 text-overflow">
+          { opts.line.qty }x { opts.line.product.title[this.language] }
+        </b>
+        <div class="options">
+          <span class="badge mr-2 bg-primary" each={ opt, i in opts.line.opts }>
+            { this.option(opt).name }
+          </span>
+        </div>
       </div>
     </div>
-    <div class="col-3 text-right">
-      <money class="lead" amount={ (this.product.price(opts.line.product, opts.line.opts) * opts.line.qty) } />
+    <div class="col-3 d-flex align-items-center">
+      <div class="w-100 text-right">
+        <money class="lead" amount={ (this.product.price(opts.line.product, opts.line.opts) * opts.line.qty) } />
+      </div>
     </div>
   </div>
 
@@ -34,7 +38,7 @@
      *
      * @return {*}
      */
-    option (option) {
+    option(option) {
       // get prices
       for (let i = 0; i < opts.line.product.variations.length; i++) {
         // get value

@@ -5,8 +5,8 @@ const Events = require('events');
 // require local dependencies
 const store        = require('default/public/js/store');
 const socket       = require('socket/public/js/bootstrap');
-const CartStore    = require('cart/public/js/cart');
-const ProductStore = require('product/public/js/product');
+const cartStore    = require('cart/public/js/cart');
+const productStore = require('product/public/js/product');
 
 /**
  * build bootstrap class
@@ -28,18 +28,18 @@ class CheckoutStore extends Events {
     this.submit = this.submit.bind(this);
     this.update = this.update.bind(this);
 
-    // on CartStore update
-    CartStore.on('update', () => {
+    // on cartStore update
+    cartStore.on('update', () => {
       // build
       this.build({
-        lines    : CartStore.lines,
-        products : CartStore.products,
+        lines    : cartStore.lines,
+        products : cartStore.products,
       });
     });
   }
 
   /**
-   * build CartStore
+   * build cartStore
    */
   async build(order) {
     // check res
@@ -159,7 +159,7 @@ class CheckoutStore extends Events {
    *
    * @return {Float}
    */
-  async total() {
+  async total(withDiscount) {
     // let total
     let total = 0;
 
@@ -172,11 +172,23 @@ class CheckoutStore extends Events {
       });
 
       // add to total
-      total += ProductStore.price(product, line.opts) * line.qty;
+      total += productStore.price(product, line.opts) * line.qty;
     });
 
+    // set opts
+    const opts = {
+      total    : total,
+      lines    : this.lines,
+      actions  : this.actions,
+      discount : 0,
+      products : this.products,
+    };
+
+    // with discount
+    if (withDiscount) await eden.hook('checkout.total', opts);
+
     // return total
-    return total;
+    return opts.total;
   }
 
 

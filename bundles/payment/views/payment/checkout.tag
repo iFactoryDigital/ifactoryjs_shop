@@ -1,8 +1,6 @@
 <payment-checkout>
   <div class="card card-payment card-checkout mb-3">
-    <div class="card-header">
-      { this.t('payment.title') }
-    </div>
+
     <!-- payment choices -->
     <div class="card-body p-0">
       <div class="list-group list-group-flush">
@@ -12,6 +10,7 @@
       </div>
     </div>
     <!-- / payment choices -->
+    
   </div>
 
   <script>
