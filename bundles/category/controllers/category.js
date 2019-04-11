@@ -7,6 +7,7 @@ const Product  = model('product');
 const Category = model('category');
 
 // require helpers
+const blockHelper    = helper('cms/block');
 const categoryHelper = helper('category');
 
 /**
@@ -34,15 +35,6 @@ class CategoryController extends Controller {
    * build category controller
    */
   async build() {
-    // on render
-    this.eden.pre('view.compile', async (render) => {
-      // not required by json
-      if (render.isJSON) return;
-
-      // set categories
-      render.categories = categoryHelper.sanitised;
-    });
-
     // get categories
     (await Category.find({
       active : true,
@@ -54,7 +46,65 @@ class CategoryController extends Controller {
         changefreq : 'daily',
       });
     });
+
+    // register simple block
+    blockHelper.block('frotend.categories', {
+      for         : ['frontend'],
+      title       : 'Categories List',
+      description : 'Shows a list of published product categories',
+    }, async (req, block) => {
+      // get products
+      const query = await Category.where({
+        active : true,
+      });
+
+      // set data
+      const data = {
+        query,
+        req
+      };
+
+      // hook
+      await this.eden.hook('frontend.categories.query', data);
+
+      // return
+      return {
+        tag        : 'categories',
+        current    : req.category ? req.category.get('_id').toString() : null,
+        categories : await Promise.all((await data.query.find()).map(product => product.sanitise())),
+      };
+    }, async (req, block) => { });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOKS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * on view render
+   *
+   * @param  {Object} render
+   *
+   * @pre    view.compile
+   * @return {*}
+   */
+  viewHook(render) {
+    // not required by json
+    if (render.isJSON) return;
+
+    // set categories
+    render.categories = categoryHelper.sanitised;
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTIONS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -161,7 +211,7 @@ class CategoryController extends Controller {
     // render index page
     res.render('category', {
       trail,
-  
+
       title  : category.get(`title.${req.language}`),
       banner : {
         view      : 'content',
