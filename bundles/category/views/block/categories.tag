@@ -26,7 +26,6 @@
 
   <script>
     // i18n
-    { JSON.stringify(opts.data.categories) }
     this.mixin('i18n');
   
     /**
