@@ -21,7 +21,6 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
-        <!-- Modal Header -->
         <div class="modal-header">
           <h4 class="modal-title">
             Record Payment
@@ -29,7 +28,6 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
-        <!-- Modal body -->
         <div class="modal-body">
           <div class="mb-3">
             <button class="btn btn-{ this.payment === 'normal' ? 'primary' : 'secondary' } mr-2" onclick={ onNormalPayment }>
@@ -63,13 +61,12 @@
                 Manual Payment
               </div>
               <div class="card-body">
-                <validate label="Method" required min-length={ 2 } name="method" type="text" ref="method" />
+                <validate label="Method" required min-length={ 2 } name="method" type="select" options={ [{ label : 'Cash', value : 'cash' }, { label : 'Bank Deposit', value : 'bank' }] } ref="method" />
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Modal footer -->
         <div class="modal-footer">
           <button type="button" class={ 'btn btn-danger mr-2' : true, 'disabled' : this.loading('payment') } disabled={ this.loading('payment') } data-dismiss="modal">Close</button>
           <button type="button" class={ 'btn btn-success' : true, 'disabled' : this.loading('payment') } disabled={ this.loading('payment') } onclick={ onSubmitPayment }>
@@ -80,7 +77,7 @@
       </div>
     </div>
   </div>
-  
+
   <script>
     // set loading
     this.loading = opts.loading;
@@ -187,6 +184,6 @@
       // set saving
       this.loading('payment', false);
     }
-  
+
   </script>
 </invoice-admin-payment>
