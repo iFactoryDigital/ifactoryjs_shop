@@ -95,7 +95,7 @@ class AdminOrderController extends Controller {
     });
 
     // register simple field
-    fieldHelper.field('admin.order', {
+    fieldHelper.field('order', {
       for         : ['frontend', 'admin'],
       title       : 'User',
       description : 'Order field',
