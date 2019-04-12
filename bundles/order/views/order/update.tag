@@ -2,12 +2,14 @@
   <div class="{ opts.card || 'card mb-4' }">
     <div class="card-body">
       <span class="btn btn-{ this.colors[(this.order.status || 'pending')] }">Status: { this.t('order.status.' + (this.order.status || 'pending')) }</span>
-      <a class={ 'btn btn-info float-right' : true, 'disabled' : !this.invoice } href="/admin/shop/invoice/{ (this.invoice || {}).id }/update" disabled={ !this.invoice }>
-        View Invoice
-      </a>
+      
+      <button class={ 'btn btn-success float-right' : true, 'disabled' : !this.order.status === 'paid' } disabled={ this.order.status === 'paid' }>
+        { this.order.status === 'paid' ? 'Order Paid' : 'Pay Order' }
+      </button>
       <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
         { this.loading('save') ? 'Saving...' : 'Save Order' }
       </button>
+
       <div class="dropdown float-right mr-2" if={ opts.actions !== false }>
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-bars mr-2" />
@@ -56,7 +58,9 @@
         </div>
       </div>
     </div>
+
     <hr />
+
     <div class="card-body">
       <div class="row mb-5">
         <div class="col-sm-8">
@@ -146,10 +150,11 @@
         </table>
       </div>
     </div>
+
     <div class="card-body">
-      <a class={ 'btn btn-info float-right' : true, 'disabled' : !this.invoice } href="/admin/shop/invoice/{ (this.invoice || {}).id }/update" disabled={ !this.invoice }>
-        View Invoice
-      </a>
+      <button class={ 'btn btn-success float-right' : true, 'disabled' : this.order.status === 'paid' } disabled={ this.order.status === 'paid' }>
+        { this.order.status === 'paid' ? 'Order Paid' : 'Pay Order' }
+      </button>
       <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
         { this.loading('save') ? 'Saving...' : 'Save Order' }
       </button>

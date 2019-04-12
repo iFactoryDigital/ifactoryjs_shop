@@ -5,7 +5,7 @@
     <div class="card-body p-0">
       <div class="list-group list-group-flush">
         <virtual each={ method, i in methods() }>
-          <li class={ 'list-group-item list-group-item-method' : true, 'list-group-item-active' : isActive(method.type) } data-is="{ method.type }-method" action={ action() } method={ method } val={ (action().value || {}) } on-ready={ onMethod } />
+          <li class={ 'list-group-item list-group-item-method' : true, 'list-group-item-active' : isActive(method.type) } data-is="{ method.type }-method" action={ action() } method={ method } val={ (action().value || {}) } on-ready={ onMethod } checkout={ this.checkout } />
         </virtual>
       </div>
     </div>
@@ -16,6 +16,9 @@
   <script>
     // mixin i18n
     this.mixin('i18n');
+    
+    // set checkout
+    this.checkout = opts.checkout;
 
     /**
      * return action

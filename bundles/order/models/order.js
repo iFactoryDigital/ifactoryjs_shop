@@ -85,7 +85,7 @@ class Order extends Model {
 
     // run hook
     await eden.hook('order.sanitise', {
-      order     : this,
+      order : this,
       sanitised,
     });
 
