@@ -4,13 +4,13 @@
       <div class="col-md-4 product-media" if={ this.thumbnail }>
         <div class="card card-product-image mb-3">
           <a class="card-body" href={ this.media.url(this.thumbnail) } target="_blank">
-            <img class="img-fluid" itemprop="image" src={ this.media.url(this.thumbnail, 'md-sq') } alt={ title() }>
+            <img class="img-fluid" itemprop="image" src={ this.media.url(this.thumbnail, '3x-sq') } alt={ title() }>
           </a>
         </div>
         <div class="row row-img-gallery mb-3">
           <a each={ image, i in opts.product.images } href="#!" class="col-4 mb-2" onclick={ onImage }>
             <div class="card py-2 px-2">
-              <img class="img-fluid" src={ this.media.url(image, 'sm-sq') } alt={ title() }>
+              <img class="img-fluid" src={ this.media.url(image, '3x-sq') } alt={ title() }>
             </div>
           </a>
         </div>
@@ -30,7 +30,7 @@
           <div class="product-meta">
             <div class="row">
               <div class="col-9 d-flex align-items-center">
-                <a class="btn btn-sm btn-success mr-2" itemprop="category" each={ category, i in opts.product.categories } href="/{ category.url }">{ category.title[this.language] }</a>
+                <a class="btn btn-sm btn-success mr-2" itemprop="category" each={ category, i in opts.product.categories } href="/{ category.slug }">{ category.title[this.language] }</a>
               </div>
               <div class="col-3 product-quantity text-right text-success">
                 <span class="btn btn-link pr-0">
