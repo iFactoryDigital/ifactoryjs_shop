@@ -586,7 +586,7 @@ class AdminProductController extends Controller {
         title : field.label,
         query : (param) => {
           // Another where
-          productGrid.match(field.name, new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
+          productGrid.match(`${field.name}${field.i18n ? `.${req.language}` : ''}`, new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'));
         },
       });
     });

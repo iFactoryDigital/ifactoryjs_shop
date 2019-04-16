@@ -144,7 +144,8 @@ class CategoryController extends Controller {
     // get parent
     let trail   = [category];
     let parent  = await category.get('parent');
-    let nextCat = await category.get('parent');
+        parent  = Array.isArray(parent) ? parent[0] : parent;
+    let nextCat = parent;
 
     // while
     while (nextCat) {
@@ -156,6 +157,7 @@ class CategoryController extends Controller {
 
       // set next
       nextCat = await parent.get('parent');
+      nextCat = Array.isArray(nextCat) ? nextCat[0] : nextCat;
     }
 
     // reverse trail
@@ -164,69 +166,15 @@ class CategoryController extends Controller {
     // await trail sanitised
     trail = await Promise.all(trail.map(cat => cat.sanitise(true)));
 
-    // get parents
-    const cats = [category.get('_id').toString()];
-
-    // push cats
-    cats.push(...(await Category.find({
-      parents : category.get('_id').toString(),
-    })).map(cat => cat.get('_id').toString()));
-
-    // set sort
-    let sort      = 'priority';
-    let page      = 1;
-    const limit     = 24;
-    let direction = -1;
-
-    // check sort
-    if ((req.query.sort || '').toLowerCase() === 'highest') {
-      sort = 'pricing.price';
-    } else if ((req.query.sort || '').toLowerCase() === 'lowest') {
-      sort = 'pricing.price';
-      direction = 1;
-    }
-
-    // check page
-    if (req.query.page) {
-      // set page
-      page = parseInt(req.query.page) || 0;
-    }
-
-    // add content
-    req.placement(`${category.get('slug')}.banner`);
-
-    // get image
-    const image = (await category.get('images') || [])[0];
-
-    // set description
-    req.title(category.get(`title.${req.language}`));
-    req.description(category.get(`short.${req.language}`));
-
-    // set image
-    if (image) req.image(image.url('md-sq'));
-
-    // set twitter
-    req.twitter('card', 'summary_large_image');
+    // category page
+    req.placement('category.page');
 
     // render index page
     res.render('category', {
       trail,
 
-      title  : category.get(`title.${req.language}`),
-      banner : {
-        view      : 'content',
-        placement : `${category.get('slug')}.banner`,
-      },
-      total : await Product.where({
-        publish : true,
-      }).in('categories.id', cats).count(),
-      parent   : parent ? await parent.sanitise() : null,
+      title    : category.get(`title.${req.language}`),
       category : await category.sanitise(),
-      products : await Promise.all((await Product.where({
-        publish : true,
-      }).in('categories.id', cats).sort(sort, direction).skip(limit * (page - 1))
-        .limit(limit)
-        .find()).map(product => product.sanitise())),
     });
   }
 

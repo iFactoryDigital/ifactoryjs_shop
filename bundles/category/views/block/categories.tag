@@ -3,9 +3,6 @@
     <yield to="body">
       <div if={ !opts.data.categories.length } class="py-5 text-center">Add Categories</div>
       <div if={ opts.data.categories.length } class="card">
-        <div class="card-header">
-          Categories
-        </div>
         <div class="card-body">
           <ul class="nav flex-column">
             <li class="nav-item" each={ category, i in opts.getCategories() }>
