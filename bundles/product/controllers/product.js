@@ -1,12 +1,16 @@
 
 // bind dependencies
+const Grid       = require('grid');
 const config     = require('config');
 const Controller = require('controller');
 
 // require models
-const Product = model('product');
+const Block    = model('block');
+const Product  = model('product');
+const Category = model('category');
 
 // get helpers
+const formHelper    = helper('form');
 const blockHelper   = helper('cms/block');
 const productHelper = helper('product');
 
@@ -75,31 +79,51 @@ class ProductController extends Controller {
     });
 
     // register simple block
-    blockHelper.block('frotend.products', {
+    blockHelper.block('frontend.products', {
+      acl         : [],
       for         : ['frontend'],
       title       : 'Products List',
-      description : 'Lets list product cards in a block',
+      description : 'Shows list of products',
     }, async (req, block) => {
-      // get products
-      const query = await Product.where({
-        promoted : true,
+      // Get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
       });
 
-      // set data
-      const data = {
-        query,
-        req
+      // Create new req
+      const fauxReq = {
+        user  : req.user,
+        query : blockModel.get('state') || {},
       };
 
-      // hook
-      await this.eden.hook('frontend.products.query', data);
-
-      // return
+      // Return
       return {
-        tag      : 'products',
-        products : await Promise.all((await data.query.find()).map(product => product.sanitise())),
+        tag   : 'product-grid',
+        name  : 'Products',
+        grid  : await (await this._grid(req)).render(fauxReq),
+        class : blockModel.get('class') || null,
+        title : blockModel.get('title') || '',
       };
-    }, async (req, block) => { });
+    }, async (req, block) => {
+      // Get notes block from db
+      const blockModel = await Block.findOne({
+        uuid : block.uuid,
+      }) || new Block({
+        uuid : block.uuid,
+        type : block.type,
+      });
+
+      // Set data
+      blockModel.set('class', req.body.data.class);
+      blockModel.set('state', req.body.data.state);
+      blockModel.set('title', req.body.data.title);
+
+      // Save block
+      await blockModel.save(req.user);
+    });
 
     // register simple block
     blockHelper.block('frotend.product', {
@@ -117,17 +141,7 @@ class ProductController extends Controller {
       };
     }, async (req, block) => { });
 
-    // register simple block
-    blockHelper.block('frotend.product.filter', {
-      for         : ['frontend'],
-      title       : 'Product Filter',
-      description : 'Filters the current page products',
-    }, async (req, block) => {
-      // return
-      return {
-        tag : 'product-filter',
-      };
-    }, async (req, block) => { });
+
 
     // Register product types
     productHelper.register('simple', {
@@ -262,6 +276,25 @@ class ProductController extends Controller {
   }
 
   /**
+   * User grid action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {post} /grid
+   */
+  async gridAction(req, res) {
+    // check category
+    if (req.query.category || req.query.cat) {
+      // set category
+      req.category = await Category.findById(req.query.category || req.query.cat);
+    }
+
+    // Return post grid request
+    return (await this._grid(req)).post(req, res);
+  }
+
+  /**
    * order product function
    *
    * @param  {Object} data
@@ -273,6 +306,53 @@ class ProductController extends Controller {
     // check price
     await this.eden.hook(`product.${product.get('type')}.pricing`, data);
     await this.eden.hook(`product.${product.get('type')}.availability`, data);
+  }
+
+  /**
+   * Renders grid
+   *
+   * @return {grid}
+   */
+  async _grid(req) {
+    // Create new grid
+    const productGrid = new Grid();
+
+    // Set route
+    productGrid.route('/product/grid');
+
+    // check category
+    if (req.category) {
+      // route
+      productGrid.route(`/product/grid?cat=${req.category.get('_id')}`)
+    }
+
+    // Set grid model
+    productGrid.bar(false);
+    productGrid.row('product-row');
+    productGrid.model(Product);
+    productGrid.models(true);
+
+    // get form
+    const form = await formHelper.get('shop.product');
+
+    // check published
+    productGrid.where({
+      published : true,
+    });
+
+    // category
+    if (req.category) {
+      // check category
+      productGrid.where({
+        'categories.id' : req.category.get('_id').toString(),
+      });
+    }
+
+    // Set default sort order
+    productGrid.sort('created_at', -1);
+
+    // Return grid
+    return productGrid;
   }
 }
 

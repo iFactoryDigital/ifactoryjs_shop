@@ -163,6 +163,10 @@ class CategoryController extends Controller {
     // reverse trail
     trail.reverse();
 
+    // set trail/category
+    req.trail    = trail;
+    req.category = category;
+
     // await trail sanitised
     trail = await Promise.all(trail.map(cat => cat.sanitise(true)));
 

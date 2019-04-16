@@ -6,7 +6,7 @@
         <div class="card-body">
           <ul class="nav flex-column">
             <li class="nav-item" each={ category, i in opts.getCategories() }>
-              <a class="nav-link" href="/{ category.slug }">
+              <a class={ 'nav-link' : true, 'active' : opts.data.current === category.id } href="/{ category.slug }">
                 { category.title[opts.i18n.lang()] }
               </a>
             </li>
