@@ -26,9 +26,15 @@
       }
 
       // return formatted currency
-      return currency.format(value, {
+      const formatted = currency.format(value, {
         'code' : opts.currency || this.settings.currency || this.eden.get('shop.currency')
       });
+      
+      // return short value
+      if (opts.small) return formatted.split('.')[0];
+      
+      // return formatted
+      return formatted;
     }
   </script>
 </money>

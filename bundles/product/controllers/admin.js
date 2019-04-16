@@ -494,101 +494,12 @@ class AdminProductController extends Controller {
     productGrid.route('/admin/shop/product/grid');
 
     // Set grid model
+    productGrid.row('product-row');
     productGrid.model(Product);
+    productGrid.models(true);
 
     // get form
     const form = await formHelper.get('shop.product');
-
-    // Add grid columns
-    productGrid.column('sku', {
-      sort   : true,
-      title  : 'SKU',
-      format : async (col, row) => {
-        return col || '<i>N/A</i>';
-      },
-    }).column('price', {
-      sort : (query, dir) => {
-        return query.sort('pricing.price', dir);
-      },
-      title  : 'Price',
-      format : async (col, row) => {
-        // return calculated price
-        return `$${(await productHelper.price(row)).amount.toFixed(2)} ${config.get('shop.currency') || 'USD'}`;
-      },
-    });
-
-    // branch fields
-    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.product.fields').slice(0)).map(async (field, i) => {
-      // set found
-      const found = config.get('shop.product.fields').find(f => f.name === field.name);
-
-      // add config field
-      await formHelper.column(req, form, productGrid, field, {
-        hidden   : !(found && found.grid),
-        priority : 100 - i,
-      });
-    }));
-
-    productGrid.column('categories', {
-      title  : 'Categories',
-      format : async (col) => {
-        return col && col.length ? col.map((category) => {
-          return `<a href="?filter[category]=${category.get(`title.${req.language}`)}" class="btn btn-sm btn-primary mr-2">${category.get(`title.${req.language}`)}</a>`;
-        }).join('') : '<i>N/A</i>';
-      },
-    }).column('sold', {
-      title  : 'Sold',
-      format : async (col, row) => {
-        // return sold amount
-        return (await Sold.where({
-          'product.id' : row.get('_id').toString(),
-        }).sum('qty')).toLocaleString();
-      },
-    })
-      .column('published', {
-        sort   : true,
-        title  : 'Published',
-        format : async (col) => {
-          return col ? '<span class="btn btn-sm btn-success">Yes</span>' : '<span class="btn btn-sm btn-danger">No</span>';
-        },
-      })
-      .column('promoted', {
-        sort   : true,
-        title  : 'Promoted',
-        format : async (col) => {
-          return col ? '<span class="btn btn-sm btn-success">Yes</span>' : '<span class="btn btn-sm btn-danger">No</span>';
-        },
-      })
-      .column('creator', {
-        sort   : true,
-        title  : 'Creator',
-        format : async (col) => {
-          return col ? col.get('username') : '<i>N/A</i>';
-        },
-      })
-      .column('updated_at', {
-        tag   : 'grid-date',
-        sort  : true,
-        title : 'Updated'
-      })
-      .column('created_at', {
-        tag   : 'grid-date',
-        sort  : true,
-        title : 'Created',
-      })
-      .column('actions', {
-        width  : '1%',
-        title  : 'Actions',
-        export : false,
-        format : async (col, row) => {
-          return [
-            '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/shop/product/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
-            `<a href="/admin/shop/product/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
-            '</div>',
-          ].join('');
-        },
-      });
 
     // Add grid filters
     productGrid.filter('sku', {

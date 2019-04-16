@@ -1,47 +1,34 @@
 <product-variable-price>
-  <span itemprop="price" content={ this.pricing.min.toFixed(2) }><money amount={ this.pricing.min } /></span><span itemprop="priceCurrency" content="USD" /><span if={ this.pricing.min !== this.pricing.max }>+</span>
+  <span if={ this.pricing.min !== this.pricing.max }>from&nbsp;</span><span itemprop="price" content={ this.pricing.min.toFixed(2) }><money amount={ this.pricing.min } small={ true } /></span><span itemprop="priceCurrency" content="USD" />
   <link itemprop="availability" href="http://schema.org/InStock" if={ opts.product.available > 0 } />
 
   <script>
     // do mixins
     this.mixin('product');
     this.mixin('settings');
+    
+    // get price
+    const price = parseFloat(opts.product.pricing.price);
 
-    // set pricing
-    this.pricing = {
-      'min' : parseFloat(opts.product.price.amount) || 0,
-      'max' : parseFloat(opts.product.price.amount) || 0
-    };
+    // get min
+    let min = price;
+    let max = price;
 
-    /**
-     * returns variation price
-     *
-     * @return {Object}
-     */
-    variationPrice () {
-      // get price
-      let price = this.product.price(opts.product, []);
+    // get opts
+    for (let i = 0; i < (opts.product.variations || []).length; i++) {
+      // get value
+      const options = opts.product.variations[i].options.map((opt) => parseFloat(opt.price));
 
-      // get min
-      let min = price;
-      let max = price;
-
-      // get opts
-      for (let i = 0; i < (opts.product.variations || []).length; i++) {
-        // get value
-        let options = opts.product.variations[i].options.map((opt) => opt.price);
-
-        // add to max
-        max += Math.max(...options);
-        min += Math.min(...options);
-      }
-
-      // return min/max
-      return {
-        min,
-        max
-      };
+      // add to max
+      max += Math.max(...options);
+      min += Math.min(...options);
     }
+
+    // return min/max
+    this.pricing = {
+      min,
+      max
+    };
 
     /**
      * on mount function
@@ -49,10 +36,6 @@
     this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
-
-      // set procing
-      this.pricing = this.variationPrice();
-
     });
 
   </script>

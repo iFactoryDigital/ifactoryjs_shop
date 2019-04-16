@@ -10,6 +10,7 @@ const escapeRegex = require('escape-string-regexp');
 const User    = model('user');
 const File    = model('file');
 const Block   = model('block');
+const Order   = model('order');
 const Invoice = model('invoice');
 const Payment = model('payment');
 

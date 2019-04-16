@@ -56,8 +56,8 @@ class PaymentController extends Controller {
   async _checkout(order) {
     // create payment action
     const action = {
-      type     : 'payment',
-      data     : {
+      type : 'payment',
+      data : {
         methods : [],
       },
       priority : 100,

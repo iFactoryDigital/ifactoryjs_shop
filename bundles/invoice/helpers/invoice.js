@@ -68,11 +68,11 @@ class InvoiceHelper extends Helper {
       return money.add(accum, money.floatToAmount(item.total));
     }, '0.00')));
 
-    // set invoice
-    order.set('invoice', invoice);
-
     // save invoice
     await invoice.save(user);
+
+    // set invoice
+    order.set('invoice', invoice);
 
     // save order
     await order.save(user);

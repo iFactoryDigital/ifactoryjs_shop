@@ -17,7 +17,7 @@
     </div>
     <div class="col-3 d-flex align-items-center">
       <div class="w-100 text-right">
-        <money class="lead" amount={ (this.product.price(opts.line.product, opts.line.opts) * opts.line.qty) } />
+        <money amount={ (this.product.price(opts.line.product, opts.line.opts) * opts.line.qty) } />
       </div>
     </div>
   </div>

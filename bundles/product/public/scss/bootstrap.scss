@@ -1,0 +1,65 @@
+
+.card-product {
+  @include transition(all 0.5s ease);
+
+  .card-shadow {
+    top      : 0;
+    left     : 0;
+    right    : 0;
+    bottom   : 0;
+    z-index  : 1;
+    position : absolute;
+
+    @include transition(all 0.5s ease);
+  }
+
+  .card-button {
+    top       : 50%;
+    left      : 50%;
+    opacity   : 0;
+    z-index   : 2;
+    position  : absolute;
+    transform : translateY(-50%) translateX(-50%);
+
+    @include transition(all 0.5s ease);
+  }
+
+  .card-body {
+    z-index    : 2;
+    position   : relative;
+    background : $card-bg;
+  }
+
+  .card-product-admin {
+    top      : $spacer;
+    right    : $spacer;
+    z-index  : 3;
+    position : absolute;
+  }
+
+  &:hover {
+
+    .card-button {
+      opacity : 1;
+    }
+
+    .card-shadow {
+      background : rgba(theme-color(primary), 0.4);
+    }
+  }
+
+  a:hover {
+    text-decoration : none;
+  }
+
+  .card-product-image {
+    overflow      : hidden;
+    position      : relative;
+    border-bottom : $card-border-width solid $card-border-color;
+
+    .card-img-top {
+      margin-top    : -15%;
+      margin-bottom : -15%;
+    }
+  }
+}
