@@ -425,10 +425,26 @@ class AdminInvoiceController extends Controller {
     let payment = null;
 
     // check for website model
-    if (req.params.id) {
+    if (req.params.id && req.params.id !== 'create') {
       // load by id
       create = false;
       invoice = await Invoice.findById(req.params.id);
+    } else if (req.params.id === 'create') {
+      // get order
+      const orders = await Promise.all((Array.isArray(req.body.orders) ? req.body.orders : [req.body.orders]).map((id) => Order.findById(id)));
+
+      // set order
+      invoice.set('orders', orders);
+
+      // save invoice
+      await invoice.save();
+
+      // set orders
+      orders.forEach((order) => {
+        // save order
+        order.set('invoice', invoice);
+        order.save();
+      });
     }
 
     // get orders

@@ -3,7 +3,7 @@
     <div class="card-body">
       <span class="btn btn-{ this.colors[(this.order.status || 'pending')] }">Status: { this.t('order.status.' + (this.order.status || 'pending')) }</span>
       
-      <button class={ 'btn btn-success float-right' : true, 'disabled' : !this.order.status === 'paid' } disabled={ this.order.status === 'paid' }>
+      <button class={ 'btn btn-success float-right' : true, 'disabled' : !this.order.status === 'paid' } disabled={ this.order.status === 'paid' } onclick={ onPayment }>
         { this.order.status === 'paid' ? 'Order Paid' : 'Pay Order' }
       </button>
       <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
@@ -152,7 +152,7 @@
     </div>
 
     <div class="card-body">
-      <button class={ 'btn btn-success float-right' : true, 'disabled' : this.order.status === 'paid' } disabled={ this.order.status === 'paid' }>
+      <button class={ 'btn btn-success float-right' : true, 'disabled' : this.order.status === 'paid' } disabled={ this.order.status === 'paid' } onclick={ onPayment }>
         { this.order.status === 'paid' ? 'Order Paid' : 'Pay Order' }
       </button>
       <button class={ 'btn btn-success float-right mr-2' : true, 'disabled' : this.loading() } onclick={ onSave } disabled={ this.loading() }>
@@ -195,6 +195,8 @@
       </div>
     </div>
   </div>
+  
+  <order-admin-payment order={ opts.order } loading={ this.loading } ref="payment" />
 
   <script>
     // do mixin
@@ -344,9 +346,9 @@
       // prevent default
       e.preventDefault();
       e.stopPropagation();
-
-      // show modal
-      jQuery(this.refs.payment).modal('show');
+      
+      // show payment
+      this.refs.payment.show();
     }
 
     /**

@@ -592,6 +592,7 @@ class AdminOrderController extends Controller {
         },
       })
       .column('actions', {
+        tag    : 'order-actions',
         width  : '1%',
         title  : 'Actions',
         export : false,
