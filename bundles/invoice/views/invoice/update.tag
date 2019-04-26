@@ -196,7 +196,7 @@
           <h4 class="modal-title">
             Add Product Line
           </h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button onclick={ onDismissProduct } class="close">&times;</button>
         </div>
 
         <!-- Modal body -->
@@ -215,7 +215,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" onclick={ onDismissProduct }>Close</button>
         </div>
 
       </div>
@@ -381,6 +381,20 @@
 
       // show modal
       if (!jQuery(this.refs.product).is('.show')) jQuery(this.refs.product).modal('show');
+    }
+    
+    /**
+     * on dismiss product
+     *
+     * @param  {Event} e
+     */
+    onDismissProduct(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // show modal
+      jQuery(this.refs.product).modal('hide');
     }
 
     /**

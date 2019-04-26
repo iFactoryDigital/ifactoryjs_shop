@@ -441,6 +441,9 @@ class AdminInvoiceController extends Controller {
 
       // set orders
       orders.forEach((order) => {
+        // check order
+        if (!order) return;
+
         // save order
         order.set('invoice', invoice);
         order.save();
