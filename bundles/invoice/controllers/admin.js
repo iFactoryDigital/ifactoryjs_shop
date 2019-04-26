@@ -16,7 +16,6 @@ const Payment = model('payment');
 
 // require helpers
 const emailHelper = helper('email');
-const fieldHelper = helper('form/field');
 const blockHelper = helper('cms/block');
 
 /**
@@ -166,7 +165,7 @@ class AdminInvoiceController extends Controller {
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
       title    : `View ${invoice.get('_id').toString()}`,
-      orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : true,
     });
@@ -206,7 +205,7 @@ class AdminInvoiceController extends Controller {
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
       title    : `View ${invoice.get('_id').toString()}`,
-      orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
     });
@@ -304,7 +303,7 @@ class AdminInvoiceController extends Controller {
     res.render('invoice/admin/update', {
       grid    : await paymentGrid.render(req, invoice),
       title   : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
-      orders  : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      orders  : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice : await invoice.sanitise(),
     });
   }
@@ -431,7 +430,7 @@ class AdminInvoiceController extends Controller {
       invoice = await Invoice.findById(req.params.id);
     } else if (req.params.id === 'create') {
       // get order
-      const orders = await Promise.all((Array.isArray(req.body.orders) ? req.body.orders : [req.body.orders]).map((id) => Order.findById(id)));
+      const orders = await Promise.all((Array.isArray(req.body.orders) ? req.body.orders : [req.body.orders]).map(id => Order.findById(id)));
 
       // set order
       invoice.set('orders', orders);
@@ -468,7 +467,7 @@ class AdminInvoiceController extends Controller {
     if (req.body.type === 'manual') {
       // set fields
       payment.set('method', {
-        type : req.body.method
+        type : req.body.method,
       });
       payment.set('complete', true);
 
@@ -645,13 +644,14 @@ class AdminInvoiceController extends Controller {
       format : async (col, row) => {
         return col ? `$${col.toFixed(2)} ${row.get('currency')}` : '<i>N/A</i>';
       },
-    }).column('status', {
-      sort   : true,
-      title  : 'Status',
-      format : async (col, row) => {
-        return col ? `<span class="btn btn-sm">${col}</span>` : '<i>N/A</i>';
-      },
     })
+      .column('status', {
+        sort   : true,
+        title  : 'Status',
+        format : async (col, row) => {
+          return col ? `<span class="btn btn-sm">${col}</span>` : '<i>N/A</i>';
+        },
+      })
       .column('updated_at', {
         sort   : true,
         title  : 'Updated',

@@ -235,7 +235,7 @@ class OrderController extends Controller {
             // unlock
             orderStatus.unlock();
           });
-        } catch (e) { console.log(e) }
+        } catch (e) { console.log(e); }
       }
 
       // loop items

@@ -2,12 +2,8 @@
  * Created by Awesome on 3/6/2016.
  */
 
-// use strict
-
-
 // require dependencies
 const money  = require('money-math');
-const config = require('config');
 const colors = require('colors');
 const Helper = require('helper');
 

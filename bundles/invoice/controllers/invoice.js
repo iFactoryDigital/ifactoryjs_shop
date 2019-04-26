@@ -1,19 +1,11 @@
 
 // bind dependencies
-const Grid        = require('grid');
-const config      = require('config');
-const puppeteer   = require('puppeteer');
-const Controller  = require('controller');
-const escapeRegex = require('escape-string-regexp');
+const config     = require('config');
+const puppeteer  = require('puppeteer');
+const Controller = require('controller');
 
 // require models
-const User    = model('user');
-const Block   = model('block');
 const Invoice = model('invoice');
-const Payment = model('payment');
-
-// require helpers
-const blockHelper = helper('cms/block');
 
 /**
  * build user admin controller
@@ -67,7 +59,7 @@ class InvoiceController extends Controller {
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
       title    : `View ${invoice.get('_id').toString()}`,
-      orders   : await Promise.all((await invoice.get('orders')).map((order) => order.sanitise())),
+      orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
     });

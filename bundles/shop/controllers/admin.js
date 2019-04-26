@@ -3,10 +3,7 @@
 const Controller = require('controller');
 
 // get block model
-const Acl       = model('acl');
-const User      = model('user');
 const Order     = model('order');
-const Block     = model('block');
 const Payment   = model('payment');
 const Dashboard = model('dashboard');
 
@@ -173,8 +170,9 @@ class ShopAdminController extends Controller {
 
       // return amount sum
       const total = await Payment.where({
-        complete : true
-      }).gte('created_at', current).lte('created_at', next).gte('amount', 0).sum('amount');
+        complete : true,
+      }).gte('created_at', current).lte('created_at', next).gte('amount', 0)
+        .sum('amount');
 
       // add to totals
       totals.push(total);
@@ -229,7 +227,8 @@ class ShopAdminController extends Controller {
       next.setDate(next.getDate() + 1);
 
       // return amount sum
-      const total = await Order.gte('created_at', current).lte('created_at', next).nin('status', [null, 'pending']).gt('expense.total', 0).sum('expense.total');
+      const total = await Order.gte('created_at', current).lte('created_at', next).nin('status', [null, 'pending']).gt('expense.total', 0)
+        .sum('expense.total');
 
       // add to totals
       totals.push(total);

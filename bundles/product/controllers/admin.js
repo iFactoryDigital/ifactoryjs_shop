@@ -6,8 +6,6 @@ const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
 // Require models
-const Sold     = model('sold');
-const Image    = model('image');
 const Block    = model('block');
 const Product  = model('product');
 const Category = model('category');
@@ -365,19 +363,19 @@ class AdminProductController extends Controller {
     }
 
     // Load pricing
-    const pricing = req.body.pricing;
+    const { pricing } = req.body;
 
     // Set pricing
     await this.eden.hook('product.pricing', req.body.type || product.get('type'), pricing);
 
     // Load availability
-    const availability = req.body.availability;
+    const { availability } = req.body;
 
     // Set availability
     await this.eden.hook('product.availability', req.body.type || product.get('type'), availability);
 
     // Load availability
-    const shipping = req.body.shipping;
+    const { shipping } = req.body;
 
     // Set availability
     await this.eden.hook('product.shipping', req.body.type || product.get('type'), shipping);

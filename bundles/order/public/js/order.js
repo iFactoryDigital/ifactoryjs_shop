@@ -89,7 +89,7 @@ class OrderStore extends Events {
     // reduce for total
     return quantities.reduce((a, b) => {
       // return sum
-      return (parseInt(a) + parseInt(b));
+      return (parseInt(a, 10) + parseInt(b, 10));
     });
   }
 

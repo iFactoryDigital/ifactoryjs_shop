@@ -2,9 +2,6 @@
  * Created by Awesome on 3/6/2016.
  */
 
-// use strict
-
-
 // require dependencies
 const config = require('config');
 const colors = require('colors');
@@ -12,9 +9,6 @@ const Helper = require('helper');
 
 // require models
 const Payment = model('payment');
-
-// get helpers
-const orderHelper = helper('order');
 
 /**
  * build payment helper

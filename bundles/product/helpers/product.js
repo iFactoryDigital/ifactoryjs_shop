@@ -81,7 +81,7 @@ class ProductHelper extends Helper {
     const opts = Object.values(line.opts || {});
 
     // log
-    this._log(product, `${opts.length ? '[' + colors.red(JSON.stringify(opts).split('"').join('').slice(1, -1)) + '] ' : ''}${line.qty.toLocaleString()} ordered`, true);
+    this._log(product, `${opts.length ? `[${colors.red(JSON.stringify(opts).split('"').join('').slice(1, -1))}] ` : ''}${line.qty.toLocaleString()} ordered`, true);
 
     // await price
     const rtn = await registered.order(product, line, req);
@@ -119,7 +119,7 @@ class ProductHelper extends Helper {
     const opts = Object.values(line.opts || {});
 
     // log
-    this._log(product, `${opts.length ? '[' + colors.red(JSON.stringify(opts).split('"').join('').slice(1, -1)) + '] ' : ''}${line.qty.toLocaleString()} purchased`, true);
+    this._log(product, `${opts.length ? `[${colors.red(JSON.stringify(opts).split('"').join('').slice(1, -1))}] ` : ''}${line.qty.toLocaleString()} purchased`, true);
 
     // await price
     const rtn = await registered.complete(product, line, order);

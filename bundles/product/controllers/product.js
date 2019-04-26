@@ -142,7 +142,6 @@ class ProductController extends Controller {
     }, async (req, block) => { });
 
 
-
     // Register product types
     productHelper.register('simple', {
       options  : ['availability'],
@@ -180,7 +179,7 @@ class ProductController extends Controller {
       // loop for variations
       Object.keys(variations).forEach((type) => {
         // check found option
-        let found = (variations[type].options || []).find(option => (opts || []).includes(option.sku)) || (variations[type].options || [])[0];
+        const found = (variations[type].options || []).find(option => (opts || []).includes(option.sku)) || (variations[type].options || [])[0];
 
         // add to price
         if (found) price += parseFloat(found.price);
@@ -301,7 +300,7 @@ class ProductController extends Controller {
    */
   async _order(data) {
     // set qty
-    const product = data.product;
+    const { product } = data;
 
     // check price
     await this.eden.hook(`product.${product.get('type')}.pricing`, data);
@@ -323,7 +322,7 @@ class ProductController extends Controller {
     // check category
     if (req.category) {
       // route
-      productGrid.route(`/product/grid?cat=${req.category.get('_id')}`)
+      productGrid.route(`/product/grid?cat=${req.category.get('_id')}`);
     }
 
     // Set grid model

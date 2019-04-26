@@ -14,7 +14,6 @@ class PaymentMethodController extends Controller {
   constructor() {
     // Run super
     super();
-    
   }
 }
 

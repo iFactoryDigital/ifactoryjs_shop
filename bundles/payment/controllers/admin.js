@@ -356,19 +356,21 @@ class AdminPaymentController extends Controller {
       format : async (col, row) => {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
-    }).column('method.type', {
-      sort   : true,
-      title  : 'Method',
-      format : async (col, row) => {
-        return col ? col : '<i>N/A</i>';
-      },
-    }).column('details', {
-      sort   : true,
-      title  : 'Details',
-      format : async (col, row) => {
-        return col ? col : '<i>N/A</i>';
-      },
-    });
+    })
+      .column('method.type', {
+        sort   : true,
+        title  : 'Method',
+        format : async (col, row) => {
+          return col || '<i>N/A</i>';
+        },
+      })
+      .column('details', {
+        sort   : true,
+        title  : 'Details',
+        format : async (col, row) => {
+          return col || '<i>N/A</i>';
+        },
+      });
 
     // check invoice
     if (!invoice) {
@@ -379,17 +381,17 @@ class AdminPaymentController extends Controller {
         format : async (col) => {
           return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
         },
-      })
+      });
     }
 
     // continue grid
     paymentGrid.column('error', {
-        sort   : true,
-        title  : 'Error',
-        format : async (col) => {
-          return col && col.text ? col.text : (col ? JSON.stringify(col) : '<i>N/A</i>');
-        },
-      })
+      sort   : true,
+      title  : 'Error',
+      format : async (col) => {
+        return col && col.text ? col.text : (col ? JSON.stringify(col) : '<i>N/A</i>');
+      },
+    })
       .column('updated_at', {
         sort   : true,
         title  : 'Updated',
@@ -481,7 +483,7 @@ class AdminPaymentController extends Controller {
     if (invoice) {
       // by invoice
       paymentGrid.where({
-        'invoice.id' : invoice
+        'invoice.id' : invoice,
       });
     }
 
