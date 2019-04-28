@@ -5,7 +5,7 @@
   "dependencies": {
     "currency-converter": "^0.1.12",
     "currency-formatter": "^1.5.3",
-    "escape-string-regexp": "^1.0.5",
+    "escape-string-regexp": "^2.0.0",
     "is-type": "0.0.1",
     "moment": "^2.22.2",
     "money-math": "^2.5.1",
