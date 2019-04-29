@@ -714,18 +714,18 @@ class AdminOrderController extends Controller {
       },
     });
 
-    // do hook
-    await this.eden.hook('shop.admin.order.grid', {
-      req,
-      grid : orderGrid,
-    });
-
     // set default sort order
     orderGrid.sort('created_at', -1);
     orderGrid.elem('lines', {
       qty : {
         $gt : 0,
       },
+    });
+
+    // do hook
+    await this.eden.hook('shop.admin.order.grid', {
+      req,
+      grid : orderGrid,
     });
 
     // return grid
