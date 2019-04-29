@@ -33,9 +33,6 @@ class ProductController extends Controller {
     // bind methods
     this.viewAction = this.viewAction.bind(this);
 
-    // bind private methods
-    this._order = this._order.bind(this);
-
     // build product helper
     this.building = this.build();
   }
@@ -51,18 +48,6 @@ class ProductController extends Controller {
    * order individual item
    */
   async build() {
-    // await hooks
-    this.eden.pre('product.order', this._order);
-
-    // sanitise product
-    this.eden.pre('product.sanitise', ({ sanitised, product }) => {
-      // check variable
-      if (product.get('type') !== 'variable') return;
-
-      // get variations
-      sanitised.variations = product.get('variations');
-    });
-
     // get categories
     (await Product.find({
       published : true,
@@ -209,6 +194,42 @@ class ProductController extends Controller {
 
   // ////////////////////////////////////////////////////////////////////////////
   //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * order product function
+   *
+   * @pre   product.order
+   * @param {Object} data
+   */
+  async orderHook(data) {
+    // set qty
+    const { product } = data;
+
+    // check price
+    await this.eden.hook(`product.${product.get('type')}.pricing`, data);
+    await this.eden.hook(`product.${product.get('type')}.availability`, data);
+  }
+
+  /**
+   * sanitise hook
+   *
+   * @pre   product.sanitise
+   * @param {Object} data
+   */
+  async sanitiseHook({ sanitised, product }) {
+    // check variable
+    if (product.get('type') !== 'variable') return;
+
+    // get variations
+    sanitised.variations = product.get('variations');
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
   // ACTION METHODS
   //
   // ////////////////////////////////////////////////////////////////////////////
@@ -313,20 +334,6 @@ class ProductController extends Controller {
   // PRIVATE METHODS
   //
   // ////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * order product function
-   *
-   * @param  {Object} data
-   */
-  async _order(data) {
-    // set qty
-    const { product } = data;
-
-    // check price
-    await this.eden.hook(`product.${product.get('type')}.pricing`, data);
-    await this.eden.hook(`product.${product.get('type')}.availability`, data);
-  }
 
   /**
    * Renders grid
