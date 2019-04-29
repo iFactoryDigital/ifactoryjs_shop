@@ -50,63 +50,20 @@ class AdminProductController extends Controller {
     this._grid = this._grid.bind(this);
 
     // Build
-    this.build();
+    this.building = this.build();
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * Builds admin category
    */
   build() {
-    // Build slug function
-    const slugify = async (product) => {
-      // Get title
-      const title = Object.values(product.get('title') || {})[0];
-
-      // Slugify
-      let slugifiedTitle = slug(title || '', {
-        lower : true,
-      });
-
-      // Check slug
-      let i = 0;
-
-      // Loop until slug available
-      while (true) {
-        // Set slug
-        const check = await Product.findOne({
-          slug : (i ? `${slugifiedTitle}-${i}` : slugifiedTitle),
-        });
-
-        // Check id
-        if (check && product.get('_id') && product.get('_id').toString() !== check.get('_id').toString()) {
-          // Add to i
-          i++;
-        } else {
-          // Set new slug
-          slugifiedTitle = (i ? `${slugifiedTitle}-${i}` : slugifiedTitle);
-
-          // Break if not found
-          break;
-        }
-      }
-
-      // Set slug
-      product.set('slug', slugifiedTitle);
-    };
-
-    // On render
-    this.eden.pre('product.update', slugify);
-    this.eden.pre('product.create', slugify);
-
-    // Pre pricing submit
-    this.eden.pre('product.submit', (req, product) => {
-      // Check type
-      if (product.get('type') !== 'variable') return;
-
-      // Set pricing
-      product.set('variations', req.body.variation || []);
-    });
-
     // Register simple block
     blockHelper.block('dashboard.cms.products', {
       acl         : ['admin.shop'],
@@ -154,6 +111,81 @@ class AdminProductController extends Controller {
       await blockModel.save(req.user);
     });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * submit hook
+   *
+   * @param  {Product} product
+   *
+   * @pre    product.submit
+   * @return {Promise}
+   */
+  async submitHook(req, product) {
+    // Check type
+    if (product.get('type') !== 'variable') return;
+
+    // Set pricing
+    product.set('variations', req.body.variation || []);
+  }
+
+  /**
+   * update hook
+   *
+   * @param  {Product} product
+   *
+   * @pre    product.update
+   * @pre    product.create
+   * @return {Promise}
+   */
+  async updateHook(product) {
+    // Get title
+    const title = Object.values(product.get('title') || {})[0];
+
+    // Slugify
+    let slugifiedTitle = slug(title || '', {
+      lower : true,
+    });
+
+    // Check slug
+    let i = 0;
+
+    // Loop until slug available
+    while (true) {
+      // Set slug
+      const check = await Product.findOne({
+        slug : (i ? `${slugifiedTitle}-${i}` : slugifiedTitle),
+      });
+
+      // Check id
+      if (check && product.get('_id') && product.get('_id').toString() !== check.get('_id').toString()) {
+        // Add to i
+        i++;
+      } else {
+        // Set new slug
+        slugifiedTitle = (i ? `${slugifiedTitle}-${i}` : slugifiedTitle);
+
+        // Break if not found
+        break;
+      }
+    }
+
+    // Set slug
+    product.set('slug', slugifiedTitle);
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * Index action
@@ -478,6 +510,13 @@ class AdminProductController extends Controller {
     // Return post grid request
     return (await this._grid(req)).post(req, res);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * Renders grid
