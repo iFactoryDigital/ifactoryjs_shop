@@ -605,7 +605,7 @@ class AdminInvoiceController extends Controller {
    *
    * @return {grid}
    */
-  _grid(req) {
+  async _grid(req) {
     // create new grid
     const invoiceGrid = new Grid();
 
@@ -731,6 +731,13 @@ class AdminInvoiceController extends Controller {
           'error.text' : new RegExp(escapeRegex(param.toString().toLowerCase()), 'i'),
         });
       },
+    });
+
+    // add hook
+    await this.eden.hook('shop.invoice.grid', {
+      req,
+
+      grid : invoiceGrid,
     });
 
     // set default sort order

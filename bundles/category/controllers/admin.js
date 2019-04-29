@@ -595,6 +595,13 @@ class AdminCategoryController extends Controller {
       });
     });
 
+    // add hook
+    await this.eden.hook('shop.category.grid', {
+      req,
+
+      grid : categoryGrid,
+    });
+
     // Set default sort order
     categoryGrid.sort('created_at', -1);
 

@@ -49,39 +49,8 @@ class CartController extends Controller {
     // use settings middleware
     this.eden.router.use(this._middleware);
 
-    // on render
-    this.eden.pre('view.compile', (render) => {
-      // move menus
-      if (render.state.cart && !render.isJSON) render.cart = render.state.cart;
-
-      // delete from state
-      delete render.state.cart;
-    });
-
     // add cart endpoint
     this.eden.endpoint('cart', this.cartEndpoint);
-
-    // add cart endpoint
-    this.eden.post('order.complete', async (order) => {
-      // get cart lines
-      let cart = await order.get('cart');
-      const user = await order.get('user');
-
-      // remove cart
-      if (cart) await cart.remove(user);
-
-      // create new cart
-      cart = new Cart({
-        user      : await order.get('user'),
-        sessionID : order.get('meta.session'),
-      });
-
-      // save cart
-      await cart.save(user);
-
-      // emit to user/socket
-      socket[user ? 'user' : 'session'](user || order.get('meta.session'), 'cart', await cart.sanitise());
-    });
 
     // register simple block
     blockHelper.block('cart.dropdown', {
@@ -96,6 +65,54 @@ class CartController extends Controller {
         dropdown : block.dropdown || null,
       };
     }, async (req, block) => {});
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * compile view
+   *
+   * @pre    view.compile
+   * @param  {Object} render
+   */
+  viewCompileHook(render) {
+    // move menus
+    if (render.state.cart && !render.isJSON) render.cart = render.state.cart;
+
+    // delete from state
+    delete render.state.cart;
+  }
+
+  /**
+   * compile view
+   *
+   * @post   order.complete
+   * @param  {Object} render
+   */
+  async orderCompleteHook(order) {
+    // get cart lines
+    let cart = await order.get('cart');
+    const user = await order.get('user');
+
+    // remove cart
+    if (cart) await cart.remove(user);
+
+    // create new cart
+    cart = new Cart({
+      user      : await order.get('user'),
+      sessionID : order.get('meta.session'),
+    });
+
+    // save cart
+    await cart.save(user);
+
+    // emit to user/socket
+    socket[user ? 'user' : 'session'](user || order.get('meta.session'), 'cart', await cart.sanitise());
   }
 
 

@@ -487,6 +487,13 @@ class AdminPaymentController extends Controller {
       });
     }
 
+    // add hook
+    await this.eden.hook('shop.payment.grid', {
+      req,
+
+      grid : paymentGrid,
+    });
+
     // return grid
     return paymentGrid;
   }

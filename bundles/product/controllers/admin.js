@@ -592,6 +592,13 @@ class AdminProductController extends Controller {
     // Set default sort order
     productGrid.sort('created_at', -1);
 
+    // add hook
+    await this.eden.hook('shop.product.grid', {
+      req,
+
+      grid : productGrid,
+    });
+
     // Return grid
     return productGrid;
   }
