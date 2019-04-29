@@ -37,7 +37,7 @@ class Cart extends Model {
    */
   async sanitise() {
     // return sanitised bot
-    return {
+    const sanitised = {
       id       : this.get('_id') ? this.get('_id').toString() : null,
       lines    : this.get('lines') || [],
       products : await Promise.all((this.get('lines') || []).map(async (line) => {
@@ -45,6 +45,16 @@ class Cart extends Model {
         return await (await Product.findById(line.product)).sanitise();
       })),
     };
+
+    // hook
+    await this.eden.hook('cart.sanitise', {
+      sanitised,
+
+      cart : this,
+    });
+
+    // return sanitised
+    return sanitised;
   }
 }
 

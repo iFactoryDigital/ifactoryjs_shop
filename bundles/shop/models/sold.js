@@ -27,9 +27,19 @@ class Sold extends Model {
    */
   async sanitise() {
     // return sanitised bot
-    return {
+    const sanitised = {
       id : this.get('_id') ? this.get('_id').toString() : null,
     };
+
+    // hook
+    await this.eden.hook('sold.sanitise', {
+      sanitised,
+
+      sold : this,
+    });
+
+    // return sanitised
+    return sanitised;
   }
 }
 

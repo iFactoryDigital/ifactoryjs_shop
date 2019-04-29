@@ -34,7 +34,7 @@ class Payment extends Model {
    */
   async sanitise() {
     // return sanitised bot
-    return {
+    const sanitised = {
       id       : this.get('_id') ? this.get('_id').toString() : null,
       data     : this.get('data'),
       method   : this.get('method'),
@@ -42,6 +42,16 @@ class Payment extends Model {
       details  : this.get('details'),
       complete : this.get('complete'),
     };
+
+    // hook
+    await this.eden.hook('payment.sanitise', {
+      sanitised,
+
+      payment : this,
+    });
+
+    // return sanitised
+    return sanitised;
   }
 }
 

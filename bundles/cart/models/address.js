@@ -27,11 +27,21 @@ class Address extends Model {
    */
   async sanitise() {
     // return sanitised bot
-    return {
+    const sanitised = {
       id        : this.get('_id') ? this.get('_id').toString() : null,
       name      : this.get('name'),
       formatted : this.get('formatted'),
     };
+
+    // hook
+    await this.eden.hook('address.sanitise', {
+      sanitised,
+
+      address : this,
+    });
+
+    // return sanitised
+    return sanitised;
   }
 }
 
