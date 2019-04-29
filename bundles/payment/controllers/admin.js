@@ -28,6 +28,7 @@ class AdminPaymentController extends Controller {
     super();
 
     // bind methods
+    this.build = this.build.bind(this);
     this.gridAction = this.gridAction.bind(this);
     this.indexAction = this.indexAction.bind(this);
     this.createAction = this.createAction.bind(this);
@@ -40,6 +41,23 @@ class AdminPaymentController extends Controller {
     // bind private methods
     this._grid = this._grid.bind(this);
 
+    // build
+    this.building = this.build();
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * build payment admin controller
+   *
+   * @return {Promise}
+   */
+  async build() {
     // register simple block
     blockHelper.block('dashboard.cms.payments', {
       acl         : ['admin.shop'],
@@ -87,6 +105,13 @@ class AdminPaymentController extends Controller {
       await blockModel.save(req.user);
     });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -304,6 +329,13 @@ class AdminPaymentController extends Controller {
     // return post grid request
     return (await this._grid()).post(req, res);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * renders grid

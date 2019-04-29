@@ -25,6 +25,13 @@ class InvoiceController extends Controller {
     this.printAction = this.printAction.bind(this);
   }
 
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
   /**
    * update action
    *
@@ -92,6 +99,13 @@ class InvoiceController extends Controller {
     // load pdf
     res.send(await this._toPDF(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/print?user=${req.query.user || req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`));
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * create PDF

@@ -25,35 +25,42 @@ class PaymentController extends Controller {
     this.build = this.build.bind(this);
 
     // bind private methods
-    this._order = this._order.bind(this);
-    this._payment = this._payment.bind(this);
-    this._checkout = this._checkout.bind(this);
+    this.orderHook = this.orderHook.bind(this);
+    this.paymentHook = this.paymentHook.bind(this);
+    this.checkoutHook = this.checkoutHook.bind(this);
 
     // build
-    this.build();
+    this.building = this.build();
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * builds cart controller
    */
   build() {
-    // checkout hooks
-    this.eden.pre('checkout.init', this._checkout);
 
-    // order hooks
-    this.eden.pre('order.init', this._order);
-    this.eden.pre('order.payment', this._payment);
-
-    // hook payment
-    this.eden.pre('payment.init', this._manual);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * checkout order
    *
-   * @param  {Object} order
+   * @pre   checkout.init
+   * @param {Object} order
    */
-  async _checkout(order) {
+  async checkoutHook(order) {
     // create payment action
     const action = {
       type : 'payment',
@@ -83,9 +90,10 @@ class PaymentController extends Controller {
   /**
    * checkout order
    *
+   * @pre   order.init
    * @param {order} Order
    */
-  async _order(order) {
+  async orderHook(order) {
     // check order
     const actions = order.get('actions') || [];
 
@@ -109,9 +117,10 @@ class PaymentController extends Controller {
    *
    * @param  {Object}  data
    *
+   * @pre    order.payment
    * @return {Promise}
    */
-  async _payment(order, action) {
+  async paymentHook(order, action) {
     // get order and action
     const check = {
       type : 'payment',
@@ -177,9 +186,10 @@ class PaymentController extends Controller {
    *
    * @param  {Object}  opts
    *
+   * @pre    payment.init
    * @return {Promise}
    */
-  async _manual(order, action) {
+  async manualHook(order, action) {
     // check action
     if (action.type !== 'payment') return;
 

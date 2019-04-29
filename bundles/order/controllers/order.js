@@ -9,7 +9,7 @@ const Order   = model('order');
 const Product = model('product');
 
 // require helpers
-const gridHelper    = helper('grid');
+const GridHelper    = helper('grid');
 const orderHelper   = helper('order');
 const emailHelper   = helper('email');
 const modelHelper   = helper('model');
@@ -38,6 +38,13 @@ class OrderController extends Controller {
     this.build();
   }
 
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
   /**
    * builds order controller
    */
@@ -46,6 +53,13 @@ class OrderController extends Controller {
     this.eden.pre('order.create', this._status);
     this.eden.pre('order.update', this._status);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // LIVE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * Socket listen action
@@ -92,6 +106,13 @@ class OrderController extends Controller {
     // Add to room
     return await modelHelper.deafen(opts.sessionID, viewOrder, uuid);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * view order index
@@ -166,6 +187,13 @@ class OrderController extends Controller {
     // render index
     return (await this._grid(req)).post(req, res);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * pre order update
@@ -295,7 +323,7 @@ class OrderController extends Controller {
    */
   _grid(req) {
     // create new grid
-    const orderGrid = new gridHelper(req);
+    const orderGrid = new GridHelper(req);
 
     // set route
     orderGrid.route('/order/grid');

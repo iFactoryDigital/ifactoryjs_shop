@@ -24,15 +24,26 @@ class CheckoutController extends Controller {
     // run super
     super();
 
-    // bind private methods
-    this._checkout = this._checkout.bind(this);
+    // bind methods
+    this.build = this.build.bind(this);
 
-    // checkout hooks
-    this.eden.pre('checkout.init', this._checkout);
+    // building
+    this.building = this.build();
+  }
 
-    // order hooks
-    this.eden.pre('order.init', this._order);
 
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * build
+   *
+   * @return {Promise}
+   */
+  async build() {
     // Set types
     const types = ['payment', 'summary'];
 
@@ -89,6 +100,13 @@ class CheckoutController extends Controller {
       });
     });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -245,23 +263,39 @@ class CheckoutController extends Controller {
     res.json(await order.sanitise());
   }
 
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
   /**
    * checkout order
    *
+   * @pre    order.init
    * @param  {order} Order
    */
-  async _order(order) {
+  async orderHook(order) {
 
   }
 
   /**
    * checkout order
    *
+   * @pre    checkout.init
    * @param  {Object} order
    */
-  async _checkout(order) {
+  async checkoutHook(order) {
 
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * get order

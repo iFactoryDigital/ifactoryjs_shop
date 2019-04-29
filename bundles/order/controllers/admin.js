@@ -35,6 +35,7 @@ class AdminOrderController extends Controller {
     super();
 
     // bind methods
+    this.build = this.build.bind(this);
     this.gridAction = this.gridAction.bind(this);
     this.indexAction = this.indexAction.bind(this);
     this.createAction = this.createAction.bind(this);
@@ -47,6 +48,23 @@ class AdminOrderController extends Controller {
     // bind private methods
     this._grid = this._grid.bind(this);
 
+    // set building
+    this.building = this.build();
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * build method
+   *
+   * @return {Promise}
+   */
+  async build() {
     // register simple block
     blockHelper.block('dashboard.cms.orders', {
       acl         : ['admin.shop'],
@@ -130,6 +148,13 @@ class AdminOrderController extends Controller {
       }));
     });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -441,6 +466,13 @@ class AdminOrderController extends Controller {
     // return post grid request
     return (await this._grid(req)).post(req, res);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * renders grid

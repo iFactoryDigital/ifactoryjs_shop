@@ -27,48 +27,23 @@ class ShopAdminController extends Controller {
     super();
 
     // bind methods
-    this.blocks = this.blocks.bind(this);
+    this.build = this.build.bind(this);
 
     // register blocks
-    this.blocks();
+    this.building = this.build();
   }
 
-  /**
-   * admin Shop index
-   *
-   * @param  {Request}   req
-   * @param  {Response}  res
-   * @param  {Function}  next
-   *
-   * @menu   {ADMIN} Shop
-   * @icon   fa fa-shopping-cart
-   * @route  {GET} /
-   * @layout admin
-   */
-  async indexAction(req, res) {
-    // get dashboards
-    const dashboards = await Dashboard.where({
-      type : 'admin.shop',
-    }).or({
-      'user.id' : req.user.get('_id').toString(),
-    }, {
-      public : true,
-    }).find();
 
-    // Render admin page
-    res.render('admin', {
-      name       : 'Admin Shop',
-      type       : 'admin.shop',
-      blocks     : blockHelper.renderBlocks('admin'),
-      jumbotron  : 'Manage Shop',
-      dashboards : await Promise.all(dashboards.map(async (dashboard, i) => dashboard.sanitise(i === 0 ? req : null))),
-    });
-  }
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * creates blocks
    */
-  blocks() {
+  build() {
     /**
      * STAT WIDGETS
      */
@@ -139,6 +114,52 @@ class ShopAdminController extends Controller {
       return data;
     }, async (req, block) => { });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTIOn METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * admin Shop index
+   *
+   * @param  {Request}   req
+   * @param  {Response}  res
+   * @param  {Function}  next
+   *
+   * @menu   {ADMIN} Shop
+   * @icon   fa fa-shopping-cart
+   * @route  {GET} /
+   * @layout admin
+   */
+  async indexAction(req, res) {
+    // get dashboards
+    const dashboards = await Dashboard.where({
+      type : 'admin.shop',
+    }).or({
+      'user.id' : req.user.get('_id').toString(),
+    }, {
+      public : true,
+    }).find();
+
+    // Render admin page
+    res.render('admin', {
+      name       : 'Admin Shop',
+      type       : 'admin.shop',
+      blocks     : blockHelper.renderBlocks('admin'),
+      jumbotron  : 'Manage Shop',
+      dashboards : await Promise.all(dashboards.map(async (dashboard, i) => dashboard.sanitise(i === 0 ? req : null))),
+    });
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * income statistics

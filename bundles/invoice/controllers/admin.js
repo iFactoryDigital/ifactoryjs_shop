@@ -34,6 +34,7 @@ class AdminInvoiceController extends Controller {
     super();
 
     // bind methods
+    this.build = this.build.bind(this);
     this.gridAction = this.gridAction.bind(this);
     this.indexAction = this.indexAction.bind(this);
     this.createAction = this.createAction.bind(this);
@@ -46,6 +47,23 @@ class AdminInvoiceController extends Controller {
     // bind private methods
     this._grid = this._grid.bind(this);
 
+    // build
+    this.building = this.build();
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * build invoice admin controller
+   *
+   * @return {Promise}
+   */
+  async build() {
     // register simple block
     blockHelper.block('dashboard.cms.invoices', {
       acl         : ['admin.shop'],
@@ -93,6 +111,13 @@ class AdminInvoiceController extends Controller {
       await blockModel.save(req.user);
     });
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -599,6 +624,13 @@ class AdminInvoiceController extends Controller {
     // return post grid request
     return paymentGrid.post(req, res);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // PRIVATE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * renders grid

@@ -52,94 +52,20 @@ class AdminCategoryController extends Controller {
     this.building = this.build();
   }
 
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // BUILD METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
   /**
    * builds category admin controller
    */
   build() {
-    //
-    // PRIVATE FUNCTIONS
-    //
-
-    // build slug function
-    const slugify = async (category) => {
-      // get title
-      const title = category.get(`title.${config.get('i18n.fallbackLng')}`);
-
-      // slugify
-      let slugifiedURL = slug(title, {
-        lower : true,
-      });
-
-      // check slug
-      let i = 0;
-
-      // loop until slug available
-      while (true) {
-        // set slug
-        const check = await Category.findOne({
-          slug : (i ? `${slugifiedURL}-${i}` : slugifiedURL),
-        });
-
-        // check id
-        if (check && (!category.get('_id') || category.get('_id').toString() !== check.get('_id').toString())) {
-          // add to i
-          i += 1;
-        } else {
-          // set new slug
-          slugifiedURL = (i ? `${slugifiedURL}-${i}` : slugifiedURL);
-
-          // break if not found
-          break;
-        }
-      }
-
-      // set slug
-      category.set('slug', slugifiedURL);
-
-      // set url
-      let url    = [category.get('slug')];
-      let parent = await category.get('parent');
-      const parents = [];
-
-      // set url
-      while (parent && parent.get) {
-        // push to parents
-        parents.push(parent.get('_id').toString());
-
-        // set url
-        url.push(parent.get('slug'));
-
-        // set parent
-        parent = await parent.get('parent');
-      }
-
-      // set url
-      url.reverse();
-      url = url.join('/');
-
-      // set url
-      category.set('url', url);
-      category.set('parents', parents);
-
-      // return category
-      return category;
-    };
-
-    //
-    // HOOKS
-    //
-
-    // on render
-    this.eden.pre('category.update', slugify);
-    this.eden.pre('category.create', slugify);
-
     // pre category create/update
     this.eden.post('category.create', categoryHelper.list);
     this.eden.post('category.update', categoryHelper.list);
-
-    //
-    // REGISTER BLOCKS
-    //
 
     // register simple block
     blockHelper.block('shop.category.categories', {
@@ -235,6 +161,93 @@ class AdminCategoryController extends Controller {
     });
   }
 
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // HOOK METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * category hook
+   *
+   * @param  {Category} category
+   *
+   * @pre    category.update
+   * @pre    category.create
+   * @return {Promise}
+   */
+  async categoryHook(category) {
+    // get title
+    const title = category.get(`title.${config.get('i18n.fallbackLng')}`);
+
+    // slugify
+    let slugifiedURL = slug(title, {
+      lower : true,
+    });
+
+    // check slug
+    let i = 0;
+
+    // loop until slug available
+    while (true) {
+      // set slug
+      const check = await Category.findOne({
+        slug : (i ? `${slugifiedURL}-${i}` : slugifiedURL),
+      });
+
+      // check id
+      if (check && (!category.get('_id') || category.get('_id').toString() !== check.get('_id').toString())) {
+        // add to i
+        i += 1;
+      } else {
+        // set new slug
+        slugifiedURL = (i ? `${slugifiedURL}-${i}` : slugifiedURL);
+
+        // break if not found
+        break;
+      }
+    }
+
+    // set slug
+    category.set('slug', slugifiedURL);
+
+    // set url
+    let url    = [category.get('slug')];
+    let parent = await category.get('parent');
+    const parents = [];
+
+    // set url
+    while (parent && parent.get) {
+      // push to parents
+      parents.push(parent.get('_id').toString());
+
+      // set url
+      url.push(parent.get('slug'));
+
+      // set parent
+      parent = await parent.get('parent');
+    }
+
+    // set url
+    url.reverse();
+    url = url.join('/');
+
+    // set url
+    category.set('url', url);
+    category.set('parents', parents);
+
+    // return category
+    return category;
+  }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // LIVE METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
+
   /**
    * socket listen action
    *
@@ -274,6 +287,13 @@ class AdminCategoryController extends Controller {
     // add to room
     return await modelHelper.deafen(opts.sessionID, await Category.findById(id), uuid, true);
   }
+
+
+  // ////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTION METHODS
+  //
+  // ////////////////////////////////////////////////////////////////////////////
 
   /**
    * index action
@@ -325,7 +345,7 @@ class AdminCategoryController extends Controller {
       // return object
       return {
         text  : sanitised.title[req.language],
-        value : sanitised.id
+        value : sanitised.id,
       };
     }));
   }
