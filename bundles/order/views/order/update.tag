@@ -196,7 +196,7 @@
     </div>
   </div>
   
-  <order-admin-payment order={ opts.order } loading={ this.loading } ref="payment" />
+  <order-admin-payment order={ this.order } invoice={ this.invoice } loading={ this.loading } on-update={ onPaymentDone } ref="payment" />
 
   <script>
     // do mixin
@@ -325,6 +325,8 @@
       const order = (await eden.router.post(opts.submit || `/admin/shop/order/${this.order.id}/update`, {
         lines : this.order.lines,
       })).result;
+      
+      console.log(order);
 
       // set invoice
       this.order   = order;
@@ -349,6 +351,32 @@
       
       // show payment
       this.refs.payment.show();
+    }
+    
+    /**
+     * on payment done
+     *
+     * @param  {Object} invoice
+     * @param  {Array}  orders
+     */
+    onPaymentDone({ invoice, orders }) {
+      // set orders
+      if (!Array.isArray(orders)) orders = [];
+      
+      // set order
+      const order = orders.find(o => o.id === this.order.id);
+      
+      // set invoice
+      this.invoice = invoice;
+      
+      // set order
+      if (order) this.order = order;
+
+      // on save
+      if (opts.onSave) opts.onSave(order);
+      
+      // udpate view
+      this.update();
     }
 
     /**

@@ -520,8 +520,11 @@ class AdminInvoiceController extends Controller {
 
     // render page
     res.json({
-      result  : await payment.sanitise(),
-      invoice : await invoice.sanitise(),
+      result  : {
+        orders  : await Promise.all(orders.map(order => order.sanitise())),
+        payment : await payment.sanitise(),
+        invoice : await invoice.sanitise(),
+      },
       success : true,
     });
   }

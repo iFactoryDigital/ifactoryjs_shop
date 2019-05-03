@@ -157,12 +157,12 @@
       // success
       if (result.success) {
         // set invoice
-        if (!this.invoice) this.invoice = result.invoice;
+        if (!this.invoice) this.invoice = result.result.invoice;
         
         // set invoice
-        for (let key in result.invoice) {
+        for (let key in result.result.invoice) {
           // update invoice
-          this.invoice[key] = result.invoice[key];
+          this.invoice[key] = result.result.invoice[key];
         }
 
         // go redirect
@@ -172,7 +172,7 @@
         jQuery(this.refs.payment).modal('hide');
         
         // on update
-        if (opts.onUpdate) opts.onUpdate(result);
+        if (opts.onUpdate) opts.onUpdate(result.result);
       }
 
       // set saving
