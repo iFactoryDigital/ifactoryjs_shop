@@ -570,11 +570,11 @@ class AdminOrderController extends Controller {
       .column('invoice', {
         sort   : false,
         title  : 'Invoice',
-        format : async (col, row) => {
+        format : async (col) => {
           // get paid
           return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
         },
-        export : async (col, row) => {
+        export : async (col) => {
           // get invoice
           return col ? col.get('_id').toString() : '';
         },
@@ -698,11 +698,14 @@ class AdminOrderController extends Controller {
         // check pending
         if (param === 'pending') {
           // pending
-          return orderGrid.or({
+          orderGrid.or({
             status : 'pending',
           }, {
             status : null,
           });
+
+          // return no value
+          return;
         }
 
         // user id in

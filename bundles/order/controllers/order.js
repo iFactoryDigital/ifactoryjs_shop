@@ -75,7 +75,7 @@ class OrderController extends Controller {
     const viewOrder = await Order.findById(id);
 
     // Get admins
-    if (opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
+    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
 
     // Add to room
     opts.socket.join(`order.${id}`);
@@ -98,7 +98,7 @@ class OrderController extends Controller {
     const viewOrder = await Order.findById(id);
 
     // Get admins
-    if (opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
+    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
 
     // Add to room
     opts.socket.leave(`order.${id}`);
