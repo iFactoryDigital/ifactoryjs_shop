@@ -585,12 +585,9 @@ class AdminOrderController extends Controller {
         format : async (col, row) => {
         // get invoice
           const invoice = await row.get('invoice');
-          const payment = await Payment.findOne({
-            'invoice.id' : invoice ? invoice.get('_id').toString() : null,
-          });
 
           // get paid
-          return payment && payment.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
+          return invoice && invoice.get('status') === 'paid' ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
         },
       })
       .column('actions.payment.value.type', {
