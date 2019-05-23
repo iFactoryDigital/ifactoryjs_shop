@@ -43,7 +43,7 @@
                 Manual Payment
               </div>
               <div class="card-body">
-                <validate label="Method" required min-length={ 2 } name="method" type="select" options={ [{ label : 'Cash', value : 'cash' }, { label : 'Bank Deposit', value : 'bank' }] } ref="method" />
+                <validate label="Method" required min-length={ 2 } name="method" type="select" options={ [{ label : 'Cash', value : 'cash' }, { label : 'Bank Deposit', value : 'bank' }, { label : 'Cheque', value : 'cheque' }] } ref="method" />
               </div>
             </div>
           </div>

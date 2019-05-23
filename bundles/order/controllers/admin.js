@@ -369,9 +369,9 @@ class AdminOrderController extends Controller {
     let create = true;
 
     // check for website model
-    if (req.params.id) {
+    if (req.params.id || req.body.order) {
       // load by id
-      order = await Order.findById(req.params.id);
+      order = await Order.findById(req.params.id || req.body.order);
       create = false;
     }
 
@@ -448,6 +448,65 @@ class AdminOrderController extends Controller {
 
     // delete website
     await order.remove(req.user);
+
+    // render index
+    return this.indexAction(req, res);
+  }
+
+  /**
+   * delete action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {get} /:id/cancel
+   * @layout  admin
+   */
+  async cancelAction(req, res) {
+    // set website variable
+    let order = false;
+
+    // check for website model
+    if (req.params.id) {
+      // load user
+      order = await Order.findById(req.params.id);
+    }
+
+    // render page
+    res.render('order/admin/cancel', {
+      title : `Remove ${order.get('_id').toString()}`,
+      order : await order.sanitise(),
+    });
+  }
+
+  /**
+   * delete action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {post} /:id/remove
+   * @title   order Administration
+   * @layout  admin
+   */
+  async cancelSubmitAction(req, res) {
+    // set website variable
+    let order = false;
+
+    // check for website model
+    if (req.params.id) {
+      // load user
+      order = await Order.findById(req.params.id);
+    }
+
+    // alert Removed
+    req.alert('success', `Successfully cancelled ${order.get('_id').toString()}`);
+
+    // set status
+    order.set('status', 'cancelled');
+
+    // delete website
+    await order.save(req.user);
 
     // render index
     return this.indexAction(req, res);
