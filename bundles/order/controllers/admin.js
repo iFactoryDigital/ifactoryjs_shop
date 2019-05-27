@@ -610,12 +610,12 @@ class AdminOrderController extends Controller {
           // get invoice
           const invoice = await row.get('invoice');
 
-          // check invoice
-          if (!invoice || !invoice.get('total')) return '<i>N/A</i>';
-
           // return invoice total
-          return formatter.format(invoice.get('total'), {
-            code : invoice.get('currency') || config.get('shop.currency') || 'USD',
+          return formatter.format((invoice ? invoice.get('total') : row.get('total')) || row.get('lines').reduce((accum, line) => {
+            // return value
+            return accum + line.total;
+          }, 0), {
+            code : (invoice ? invoice.get('currency') : null) || config.get('shop.currency') || 'USD',
           });
         },
       })
@@ -649,12 +649,18 @@ class AdminOrderController extends Controller {
           return invoice && invoice.get('status') === 'paid' ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
         },
       })
-      .column('actions.payment.value.type', {
+      .column('method', {
         sort   : true,
         title  : 'Method',
-        format : (col) => {
-          // get paid
-          return col ? req.t(`${col}.title`) : '<i>N/A</i>';
+        format : async (col, row) => {
+          // get payments
+          const payments = await Payment.where({
+            complete     : true,
+            'invoice.id' : row.get('invoice.id'),
+          }).find();
+
+          // return payments
+          return payments.length ? payments.map(payment => payment.get('method.type')).join(', ') : '<i>N/A</i>';
         },
       })
       .column('updated_at', {

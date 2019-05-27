@@ -67,7 +67,7 @@ class Order extends Model {
       sent     : this.get('sent'),
       error    : this.get('error'),
       lines    : this.get('lines'),
-      status   : this.get('status') || 'pending',
+      status   : this.get('status') || 'draft',
       actions  : this.get('actions'),
       created  : this.get('created_at'),
       invoice  : (await this.get('invoice')) ? await (await this.get('invoice')).sanitise() : null,

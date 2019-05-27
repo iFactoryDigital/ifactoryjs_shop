@@ -3,7 +3,6 @@
     "title"      : "Order",
     "items"      : "items totalling",
     "number"     : "Number",
-    "payment"    : "Payment",
     "mailing"    : "Mailing",
     "shipping"   : "Shipping",
     "completed"  : "Completed",
@@ -15,6 +14,7 @@
 
     "status" : {
       "paid"      : "Paid",
+      "draft"     : "Draft",
       "pending"   : "Pending",
       "deployed"  : "Deployed",
       "deploying" : "Deploying"
