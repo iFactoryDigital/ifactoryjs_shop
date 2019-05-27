@@ -656,11 +656,11 @@ class AdminOrderController extends Controller {
           // get payments
           const payments = await Payment.where({
             complete     : true,
-            'invoice.id' : row.get('invoice.id'),
+            'invoice.id' : row.get('invoice.id') || 'null',
           }).find();
 
           // return payments
-          return payments.length ? payments.map(payment => payment.get('method.type')).join(', ') : '<i>N/A</i>';
+          return payments.length ? payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id')}/update">${payment.get('method.type')}</a>`).join(',<br>') : '<i>N/A</i>';
         },
       })
       .column('updated_at', {
