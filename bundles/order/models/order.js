@@ -56,7 +56,7 @@ class Order extends Model {
    *
    * @return {Object}
    */
-  async sanitise() {
+  async sanitise(args = {}) {
     // get address
     const address = await this.get('address');
 
@@ -85,7 +85,9 @@ class Order extends Model {
 
     // run hook
     await eden.hook('order.sanitise', {
+      args,
       order : this,
+
       sanitised,
     });
 
