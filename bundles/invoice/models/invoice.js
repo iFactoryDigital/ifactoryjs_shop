@@ -32,7 +32,7 @@ class Invoice extends Model {
     // load payments
     const invoicePayments = (await Payment.where({
       'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
-    }).ne('method.type', null).find() || []);
+    }).find() || []);
 
     // load payments
     const payments = invoicePayments.map((invoicePayment) => {
@@ -40,8 +40,16 @@ class Invoice extends Model {
       return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
     });
 
+    // get total
+    const total = this.get('total') || (await this.get('orders') || []).reduce((accum, order) => {
+      // return accumulated
+      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0);
+    }, 0);
+
     // return sanitised bot
     const sanitised = {
+      total,
+
       id   : this.get('_id') ? this.get('_id').toString() : false,
       rate : this.get('rate'),
       paid : (payments.length ? payments : [0]).reduce((a, b) => {
@@ -49,8 +57,7 @@ class Invoice extends Model {
         return a + b;
       }),
       note   : this.get('note'),
-      total  : this.get('total'),
-      status : this.get('total') <= (payments.length ? payments : [0]).reduce((a, b) => {
+      status : total <= (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
       }) ? 'paid' : (payments.length ? payments : [0]).reduce((a, b) => {
