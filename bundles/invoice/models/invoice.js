@@ -24,6 +24,39 @@ class Invoice extends Model {
   }
 
   /**
+   * returns if order has been paid
+   * 
+   * @param {Array} invoicePayments
+   */
+  async hasPaid(invoicePayments) {
+    // load payments
+    if (!invoicePayments) {
+      // payments
+      invoicePayments = (await Payment.where({
+        'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
+      }).find() || []);
+    }
+
+    // load payments
+    const payments = invoicePayments.map((invoicePayment) => {
+      // return sanitised images
+      return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
+    });
+
+    // get total
+    const total = this.get('total') || (await this.get('orders') || []).reduce((accum, order) => {
+      // return accumulated
+      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0);
+    }, 0);
+
+    // return
+    return (payments.length ? payments : [0]).reduce((a, b) => {
+      // return a + b
+      return a + b;
+    }) > total;
+  }
+
+  /**
    * sanitises bot
    *
    * @return {Object}

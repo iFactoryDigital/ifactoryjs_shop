@@ -12,6 +12,7 @@ const Model = require('model');
 
 // load product model
 const Product = model('product');
+const Invoice = model('invoice');
 
 /**
  * create order class
@@ -60,6 +61,11 @@ class Order extends Model {
     // get address
     const address = await this.get('address');
 
+    // find invoice
+    const invoice = await this.get('invoice') || await Invoice.findOne({
+      'orders.id' : this.get('_id'),
+    });
+
     // return sanitised bot
     const sanitised = {
       id       : this.get('_id') ? this.get('_id').toString() : null,
@@ -70,7 +76,7 @@ class Order extends Model {
       status   : this.get('status') || 'draft',
       actions  : this.get('actions'),
       created  : this.get('created_at'),
-      invoice  : (await this.get('invoice')) ? await (await this.get('invoice')).sanitise() : null,
+      invoice  : invoice ? await invoice.sanitise() : null,
       redirect : this.get('redirect'),
       products : await Promise.all((this.get('lines') || []).map(async (line) => {
         // get product

@@ -120,9 +120,13 @@ class AdminOrderController extends Controller {
     }, async (req, field, value) => {
       // set tag
       field.tag = 'order';
+      // eslint-disable-next-line no-nested-ternary
       field.value = value ? (Array.isArray(value) ? await Promise.all(value.map(item => item.sanitise())) : await value.sanitise()) : null;
+
       // return
       return field;
+
+      // eslint-disable-next-line no-unused-vars
     }, async (req, field) => {
       // save field
     }, async (req, field, value, old) => {
@@ -646,7 +650,7 @@ class AdminOrderController extends Controller {
           const invoice = await row.get('invoice');
 
           // get paid
-          return invoice && invoice.get('status') === 'paid' ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
+          return invoice && (await invoice.sanitise()).paid ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
         },
       })
       .column('method', {
