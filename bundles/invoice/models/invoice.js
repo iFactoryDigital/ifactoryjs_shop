@@ -25,7 +25,7 @@ class Invoice extends Model {
 
   /**
    * returns if order has been paid
-   * 
+   *
    * @param {Array} invoicePayments
    */
   async hasPaid(invoicePayments) {
@@ -83,13 +83,11 @@ class Invoice extends Model {
     const sanitised = {
       total,
 
-      id   : this.get('_id') ? this.get('_id').toString() : false,
-      rate : this.get('rate'),
-      paid : (payments.length ? payments : [0]).reduce((a, b) => {
-        // return a + b
-        return a + b;
-      }),
+      id     : this.get('_id') ? this.get('_id').toString() : false,
+      rate   : this.get('rate'),
+      paid   : await this.hasPaid(invoicePayments),
       note   : this.get('note'),
+      // eslint-disable-next-line no-nested-ternary
       status : total <= (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
