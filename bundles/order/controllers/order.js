@@ -6,6 +6,7 @@ const Controller = require('controller');
 // require models
 const Sold    = model('sold');
 const Order   = model('order');
+const Invoice = model('invoice');
 const Product = model('product');
 
 // require helpers
@@ -31,8 +32,8 @@ class OrderController extends Controller {
     // bind build method
     this.build = this.build.bind(this);
 
-    // bind private methods
-    this._status = this._status.bind(this);
+    // bind methods
+    this.orderUpdateHook = this.orderUpdateHook.bind(this);
 
     // build order controller
     this.build();
@@ -49,9 +50,7 @@ class OrderController extends Controller {
    * builds order controller
    */
   build() {
-    // on order change
-    this.eden.pre('order.create', this._status);
-    this.eden.pre('order.update', this._status);
+    
   }
 
 
@@ -199,19 +198,24 @@ class OrderController extends Controller {
    * pre order update
    *
    * @param  {order} Order
+   *
+   * @pre order.update
+   * @pre order.create
    */
-  async _status(orderStatus) {
+  async orderUpdateHook(orderStatus) {
     // load invoice
-    const invoice = await orderStatus.get('invoice');
+    const invoice = await orderStatus.get('invoice') || await Invoice.findOne({
+      'orders.id' : orderStatus.get('_id'),
+    });
 
     // check invoice
     if (!invoice) return;
 
-    // sanitise invoice
-    const sanitised = await invoice.sanitise();
+    // set invoice
+    orderStatus.set('invoice', invoice);
 
     // set status
-    if (orderStatus.get('status') !== 'paid' && sanitised.paid) {
+    if (orderStatus.get('status') !== 'paid' && await invoice.hasPaid()) {
       // emit paid
       invoice.set('status', 'paid');
       orderStatus.set('status', 'paid');

@@ -655,7 +655,7 @@ class AdminOrderController extends Controller {
       })
       .column('method', {
         sort   : true,
-        title  : 'Method',
+        title  : 'Method(s)',
         format : async (col, row) => {
           // get payments
           const payments = await Payment.where({
@@ -664,7 +664,7 @@ class AdminOrderController extends Controller {
           }).find();
 
           // return payments
-          return payments.length ? payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id')}/update">${payment.get('method.type')}</a>`).join(',<br>') : '<i>N/A</i>';
+          return payments.length ? payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id')}/update">$${payment.get('amount').toFixed(2)} ${payment.get('currency')}, by ${payment.get('method.type')}</a>`).join(',<br>') : '<i>N/A</i>';
         },
       })
       .column('updated_at', {

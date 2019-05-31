@@ -32,9 +32,9 @@ class Invoice extends Model {
     // load payments
     if (!invoicePayments) {
       // payments
-      invoicePayments = (await Payment.where({
+      invoicePayments = await Payment.where({
         'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
-      }).find() || []);
+      }).find() || [];
     }
 
     // load payments
@@ -53,7 +53,7 @@ class Invoice extends Model {
     return (payments.length ? payments : [0]).reduce((a, b) => {
       // return a + b
       return a + b;
-    }) > total;
+    }) >= total;
   }
 
   /**
