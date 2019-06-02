@@ -1,20 +1,14 @@
 
 // bind dependencies
-const config     = require('config');
 const Controller = require('controller');
 
 // require models
-const Sold    = model('sold');
-const Order   = model('order');
-const Invoice = model('invoice');
-const Product = model('product');
+const Order = model('order');
 
 // require helpers
-const GridHelper    = helper('grid');
-const orderHelper   = helper('order');
-const emailHelper   = helper('email');
-const modelHelper   = helper('model');
-const productHelper = helper('product');
+const GridHelper  = helper('grid');
+const orderHelper = helper('order');
+const modelHelper = helper('model');
 
 /**
  * build cart controller
