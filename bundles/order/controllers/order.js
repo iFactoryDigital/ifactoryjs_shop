@@ -215,10 +215,13 @@ class OrderController extends Controller {
     orderStatus.set('invoice', invoice);
 
     // set status
-    if (orderStatus.get('status') !== 'paid' && await invoice.hasPaid()) {
-      // emit paid
+    if (!orderStatus.get('complete') && await invoice.hasPaid()) {
+      // set invoice
       invoice.set('status', 'paid');
+
+      // set order
       orderStatus.set('status', 'paid');
+      orderStatus.set('complete', new Date());
 
       // save order
       await invoice.save(await invoice.get('user'));
