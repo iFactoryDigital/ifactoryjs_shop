@@ -32,9 +32,6 @@ class OrderController extends Controller {
     // bind build method
     this.build = this.build.bind(this);
 
-    // bind methods
-    this.orderUpdateHook = this.orderUpdateHook.bind(this);
-
     // build order controller
     this.build();
   }
@@ -213,8 +210,8 @@ class OrderController extends Controller {
 
     // add grid filters
     orderGrid.filter('status', {
-      title : 'Status',
       type  : 'select',
+      title : 'Status',
       query : (param) => {
         if (!param.toString().length || param.toString() === 'all') return;
 
