@@ -1,9 +1,10 @@
 {
   "invoice" : {
     "status" : {
-      "paid"    : "Paid",
-      "unpaid"  : "Unpaid",
-      "partial" : "Partially Paid"
+      "paid"     : "Paid",
+      "unpaid"   : "Unpaid",
+      "partial"  : "Partially Paid",
+      "approval" : "Pending Approval"
     }
   }
 }

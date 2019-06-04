@@ -37,6 +37,7 @@ class Payment extends Model {
     const sanitised = {
       id       : this.get('_id') ? this.get('_id').toString() : null,
       data     : this.get('data'),
+      state    : this.get('state'),
       method   : this.get('method'),
       amount   : this.get('amount'),
       details  : this.get('details'),

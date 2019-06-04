@@ -220,14 +220,11 @@ class AdminPaymentController extends Controller {
     // set details
     if (!payment.get('complete') && req.body.paid === 'paid') {
       // set details
-      payment.set('complete', true);
-      payment.set('method', {
-        type : 'manual',
-      });
       payment.set('manual', {
         updated : new Date(),
       });
       payment.set('manual.by', req.user);
+      payment.set('complete', true);
 
       // unset data
       payment.unset('data');
@@ -393,7 +390,7 @@ class AdminPaymentController extends Controller {
         sort   : true,
         title  : 'Method',
         format : async (col, row) => {
-          return col || '<i>N/A</i>';
+          return col ? req.t(`${col}.title`) : '<i>N/A</i>';
         },
       })
       .column('details', {

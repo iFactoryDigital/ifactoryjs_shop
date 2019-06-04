@@ -16,6 +16,7 @@
       "paid"      : "Paid",
       "draft"     : "Draft",
       "pending"   : "Pending",
+      "approval"  : "Approval Required",
       "deployed"  : "Deployed",
       "deploying" : "Deploying"
     }

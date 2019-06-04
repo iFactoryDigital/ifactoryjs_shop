@@ -494,7 +494,7 @@ class AdminInvoiceController extends Controller {
       payment.set('method', {
         type : req.body.method,
       });
-      payment.set('complete', true);
+      payment.set('state', 'approval');
 
       // save payment
       await payment.save(req.user);

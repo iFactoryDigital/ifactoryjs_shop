@@ -57,6 +57,30 @@ class Invoice extends Model {
   }
 
   /**
+   * returns has payment requiring approval
+   *
+   * @param {*} invoicePayments 
+   */
+  async hasApproval(invoicePayments) {
+    // load payments
+    if (!invoicePayments) {
+      // payments
+      invoicePayments = await Payment.where({
+        'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
+      }).find() || [];
+    }
+
+    // load payments
+    const payments = (invoicePayments.map((invoicePayment) => {
+      // return sanitised images
+      return invoicePayment.get('state') === 'approval' ? invoicePayment.get('amount') : 0;
+    })).reduce((accum, amount) => accum + amount, 0);
+    
+    // return approval
+    return payments;
+  }
+
+  /**
    * sanitises bot
    *
    * @return {Object}
@@ -91,10 +115,11 @@ class Invoice extends Model {
       status : total <= (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
+      // eslint-disable-next-line no-nested-ternary
       }) ? 'paid' : (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
-      }) > 0 ? 'partial' : 'unpaid',
+      }) > 0 ? 'partial' : (this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
       discount : this.get('discount') || 0,
       currency : this.get('currency'),
       payments : await Promise.all(invoicePayments.map((invoicePayment) => {

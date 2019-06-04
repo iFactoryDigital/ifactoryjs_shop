@@ -5,5 +5,14 @@
     "order" : {
       "title" : "Payment"
     }
+  },
+  "bank" : {
+    "title" : "Bank Deposit"
+  },
+  "cash" : {
+    "title" : "Cash"
+  },
+  "cheque" : {
+    "title" : "Cheque"
   }
 }

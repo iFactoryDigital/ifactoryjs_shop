@@ -14,10 +14,8 @@ const productHelper = helper('product');
 
 /**
  * build cart controller
- *
- * @mount /order
  */
-class OrderDaemon extends Daemon {
+class AllOrderDaemon extends Daemon {
   /**
    * construct user cart controller
    */
@@ -76,17 +74,22 @@ class OrderDaemon extends Daemon {
     // set invoice
     orderStatus.set('invoice', invoice);
 
+    // check pending paid
+    if (!await invoice.hasPaid() && await invoice.hasApproval() && orderStatus.get('status') !== 'approval') {
+      // set order
+      orderStatus.set('status', 'approval');
+
+      // save order
+      await orderStatus.save(await orderStatus.get('user'));
+    }
+
     // set status
     if (!orderStatus.get('complete') && await invoice.hasPaid()) {
-      // set invoice
-      invoice.set('status', 'paid');
-
       // set order
       orderStatus.set('status', 'paid');
       orderStatus.set('complete', new Date());
 
       // save order
-      await invoice.save(await invoice.get('user'));
       await orderStatus.save(await orderStatus.get('user'));
 
       // emit create
@@ -189,6 +192,6 @@ class OrderDaemon extends Daemon {
 /**
  * export order daemon
  *
- * @type {OrderDaemon}
+ * @type {AllOrderDaemon}
  */
-exports = module.exports = OrderDaemon;
+exports = module.exports = AllOrderDaemon;

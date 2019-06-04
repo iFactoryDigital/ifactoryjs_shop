@@ -269,11 +269,12 @@
     this.invoice  = opts.invoice;
     this.discount = (this.invoice || {}).discount || 0;
     this.colors   = {
-      'paid'    : 'success',
-      'sent'    : 'primary',
-      'partial' : 'warning',
-      'unpaid'  : 'danger',
-      'pending' : 'info',
+      'paid'     : 'success',
+      'sent'     : 'primary',
+      'partial'  : 'warning',
+      'unpaid'   : 'danger',
+      'pending'  : 'info',
+      'approval' : 'warning',
     };
 
     /**

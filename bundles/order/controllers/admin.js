@@ -658,13 +658,12 @@ class AdminOrderController extends Controller {
         title  : 'Method(s)',
         format : async (col, row) => {
           // get payments
-          const payments = await Payment.where({
-            complete     : true,
+          const payments = (await Payment.where({
             'invoice.id' : row.get('invoice.id') || 'null',
-          }).find();
+          }).find()).filter(item => item.get('complete') || item.get('state') === 'approval');
 
           // return payments
-          return payments.length ? payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id')}/update">$${payment.get('amount').toFixed(2)} ${payment.get('currency')}, by ${payment.get('method.type')}</a>`).join(',<br>') : '<i>N/A</i>';
+          return payments.length ? payments.map(payment => `<a href="/admin/shop/payment/${payment.get('_id')}/update">$${payment.get('amount').toFixed(2)} ${payment.get('currency')} by ${req.t(`${payment.get('method.type')}.title`)}${payment.get('state') === 'approval' ? ' (Unapproved)' : ''}</a>`).join(',<br>') : '<i>N/A</i>';
         },
       })
       .column('updated_at', {
