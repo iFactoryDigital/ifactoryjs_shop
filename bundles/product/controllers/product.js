@@ -71,51 +71,31 @@ class ProductController extends Controller {
     });
 
     // register simple block
-    blockHelper.block('frontend.products', {
-      acl         : [],
+    blockHelper.block('frotend.products', {
       for         : ['frontend'],
       title       : 'Products List',
-      description : 'Shows list of products',
+      description : 'Lets list product cards in a block',
     }, async (req, block) => {
-      // Get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
+      // get products
+      const query = await Product.where({
+        promoted : true,
       });
 
-      // Create new req
-      const fauxReq = {
-        user  : req.user,
-        query : blockModel.get('state') || {},
+      // set data
+      const data = {
+        query,
+        req
       };
 
-      // Return
+      // hook
+      await this.eden.hook('frontend.products.query', data);
+
+      // return
       return {
-        tag   : 'product-grid',
-        name  : 'Products',
-        grid  : await (await this._grid(req)).render(fauxReq),
-        class : blockModel.get('class') || null,
-        title : blockModel.get('title') || '',
+        tag      : 'products',
+        products : await Promise.all((await data.query.find()).map(product => product.sanitise())),
       };
-    }, async (req, block) => {
-      // Get notes block from db
-      const blockModel = await Block.findOne({
-        uuid : block.uuid,
-      }) || new Block({
-        uuid : block.uuid,
-        type : block.type,
-      });
-
-      // Set data
-      blockModel.set('class', req.body.data.class);
-      blockModel.set('state', req.body.data.state);
-      blockModel.set('title', req.body.data.title);
-
-      // Save block
-      await blockModel.save(req.user);
-    });
+    }, async (req, block) => { });
 
     // register simple block
     blockHelper.block('frotend.product', {

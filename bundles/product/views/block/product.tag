@@ -1,12 +1,12 @@
 <block-product>
-  <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } on-remove={ opts.onRemove } on-card={ onCard } on-product={ onProduct } block={ opts.block } data={ opts.data } ref="block" class="block-notes">  
+  <block on-refresh={ opts.onRefresh } on-save={ opts.onSave } on-remove={ opts.onRemove } on-card={ onCard } on-product={ onProduct } block={ opts.block } data={ opts.data } ref="block" class="block-notes">
     <yield to="body">
       <div data-is="product-{ opts.data.product.type }-card" product={ opts.data.product } class={ opts.block.card } />
       <div if={ !opts.block.product } class="py-5 text-center">Add Product</div>
     </yield>
-    
+
     <yield to="modal">
-    
+
       <div class="form-group">
         <label>
           Product ID
@@ -19,13 +19,13 @@
         </label>
         <input class="form-control" ref="card" value={ opts.block.card } onchange={ opts.onCard } />
       </div>
-      
+
     </yield>
-    
+
   </block>
 
   <script>
-    
+
     /**
      * on product row
      *
@@ -38,7 +38,7 @@
       // do update
       opts.onSave(opts.block, opts.data, opts.placement);
     }
-      
+
     /**
      * on product row
      *
