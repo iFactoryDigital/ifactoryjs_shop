@@ -280,7 +280,7 @@ class CartStore extends Events {
     // reduce for total
     return quantities.reduce((a, b) => {
       // return sum
-      return (parseInt(a) + parseInt(b));
+      return (parseInt(a, 10) + parseInt(b, 10));
     });
   }
 
@@ -290,13 +290,15 @@ class CartStore extends Events {
    * @param  {Array}  lines
    * @param  {Object} payment
    * @param  {Object} address
+   *
+   * @return {*}
    */
   async order(lines, payment, address) {
     // socket call
     const order = await socket.call('order.create', lines, payment, address);
 
     // check error
-    if (order.error) return;
+    if (order.error) return null;
 
     // redirect
     if (order.invoice.redirect) {
@@ -306,8 +308,11 @@ class CartStore extends Events {
       // update view
       this.update();
 
+      // set value
+      window.location = order.invoice.redirect;
+
       // return redirect
-      return window.location = order.invoice.redirect;
+      return null;
     }
 
     // redirect
