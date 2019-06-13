@@ -89,7 +89,7 @@ class AdminInvoiceController extends Controller {
       return {
         tag   : 'grid',
         name  : 'Invoices',
-        grid  : await this._grid(req).render(fauxReq),
+        grid  : await (await this._grid(req)).render(fauxReq),
         class : blockModel.get('class') || null,
         title : blockModel.get('title') || '',
       };
