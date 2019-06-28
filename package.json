@@ -1,8 +1,9 @@
 {
   "name": "@edenjs/shop",
   "description": "",
-  "version": "1.3.14",
+  "version": "1.3.17",
   "dependencies": {
+    "@edenjs/user-settings": "^1.0.1",
     "currency-converter": "^0.1.12",
     "currency-formatter": "^1.5.3",
     "escape-string-regexp": "^2.0.0",
