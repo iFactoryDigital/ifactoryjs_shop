@@ -2,11 +2,11 @@
 const config = {};
 
 config.js = [
-  './node_modules/summernote/dist/summernote-bs4.js',
+//  './node_modules/summernote/dist/summernote-bs4.js',
 ];
 
 config.sass = [
-  './node_modules/summernote/dist/summernote-bs4.css',
+//  './node_modules/summernote/dist/summernote-bs4.css',
 ];
 
 // set shop config
