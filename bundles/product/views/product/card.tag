@@ -4,7 +4,7 @@
     <div class="card-product-admin" if={ this.acl.validate('admin') }>
       <div class="btn-group">
         <a href="/admin/shop/product/{ opts.product.id }/update" class="btn btn-info">
-          <i class="fa fa-pencil" />
+          <i class="fa fa-pencil-alt" />
         </a>
         <a href="/admin/shop/product/{ opts.product.id }/remove" class="btn btn-danger">
           <i class="fa fa-times" />
