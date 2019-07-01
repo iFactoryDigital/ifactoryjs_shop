@@ -718,7 +718,7 @@ class AdminInvoiceController extends Controller {
             '<div class="btn-group btn-group-sm" role="group">',
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/print" class="btn btn-info" target="_blank"><i class="fa fa-print"></i></a>`,
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil"></i></a>`,
+            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil-alt"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');

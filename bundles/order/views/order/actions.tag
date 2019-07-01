@@ -1,7 +1,7 @@
 <order-actions>
   <div class="btn-group btn-group-sm" role="group">
     <a href="/admin/shop/order/{ opts.row._id }/update" class="btn btn-primary" onclick={ onUpdate }>
-      <i class="fa fa-pencil" />
+      <i class="fa fa-pencil-alt" />
     </a>
     <a href="/admin/shop/order/{ opts.row._id }/remove" class="btn btn-danger" onclick={ onRemove }>
       <i class="fa fa-times" />
