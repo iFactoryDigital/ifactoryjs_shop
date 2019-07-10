@@ -34,7 +34,7 @@ class AllInvoiceDaemon extends Daemon {
    * builds order controller
    */
   build() {
-    
+
   }
 
 
@@ -69,4 +69,4 @@ class AllInvoiceDaemon extends Daemon {
  *
  * @type {AllInvoiceDaemon}
  */
-exports = module.exports = AllInvoiceDaemon;
+module.exports = AllInvoiceDaemon;

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * Created by Awesome on 3/6/2016.
  */
@@ -42,8 +43,7 @@ class InvoiceHelper extends Helper {
    */
   async invoice(order) {
     // get lines
-    const user  = await order.get('user');
-    const lines = order.get('lines');
+    const user = await order.get('user');
 
     // create new invoice
     const invoice = await order.get('invoice') || new Invoice({

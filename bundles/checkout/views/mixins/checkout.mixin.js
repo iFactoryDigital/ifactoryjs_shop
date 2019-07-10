@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 
 // create mixin
 riot.mixin('checkout', {
@@ -22,6 +23,7 @@ riot.mixin('checkout', {
         const y = b.priority || 0;
 
         // return action
+        // eslint-disable-next-line no-nested-ternary
         return x < y ? -1 : x > y ? 1 : 0;
       });
 

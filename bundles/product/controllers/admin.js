@@ -157,6 +157,7 @@ class AdminProductController extends Controller {
     let i = 0;
 
     // Loop until slug available
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // Set slug
       const check = await Product.findOne({
@@ -166,7 +167,7 @@ class AdminProductController extends Controller {
       // Check id
       if (check && product.get('_id') && product.get('_id').toString() !== check.get('_id').toString()) {
         // Add to i
-        i++;
+        i += 1;
       } else {
         // Set new slug
         slugifiedTitle = (i ? `${slugifiedTitle}-${i}` : slugifiedTitle);
@@ -252,13 +253,11 @@ class AdminProductController extends Controller {
    */
   async getAction(req, res) {
     // Set website variable
-    let create  = true;
     let product = new Product();
 
     // Check for website model
     if (req.params.id) {
       // Load by id
-      create = false;
       product = await Product.findById(req.params.id);
     }
 
@@ -535,9 +534,6 @@ class AdminProductController extends Controller {
     productGrid.model(Product);
     productGrid.models(true);
 
-    // get form
-    const form = await formHelper.get('shop.product');
-
     // Add grid filters
     productGrid.filter('sku', {
       title : 'SKU',
@@ -648,4 +644,4 @@ class AdminProductController extends Controller {
  *
  * @type {AdminProductController}
  */
-exports = module.exports = AdminProductController;
+module.exports = AdminProductController;

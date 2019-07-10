@@ -64,7 +64,7 @@ class CartController extends Controller {
         class    : block.class || null,
         dropdown : block.dropdown || null,
       };
-    }, async (req, block) => {});
+    }, async () => {});
   }
 
 
@@ -252,7 +252,7 @@ class CartController extends Controller {
     res.locals.cart = await cart.sanitise();
 
     // Run next
-    next();
+    return next();
   }
 }
 
@@ -261,4 +261,4 @@ class CartController extends Controller {
  *
  * @type {CartController}
  */
-exports = module.exports = CartController;
+module.exports = CartController;

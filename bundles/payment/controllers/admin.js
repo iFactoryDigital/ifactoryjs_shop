@@ -346,6 +346,7 @@ class AdminPaymentController extends Controller {
     // check invoice
     if (((req || {}).params || {}).invoice) {
       // set id
+      // eslint-disable-next-line prefer-destructuring
       invoice = req.params.invoice;
     } else if (invoice) {
       // set id
@@ -389,14 +390,14 @@ class AdminPaymentController extends Controller {
       .column('method.type', {
         sort   : true,
         title  : 'Method',
-        format : async (col, row) => {
+        format : async (col) => {
           return col ? req.t(`${col}.title`) : '<i>N/A</i>';
         },
       })
       .column('details', {
         sort   : true,
         title  : 'Details',
-        format : async (col, row) => {
+        format : async (col) => {
           return col || '<i>N/A</i>';
         },
       });
@@ -418,6 +419,7 @@ class AdminPaymentController extends Controller {
       sort   : true,
       title  : 'Error',
       format : async (col) => {
+        // eslint-disable-next-line no-nested-ternary
         return col && col.text ? col.text : (col ? JSON.stringify(col) : '<i>N/A</i>');
       },
     })
@@ -533,4 +535,4 @@ class AdminPaymentController extends Controller {
  *
  * @type {AdminPaymentController}
  */
-exports = module.exports = AdminPaymentController;
+module.exports = AdminPaymentController;

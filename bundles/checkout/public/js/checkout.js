@@ -1,10 +1,10 @@
+/* eslint-disable no-nested-ternary */
 
 // require dependencies
 const Events = require('events');
 
 // require local dependencies
 const store        = require('default/public/js/store');
-const socket       = require('socket/public/js/bootstrap');
 const cartStore    = require('cart/public/js/cart');
 const productStore = require('product/public/js/product');
 
@@ -191,7 +191,7 @@ class CheckoutStore extends Events {
 
     // set opts
     const opts = {
-      total    : total,
+      total,
       lines    : this.lines,
       actions  : this.actions,
       discount : 0,
@@ -229,4 +229,4 @@ store.set('checkout', builtStore);
 /**
 * export built store
 */
-exports = module.exports = builtStore;
+module.exports = builtStore;

@@ -27,9 +27,9 @@ class Product extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.sanitise = this.sanitise.bind(this);
@@ -109,16 +109,21 @@ class Product extends Model {
     const form = await formHelper.get('shop.product');
 
     // add other fields
-    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.product.fields').slice(0)).map(async (field, i) => {
+    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.product.fields').slice(0)).map(async (field) => {
       // set field name
       const fieldName = field.name || field.uuid;
 
       // set sanitised
       sanitised[fieldName] = await this.get(fieldName);
+      // eslint-disable-next-line max-len
       sanitised[fieldName] = sanitised[fieldName] && sanitised[fieldName].sanitise ? await sanitised[fieldName].sanitise() : sanitised[fieldName];
+      // eslint-disable-next-line max-len
       sanitised[fieldName] = Array.isArray(sanitised[fieldName]) ? await Promise.all(sanitised[fieldName].map((val) => {
         // return sanitised value
         if (val.sanitise) return val.sanitise();
+
+        // return val
+        return val;
       })) : sanitised[fieldName];
     }));
 
@@ -153,4 +158,4 @@ class Product extends Model {
  *
  * @type {Product}
  */
-exports = module.exports = Product;
+module.exports = Product;

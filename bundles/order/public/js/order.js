@@ -126,10 +126,10 @@ class OrderStore extends Events {
     order = order || {};
 
     // loop for keys
-    for (const key in order) {
+    Object.keys(order).forEach((key) => {
       // set key
       this[key] = order[key];
-    }
+    });
 
     // set cart
     this.order = order;
@@ -144,4 +144,4 @@ class OrderStore extends Events {
  *
  * @return {OrderStore}
  */
-exports = module.exports = OrderStore;
+module.exports = OrderStore;

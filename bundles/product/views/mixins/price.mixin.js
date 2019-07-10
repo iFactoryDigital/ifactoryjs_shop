@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 
 // create mixin
 riot.mixin('product', {
@@ -7,7 +8,7 @@ riot.mixin('product', {
   init() {
     // set value
     this.product = {
-      price : (product, opts) => {
+      price : (product) => {
         // let price
         return product.price.amount;
       },

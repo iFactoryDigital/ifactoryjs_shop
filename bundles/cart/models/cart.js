@@ -22,9 +22,9 @@ class Cart extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.sanitise = this.sanitise.bind(this);
@@ -63,4 +63,4 @@ class Cart extends Model {
  *
  * @type {cart}
  */
-exports = module.exports = Cart;
+module.exports = Cart;

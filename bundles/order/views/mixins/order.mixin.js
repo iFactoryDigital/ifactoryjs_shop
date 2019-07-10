@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 
 // create mixin
 riot.mixin('order', {
@@ -22,7 +23,7 @@ riot.mixin('order', {
       // reduce for total
       return quantities.reduce((a, b) => {
         // return sum
-        return (parseInt(a) + parseInt(b));
+        return (parseInt(a, 10) + parseInt(b, 10));
       });
     };
     this.order.total = () => {
@@ -48,8 +49,10 @@ riot.mixin('order', {
     if (!this.eden.frontend) return;
 
     // set this store
-    this.order = require('order/public/js/order');
-    this.order = new this.order(this.eden.get('state').order);
+    const Order = require('order/public/js/order');
+
+    // set order
+    this.order = new Order(this.eden.get('state').order);
 
     // on update
     this.order.on('update', this.update);

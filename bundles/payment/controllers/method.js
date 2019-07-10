@@ -8,13 +8,6 @@ const Controller = require('controller');
  * @extends Controller
  */
 class PaymentMethodController extends Controller {
-  /**
-   * Construct Stripe Controller class
-   */
-  constructor() {
-    // Run super
-    super();
-  }
 }
 
 /**
@@ -22,4 +15,4 @@ class PaymentMethodController extends Controller {
  *
  * @type {PaymentMethodController}
  */
-exports = module.exports = PaymentMethodController;
+module.exports = PaymentMethodController;

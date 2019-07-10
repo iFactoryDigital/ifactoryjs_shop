@@ -5,12 +5,10 @@ const config     = require('config');
 const Controller = require('controller');
 
 // require models
-const Block    = model('block');
 const Product  = model('product');
 const Category = model('category');
 
 // get helpers
-const formHelper    = helper('form');
 const blockHelper   = helper('cms/block');
 const productHelper = helper('product');
 
@@ -75,7 +73,7 @@ class ProductController extends Controller {
       for         : ['frontend'],
       title       : 'Products List',
       description : 'Lets list product cards in a block',
-    }, async (req, block) => {
+    }, async (req) => {
       // get products
       const query = await Product.where({
         promoted : true,
@@ -84,7 +82,7 @@ class ProductController extends Controller {
       // set data
       const data = {
         query,
-        req
+        req,
       };
 
       // hook
@@ -95,7 +93,7 @@ class ProductController extends Controller {
         tag      : 'products',
         products : await Promise.all((await data.query.find()).map(product => product.sanitise())),
       };
-    }, async (req, block) => { });
+    }, async () => { });
 
     // register simple block
     blockHelper.block('frotend.product', {
@@ -111,23 +109,23 @@ class ProductController extends Controller {
         tag     : 'product',
         product : product ? await product.sanitise() : null,
       };
-    }, async (req, block) => { });
+    }, async () => { });
 
 
     // Register product types
     productHelper.register('simple', {
       options  : ['availability'],
       sections : ['simple-pricing', 'display'],
-    }, async (product, opts) => {
+    }, async (product) => {
       // return price
       return {
         amount    : parseFloat(product.get('pricing.price')),
         currency  : config.get('shop.currency') || 'USD',
         available : product.get('availability.quantity') > 0,
       };
-    }, async (product, line, req) => {
+    }, async () => {
 
-    }, async (product, line, order) => {
+    }, async () => {
 
     });
 
@@ -151,7 +149,10 @@ class ProductController extends Controller {
       // loop for variations
       Object.keys(variations).forEach((type) => {
         // check found option
-        const found = (variations[type].options || []).find(option => (opts || []).includes(option.sku)) || (variations[type].options || [])[0];
+        const found = (variations[type].options || []).find((option) => {
+          // return includes
+          return (opts || []).includes(option.sku);
+        }) || (variations[type].options || [])[0];
 
         // add to price
         if (found) price += parseFloat(found.price);
@@ -164,9 +165,9 @@ class ProductController extends Controller {
         currency  : config.get('shop.currency') || 'USD',
         available : product.get('availability.quantity') > 0,
       };
-    }, async (product, line, req) => {
+    }, async () => {
 
-    }, async (product, line, order) => {
+    }, async () => {
 
     });
   }
@@ -254,7 +255,7 @@ class ProductController extends Controller {
 
     // set og tags
     req.meta('product:condition', 'new');
-    req.meta('product:availability', (parseInt(product.get('availability.quantity')) > 0 ? 'instock' : 'oos'));
+    req.meta('product:availability', (parseInt(product.get('availability.quantity'), 10) > 0 ? 'instock' : 'oos'));
     req.meta('product:price:amount', parseFloat(sanitised.price).toFixed(2));
     req.meta('product:modified_time', product.get('updated_at').toISOString());
     req.meta('product:published_time', product.get('created_at').toISOString());
@@ -281,7 +282,7 @@ class ProductController extends Controller {
     ].join('');
 
     // render product page
-    res.render('product', {
+    return res.render('product', {
       title   : product.get(`title.${req.language}`),
       query   : req.query || {},
       layout  : 'product',
@@ -339,9 +340,6 @@ class ProductController extends Controller {
     productGrid.model(Product);
     productGrid.models(true);
 
-    // get form
-    const form = await formHelper.get('shop.product');
-
     // check published
     productGrid.where({
       published : true,
@@ -368,4 +366,4 @@ class ProductController extends Controller {
  *
  * @type {ProductController}
  */
-exports = module.exports = ProductController;
+module.exports = ProductController;

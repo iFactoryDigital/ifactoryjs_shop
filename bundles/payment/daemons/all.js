@@ -34,7 +34,7 @@ class AllPaymentDaemon extends Daemon {
    * builds order controller
    */
   build() {
-    
+
   }
 
 
@@ -67,4 +67,4 @@ class AllPaymentDaemon extends Daemon {
  *
  * @type {AllPaymentDaemon}
  */
-exports = module.exports = AllPaymentDaemon;
+module.exports = AllPaymentDaemon;

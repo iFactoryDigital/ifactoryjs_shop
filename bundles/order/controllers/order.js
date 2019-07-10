@@ -41,7 +41,7 @@ class OrderController extends Controller {
    * builds order controller
    */
   build() {
-    
+
   }
 
 
@@ -65,7 +65,7 @@ class OrderController extends Controller {
     const viewOrder = await Order.findById(id);
 
     // Get admins
-    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
+    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return null;
 
     // Add to room
     opts.socket.join(`order.${id}`);
@@ -88,7 +88,7 @@ class OrderController extends Controller {
     const viewOrder = await Order.findById(id);
 
     // Get admins
-    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return;
+    if (!opts.user || opts.user.get('_id').toString() !== viewOrder.get('user.id')) return null;
 
     // Add to room
     opts.socket.leave(`order.${id}`);
@@ -142,7 +142,7 @@ class OrderController extends Controller {
     }
 
     // render order page
-    res.render('order', {
+    return res.render('order', {
       title : `View Order #${viewOrder.get('_id').toString()}`,
       order : await viewOrder.sanitise(),
     });
@@ -262,4 +262,4 @@ class OrderController extends Controller {
  *
  * @type {OrderController}
  */
-exports = module.exports = OrderController;
+module.exports = OrderController;

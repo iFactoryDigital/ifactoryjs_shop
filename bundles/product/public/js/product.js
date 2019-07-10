@@ -2,6 +2,9 @@
 // require dependencies
 const Events = require('events');
 
+// set built
+let built = null;
+
 /**
  * build bootstrap class
  */
@@ -9,9 +12,9 @@ class ProductStore extends Events {
   /**
    * construct bootstrap class
    */
-  constructor() {
+  constructor(...args) {
     // set observable
-    super(...arguments);
+    super(...args);
 
     // register pricing function
     this.__products = [];
@@ -39,13 +42,13 @@ class ProductStore extends Events {
     // register simple product
     this.product('simple', {
 
-    }, (product, opts) => {
+    }, (product) => {
       // let price
       const price = product.price.amount;
 
       // return price
       return price;
-    }, (product, opts) => {
+    }, () => {
 
     });
 
@@ -57,7 +60,7 @@ class ProductStore extends Events {
       let price = product.price.base;
 
       // get opts
-      for (let i = 0; i < (product.variations || []).length; i++) {
+      for (let i = 0; i < (product.variations || []).length; i += 1) {
         // get value
         const option = product.variations[i].options.find((opt) => {
           // return found
@@ -70,7 +73,7 @@ class ProductStore extends Events {
 
       // return price
       return price;
-    }, (product, opts) => {
+    }, () => {
 
     });
   }
@@ -136,9 +139,13 @@ class ProductStore extends Events {
   }
 }
 
+// set built
+built = new ProductStore();
+
 /**
  * export new bootstrap function
  *
  * @return {price}
  */
-exports = module.exports = window.eden.product = new ProductStore();
+window.eden.product = built;
+module.exports = built;

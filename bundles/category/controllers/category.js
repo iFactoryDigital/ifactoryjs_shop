@@ -45,7 +45,7 @@ class CategoryController extends Controller {
     // get categories
     (await Category.find({
       active : true,
-    })).map((category) => {
+    })).forEach((category) => {
       // add to eden
       this.eden.sitemap.add({
         url        : `/${category.get('slug')}`,
@@ -59,7 +59,7 @@ class CategoryController extends Controller {
       for         : ['frontend'],
       title       : 'Categories List',
       description : 'Shows a list of published product categories',
-    }, async (req, block) => {
+    }, async (req) => {
       // get products
       const query = await Category.where({
         active : true,
@@ -68,7 +68,7 @@ class CategoryController extends Controller {
       // set data
       const data = {
         query,
-        req
+        req,
       };
 
       // hook
@@ -78,9 +78,12 @@ class CategoryController extends Controller {
       return {
         tag        : 'categories',
         current    : req.category ? req.category.get('_id').toString() : null,
-        categories : await Promise.all((await data.query.find()).map(product => product.sanitise())),
+        categories : await Promise.all((await data.query.find()).map((product) => {
+          // return sanitised
+          return product.sanitise();
+        })),
       };
-    }, async (req, block) => { });
+    }, async () => { });
   }
 
 
@@ -151,7 +154,7 @@ class CategoryController extends Controller {
     // get parent
     let trail   = [category];
     let parent  = await category.get('parent');
-        parent  = Array.isArray(parent) ? parent[0] : parent;
+    parent = Array.isArray(parent) ? parent[0] : parent;
     let nextCat = parent;
 
     // while
@@ -171,7 +174,7 @@ class CategoryController extends Controller {
     trail.reverse();
 
     // set trail/category
-    req.trail    = trail;
+    req.trail = trail;
     req.category = category;
 
     // await trail sanitised
@@ -181,7 +184,7 @@ class CategoryController extends Controller {
     req.placement('category.page');
 
     // render index page
-    res.render('category', {
+    return res.render('category', {
       trail,
 
       title    : category.get(`title.${req.language}`),
@@ -238,4 +241,4 @@ class CategoryController extends Controller {
  *
  * @type {CategoryController}
  */
-exports = module.exports = CategoryController;
+module.exports = CategoryController;

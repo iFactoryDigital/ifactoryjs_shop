@@ -1,3 +1,5 @@
+/* eslint-disable no-empty-function */
+/* eslint-disable no-empty */
 
 // bind dependencies
 const Controller = require('controller');
@@ -195,7 +197,7 @@ class CheckoutController extends Controller {
     await this.eden.hook('checkout.render', order, sanitisedOrder);
 
     // render grid
-    res.render('checkout', {
+    return res.render('checkout', {
       order : sanitisedOrder,
     });
   }
@@ -276,8 +278,7 @@ class CheckoutController extends Controller {
    * @pre    order.init
    * @param  {order} Order
    */
-  async orderHook(order) {
-
+  async orderHook() {
   }
 
   /**
@@ -286,8 +287,7 @@ class CheckoutController extends Controller {
    * @pre    checkout.init
    * @param  {Object} order
    */
-  async checkoutHook(order) {
-
+  async checkoutHook() {
   }
 
 
@@ -381,4 +381,4 @@ class CheckoutController extends Controller {
  *
  * @type {CheckoutController}
  */
-exports = module.exports = CheckoutController;
+module.exports = CheckoutController;

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * Created by Awesome on 3/6/2016.
  */

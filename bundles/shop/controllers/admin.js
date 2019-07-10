@@ -54,7 +54,7 @@ class ShopAdminController extends Controller {
       for         : ['admin'],
       title       : 'Shop Income Stats',
       description : 'Shop income stat block',
-    }, async (req, block) => {
+    }, async () => {
       // get data
       const data = await this._getIncomeStat();
 
@@ -68,7 +68,7 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, block) => { });
+    }, async () => { });
 
     // register simple block
     blockHelper.block('dashboard.shop.expense', {
@@ -76,7 +76,7 @@ class ShopAdminController extends Controller {
       for         : ['admin'],
       title       : 'Shop Expense Stats',
       description : 'Shop expenses stat block',
-    }, async (req, block) => {
+    }, async () => {
       // get data
       const data = await this._getExpenseStat();
 
@@ -90,7 +90,7 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, block) => { });
+    }, async () => { });
 
     // register simple block
     blockHelper.block('dashboard.shop.orders', {
@@ -98,7 +98,7 @@ class ShopAdminController extends Controller {
       for         : ['admin'],
       title       : 'Shop Order Stats',
       description : 'Shop orders stat block',
-    }, async (req, block) => {
+    }, async () => {
       // get data
       const data = await this._getOrdersStat();
 
@@ -112,7 +112,7 @@ class ShopAdminController extends Controller {
 
       // return
       return data;
-    }, async (req, block) => { });
+    }, async () => { });
   }
 
 
@@ -150,7 +150,10 @@ class ShopAdminController extends Controller {
       type       : 'admin.shop',
       blocks     : blockHelper.renderBlocks('admin'),
       jumbotron  : 'Manage Shop',
-      dashboards : await Promise.all(dashboards.map(async (dashboard, i) => dashboard.sanitise(i === 0 ? req : null))),
+      dashboards : await Promise.all(dashboards.map(async (dashboard, i) => {
+        // return sanitised
+        return dashboard.sanitise(i === 0 ? req : null);
+      })),
     });
   }
 
@@ -336,4 +339,4 @@ class ShopAdminController extends Controller {
  *
  * @type {ShopAdminController}
  */
-exports = module.exports = ShopAdminController;
+module.exports = ShopAdminController;

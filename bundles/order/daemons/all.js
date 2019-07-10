@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 
 // bind dependencies
 const config = require('config');
@@ -44,7 +45,7 @@ class AllOrderDaemon extends Daemon {
    * builds order controller
    */
   build() {
-    
+
   }
 
 
@@ -135,11 +136,11 @@ class AllOrderDaemon extends Daemon {
             // unlock
             orderStatus.unlock();
           });
-        } catch (e) { console.log(e); }
+        } catch (e) {}
       }
 
       // loop items
-      await Promise.all(orderStatus.get('lines').map(async (line, i) => {
+      await Promise.all(orderStatus.get('lines').map(async (line) => {
         // get product
         const product = await Product.findById(line.product);
 
@@ -194,4 +195,4 @@ class AllOrderDaemon extends Daemon {
  *
  * @type {AllOrderDaemon}
  */
-exports = module.exports = AllOrderDaemon;
+module.exports = AllOrderDaemon;

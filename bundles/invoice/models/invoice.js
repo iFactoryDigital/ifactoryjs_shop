@@ -15,9 +15,9 @@ class Invoice extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.sanitise = this.sanitise.bind(this);
@@ -59,7 +59,7 @@ class Invoice extends Model {
   /**
    * returns has payment requiring approval
    *
-   * @param {*} invoicePayments 
+   * @param {*} invoicePayments
    */
   async hasApproval(invoicePayments) {
     // load payments
@@ -75,7 +75,7 @@ class Invoice extends Model {
       // return sanitised images
       return invoicePayment.get('state') === 'approval' ? invoicePayment.get('amount') : 0;
     })).reduce((accum, amount) => accum + amount, 0);
-    
+
     // return approval
     return payments;
   }
@@ -118,8 +118,8 @@ class Invoice extends Model {
       // eslint-disable-next-line no-nested-ternary
       }) ? 'paid' : (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
-        return a + b;
-      }) > 0 ? 'partial' : (this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
+          return a + b;
+        }) > 0 ? 'partial' : (this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
       discount : this.get('discount') || 0,
       currency : this.get('currency'),
       payments : await Promise.all(invoicePayments.map((invoicePayment) => {
@@ -147,4 +147,4 @@ class Invoice extends Model {
  *
  * @type {Invoice}
  */
-exports = module.exports = Invoice;
+module.exports = Invoice;

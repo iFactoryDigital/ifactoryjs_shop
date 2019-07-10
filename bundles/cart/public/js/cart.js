@@ -115,7 +115,7 @@ class CartStore extends Events {
     });
 
     // add to quantity
-    foundLine.qty++;
+    foundLine.qty += 1;
 
     // emit line
     this.emit('add', foundLine);
@@ -320,6 +320,9 @@ class CartStore extends Events {
       // go to order page
       return window.eden.router.go(`/order/${order.id}`);
     }
+
+    // return default
+    return null;
   }
 
   /**
@@ -378,13 +381,13 @@ class CartStore extends Events {
     if (cart.id && this.persisted.includes(cart.id)) return;
 
     // loop for keys
-    for (const key in cart) {
+    Object.keys(cart).forEach((key) => {
       // check key
-      if (!['lines', 'products'].includes(key)) continue;
+      if (!['lines', 'products'].includes(key)) return;
 
       // set key
       this[key] = cart[key];
-    }
+    });
 
     // set cart
     this.cart = cart;
@@ -409,4 +412,4 @@ store.set('cart', builtStore);
 /**
  * export built store
  */
-exports = module.exports = builtStore;
+module.exports = builtStore;

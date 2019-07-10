@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 
 // import local dependencies
 const Model  = require('model');
@@ -16,9 +17,9 @@ class Category extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.sanitise = this.sanitise.bind(this);
@@ -31,7 +32,7 @@ class Category extends Model {
    *
    * @return {Object}
    */
-  async sanitise(small) {
+  async sanitise() {
     // return object
     const sanitised = {
       id         : this.get('_id') ? this.get('_id').toString() : null,
@@ -43,7 +44,7 @@ class Category extends Model {
     const form = await formHelper.get('shop.category');
 
     // add other fields
-    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.category.fields').slice(0)).map(async (field, i) => {
+    await Promise.all((form.get('_id') ? form.get('fields') : config.get('shop.category.fields').slice(0)).map(async (field) => {
       // set field name
       const fieldName = field.name || field.uuid;
 
@@ -53,6 +54,9 @@ class Category extends Model {
       sanitised[fieldName] = Array.isArray(sanitised[fieldName]) ? await Promise.all(sanitised[fieldName].map((val) => {
         // return sanitised value
         if (val.sanitise) return val.sanitise();
+
+        // return value
+        return val;
       })) : sanitised[fieldName];
     }));
 
@@ -73,4 +77,4 @@ class Category extends Model {
  *
  * @type {Category}
  */
-exports = module.exports = Category;
+module.exports = Category;

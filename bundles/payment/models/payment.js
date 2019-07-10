@@ -19,9 +19,9 @@ class Payment extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.sanitise = this.sanitise.bind(this);
@@ -61,4 +61,4 @@ class Payment extends Model {
  *
  * @type {Payment}
  */
-exports = module.exports = Payment;
+module.exports = Payment;

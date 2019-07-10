@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 
 // bind dependencies
 const Grid        = require('grid');
@@ -167,13 +168,11 @@ class AdminInvoiceController extends Controller {
    */
   async viewAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -184,6 +183,7 @@ class AdminInvoiceController extends Controller {
     const paymentController = await this.eden.controller('payment/controllers/admin');
 
     // get payment grid
+    // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
     // render page
@@ -207,13 +207,11 @@ class AdminInvoiceController extends Controller {
    */
   async printAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -224,6 +222,7 @@ class AdminInvoiceController extends Controller {
     const paymentController = await this.eden.controller('payment/controllers/admin');
 
     // get payment grid
+    // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
     // render page
@@ -246,13 +245,11 @@ class AdminInvoiceController extends Controller {
    */
   async emailAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -322,6 +319,7 @@ class AdminInvoiceController extends Controller {
     const paymentController = await this.eden.controller('payment/controllers/admin');
 
     // get payment grid
+    // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice);
 
     // render page
@@ -358,7 +356,6 @@ class AdminInvoiceController extends Controller {
    */
   async updateSubmitAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice({
       currency : config.get('shop.currency') || 'USD',
     });
@@ -366,7 +363,6 @@ class AdminInvoiceController extends Controller {
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -444,18 +440,20 @@ class AdminInvoiceController extends Controller {
    */
   async paymentCreateAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
     let payment = null;
 
     // check for website model
     if (req.params.id && req.params.id !== 'create') {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     } else if (req.params.id === 'create') {
       // get order
-      const orders = await Promise.all((Array.isArray(req.body.orders) ? req.body.orders : [req.body.orders]).map(id => Order.findById(id)));
+      // eslint-disable-next-line max-len
+      const orders = await Promise.all((Array.isArray(req.body.orders) ? req.body.orders : [req.body.orders]).map((id) => {
+        // return orders
+        return Order.findById(id);
+      }));
 
       // set order
       invoice.set('orders', orders);
@@ -622,6 +620,7 @@ class AdminInvoiceController extends Controller {
     const paymentController = await this.eden.controller('payment/controllers/admin');
 
     // get payment grid
+    // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
     // return post grid request
@@ -668,7 +667,7 @@ class AdminInvoiceController extends Controller {
       },
     }).column('orders', {
       title  : 'Orders',
-      format : async (col, row) => {
+      format : async (col) => {
         return col && col.length ? col.map((item) => {
           // return item
           return `<a href="/admin/shop/order/${item.get('_id').toString()}/update">${item.get('_id').toString()}</a>`;
@@ -683,7 +682,7 @@ class AdminInvoiceController extends Controller {
       .column('status', {
         sort   : true,
         title  : 'Status',
-        format : async (col, row) => {
+        format : async (col) => {
           return col ? `<span class="btn btn-sm">${col}</span>` : '<i>N/A</i>';
         },
       })
@@ -839,4 +838,4 @@ class AdminInvoiceController extends Controller {
  *
  * @type {AdminInvoiceController}
  */
-exports = module.exports = AdminInvoiceController;
+module.exports = AdminInvoiceController;

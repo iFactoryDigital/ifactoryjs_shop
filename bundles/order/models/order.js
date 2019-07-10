@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 
 /**
  * Created by Awesome on 2/6/2016.
@@ -24,9 +25,9 @@ class Order extends Model {
    * @param attrs
    * @param options
    */
-  constructor() {
+  constructor(...args) {
     // run super
-    super(...arguments);
+    super(...args);
 
     // bind methods
     this.count = this.count.bind(this);
@@ -107,4 +108,4 @@ class Order extends Model {
  *
  * @type {order}
  */
-exports = module.exports = Order;
+module.exports = Order;

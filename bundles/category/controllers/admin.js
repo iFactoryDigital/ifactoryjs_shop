@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 
 // bind dependencies
 const Grid        = require('grid');
@@ -126,10 +127,14 @@ class AdminCategoryController extends Controller {
     }, async (req, field, value) => {
       // set tag
       field.tag = 'category';
-      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map(item => item.sanitise())) : await value.sanitise()) : null;
+      // eslint-disable-next-line no-nested-ternary
+      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map((item) => {
+        // return sanitised
+        return item.sanitise();
+      })) : await value.sanitise()) : null;
       // return
       return field;
-    }, async (req, field) => {
+    }, async () => {
       // save field
     }, async (req, field, value, old) => {
       // set value
@@ -190,6 +195,7 @@ class AdminCategoryController extends Controller {
     let i = 0;
 
     // loop until slug available
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // set slug
       const check = await Category.findOne({
@@ -259,7 +265,7 @@ class AdminCategoryController extends Controller {
    */
   async listenAction(id, uuid, opts) {
     // / return if no id
-    if (!id) return;
+    if (!id) return null;
 
     // join room
     opts.socket.join(`category.${id}`);
@@ -279,7 +285,7 @@ class AdminCategoryController extends Controller {
    */
   async deafenAction(id, uuid, opts) {
     // / return if no id
-    if (!id) return;
+    if (!id) return null;
 
     // join room
     opts.socket.leave(`category.${id}`);
@@ -341,7 +347,10 @@ class AdminCategoryController extends Controller {
       .find();
 
     // get children
-    res.json((await Promise.all(categories.map(category => category.sanitise()))).map((sanitised) => {
+    res.json((await Promise.all(categories.map((category) => {
+      // return sanitised
+      return category.sanitise();
+    }))).map((sanitised) => {
       // return object
       return {
         text  : sanitised.title[req.language],
@@ -436,13 +445,11 @@ class AdminCategoryController extends Controller {
    */
   async updateSubmitAction(req, res, next) {
     // set website variable
-    let create   = true;
     let category = new Category();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       category = await Category.findById(req.params.id);
     }
 
@@ -635,4 +642,4 @@ class AdminCategoryController extends Controller {
  *
  * @type {admin}
  */
-exports = module.exports = AdminCategoryController;
+module.exports = AdminCategoryController;

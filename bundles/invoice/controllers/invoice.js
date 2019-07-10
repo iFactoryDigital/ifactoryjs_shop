@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 
 // bind dependencies
 const config     = require('config');
@@ -43,13 +44,11 @@ class InvoiceController extends Controller {
    */
   async printAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -60,6 +59,7 @@ class InvoiceController extends Controller {
     const paymentController = await this.eden.controller('payment/controllers/admin');
 
     // get payment grid
+    // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
     // render page
@@ -82,13 +82,11 @@ class InvoiceController extends Controller {
    */
   async pdfAction(req, res) {
     // set website variable
-    let create  = true;
     let invoice = new Invoice();
 
     // check for website model
     if (req.params.id) {
       // load by id
-      create = false;
       invoice = await Invoice.findById(req.params.id);
     }
 
@@ -164,4 +162,4 @@ class InvoiceController extends Controller {
  *
  * @type {InvoiceController}
  */
-exports = module.exports = InvoiceController;
+module.exports = InvoiceController;

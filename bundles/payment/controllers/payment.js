@@ -80,6 +80,7 @@ class PaymentController extends Controller {
       const y = b.priority || 0;
 
       // return action
+      // eslint-disable-next-line no-nested-ternary
       return a < y ? -1 : x > y ? 1 : 0;
     });
 
@@ -110,6 +111,9 @@ class PaymentController extends Controller {
         text : 'Order is missing payment',
       });
     }
+
+    // return default
+    return null;
   }
 
   /**
@@ -208,4 +212,4 @@ class PaymentController extends Controller {
  *
  * @type {paymentController}
  */
-exports = module.exports = PaymentController;
+module.exports = PaymentController;

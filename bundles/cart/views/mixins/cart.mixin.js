@@ -45,7 +45,7 @@ riot.mixin('cart', {
         // reduce for total
         return quantities.reduce((a, b) => {
           // return sum
-          return (parseInt(a) + parseInt(b));
+          return (parseInt(a, 10) + parseInt(b, 10));
         });
       };
       this.cart.total = () => {
@@ -68,6 +68,7 @@ riot.mixin('cart', {
       };
     } else {
       // set this store
+      // eslint-disable-next-line global-require
       this.cart = require('cart/public/js/cart');
 
       // on update

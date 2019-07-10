@@ -121,7 +121,10 @@ class AdminOrderController extends Controller {
       // set tag
       field.tag = 'order';
       // eslint-disable-next-line no-nested-ternary
-      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map(item => item.sanitise())) : await value.sanitise()) : null;
+      field.value = value ? (Array.isArray(value) ? await Promise.all(value.map((item) => {
+        // return sanitised
+        return item.sanitise();
+      })) : await value.sanitise()) : null;
 
       // return
       return field;
@@ -194,11 +197,6 @@ class AdminOrderController extends Controller {
     // find children
     let orders = Order.ne('status', 'paid');
 
-    // set query
-    if (req.query.q) {
-
-    }
-
     // add roles
     orders = await orders.skip(((parseInt(req.query.page, 10) || 1) - 1) * 20).limit(20).sort('name', 1)
       .find();
@@ -229,13 +227,11 @@ class AdminOrderController extends Controller {
   async getAction(req, res) {
     // set website variable
     let order  = new Order();
-    let create = true;
 
     // check for website model
     if (req.params.id) {
       // load by id
       order = await Order.findById(req.params.id);
-      create = false;
     }
 
     // return json
@@ -272,13 +268,11 @@ class AdminOrderController extends Controller {
   async viewAction(req, res) {
     // set website variable
     let order  = new Order();
-    let create = true;
 
     // check for website model
     if (req.params.id) {
       // load by id
       order = await Order.findById(req.params.id);
-      create = false;
     }
 
     // render page
@@ -299,14 +293,12 @@ class AdminOrderController extends Controller {
    */
   async printAction(req, res) {
     // set website variable
-    let order  = new Order();
-    let create = true;
+    let order = new Order();
 
     // check for website model
     if (req.params.id) {
       // load by id
       order = await Order.findById(req.params.id);
-      create = false;
     }
 
     // render page
@@ -804,4 +796,4 @@ class AdminOrderController extends Controller {
  *
  * @type {admin}
  */
-exports = module.exports = AdminOrderController;
+module.exports = AdminOrderController;
