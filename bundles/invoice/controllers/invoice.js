@@ -2,7 +2,6 @@
 
 // bind dependencies
 const config     = require('config');
-const puppeteer  = require('puppeteer');
 const Controller = require('controller');
 
 // require models
@@ -80,7 +79,7 @@ class InvoiceController extends Controller {
    *
    * @route {get} /:id/pdf
    */
-  async pdfAction(req, res) {
+  async pdfAction(req, res, next) {
     // set website variable
     let invoice = new Invoice();
 
@@ -88,6 +87,13 @@ class InvoiceController extends Controller {
     if (req.params.id) {
       // load by id
       invoice = await Invoice.findById(req.params.id);
+    }
+
+    try {
+      require.resolve('puppeteer');
+    } catch (e) {
+      next();
+      return;
     }
 
     // set headers
@@ -113,6 +119,9 @@ class InvoiceController extends Controller {
    * @return {Promise}
    */
   _toPDF(url) {
+    // eslint-disable-next-line global-require
+    const puppeteer = require('puppeteer');
+
     // return promise
     return new Promise(async (resolve, reject) => {
       // create lock
