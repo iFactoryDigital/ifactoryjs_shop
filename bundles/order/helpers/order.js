@@ -137,7 +137,7 @@ class OrderHelper extends Helper {
     // set price
     line.sku = ((product.get('sku') || '').length ? product.get('sku') : product.get('_id').toString()) + (Object.values(line.opts || {})).join('_');
     line.uuid = line.uuid || uuid();
-    line.title = product.get('title')[Object.keys(product.get('title')[0])];
+    line.title = product.get('title')[Object.keys(product.get('title'))[0]];
     line.price = parseFloat(money.floatToAmount(price.amount));
     line.total = parseFloat(money.floatToAmount(amount));
 
