@@ -19,7 +19,7 @@
               Manual Payment
             </button>
           </div>
-          <validate label="Amount" required name="amount" type="number" step="0.01" ref="amount">
+          <validate label="Amount" required name="amount" type="number" step="0.01" ref="amount" data-value={ opts.amount || 0 }>
             <yield to="prepend">
               <div class="input-group-prepend">
                 <span class="input-group-text">$</span>
@@ -66,7 +66,7 @@
     this.invoice = opts.invoice;
 
     // set initial discount
-    this.action  = Object.assign(opts.order.actions.payment, { 'manual' : true });
+    this.action  = Object.assign((opts.order.actions || {}).payment || {}, { 'manual' : true });
     this.payment = 'normal';
 
     /**
