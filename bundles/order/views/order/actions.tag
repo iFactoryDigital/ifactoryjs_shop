@@ -7,9 +7,9 @@
       <i class="fa fa-times" />
     </a>
   </div>
-  
+
   <script>
-  
+
     /**
      * on update
      *
@@ -22,7 +22,7 @@
         return this.parent.opts.onUpdateButton(e, opts.row);
       }
     }
-    
+
     /**
      * on remove
      *
@@ -35,6 +35,6 @@
         return this.parent.opts.onRemoveButton(e, opts.row);
       }
     }
-  
+
   </script>
 </order-actions>

@@ -8,9 +8,9 @@
         </a>
       </yield>
     </admin-header>
-    
+
     <div class="container-fluid">
-        
+
       <form method="post" action="/admin/shop/order/{ opts.order.id }/cancel">
         <div class="card">
           <div class="card-body">
@@ -23,7 +23,7 @@
           </div>
         </div>
       </form>
-      
+
     </div>
   </div>
 </order-admin-cancel-page>

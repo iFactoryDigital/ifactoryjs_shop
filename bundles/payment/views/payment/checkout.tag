@@ -10,7 +10,7 @@
       </div>
     </div>
     <!-- / payment choices -->
-    
+
   </div>
 
   <script>

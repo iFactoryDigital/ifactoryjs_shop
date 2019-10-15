@@ -21,11 +21,11 @@
         <span class="btn btn-link px-0">
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
-        
+
         <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd }>
           { this.t('checkout.proceed') }
         </a>
-        
+
         <span class="btn-group float-right">
           <a href="#!" if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd } onclick={ onRemove } class="btn btn-danger">
             <i class="fa fa-times" />
@@ -34,7 +34,7 @@
             <span if={ this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd }>{ this.cart.line(opts.product, Object.values(skus())).qty }</span> { this.t(this.cart.has(opts.product, Object.values(skus())) && !opts.onAdd ? 'cart.added' : 'cart.add') }
           </a>
         </span>
-        
+
         <button class="btn btn-link float-right mr-2">
           <money amount={ this.product.price(opts.product, Object.values(skus())) } />
         </button>
@@ -143,7 +143,7 @@
     this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
-      
+
       // update view
       this.update();
     });

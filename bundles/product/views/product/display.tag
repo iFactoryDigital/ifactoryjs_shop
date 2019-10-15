@@ -7,7 +7,7 @@
       <form-render ref="form" form={ opts.form } placement="shop.product" positions={ this.positions } preview={ opts.preview } class="d-block mb-3" />
     </div>
   </div>
-  
+
   <script>
     // set placements
     this.positions = opts.positions || opts.fields.map((field) => {

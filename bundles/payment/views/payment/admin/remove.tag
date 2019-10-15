@@ -8,9 +8,9 @@
         </a>
       </yield>
     </admin-header>
-    
+
     <div class="container-fluid">
-    
+
       <form method="post" action="/admin/shop/payment/{ opts.payment.id }/remove">
         <div class="card">
           <div class="card-body">
@@ -23,7 +23,7 @@
           </div>
         </div>
       </form>
-    
+
     </div>
   </div>
 </payment-admin-remove-page>

@@ -1,8 +1,8 @@
 <product-row class={ getColClass() }>
   <div data-is="product-{ opts.row.get('type') }-card" product={ opts.row.get() } />
-  
+
   <script>
-  
+
     /**
      * gets column class
      *

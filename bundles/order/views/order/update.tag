@@ -2,7 +2,7 @@
   <div class="{ opts.card || 'card mb-4' }">
     <div class="card-body">
       <span class="btn btn-{ this.colors[(this.order.status || 'pending')] }">Status: { this.t('order.status.' + (this.order.status || 'pending')) }</span>
-      
+
       <button class={ 'btn btn-success float-right' : true, 'disabled' : !this.order.status === 'paid' } disabled={ this.order.status === 'paid' } onclick={ onPayment } if={ this.order.id }>
         { this.order.status === 'paid' ? 'Order Paid' : 'Pay Order' }
       </button>
@@ -325,8 +325,6 @@
       const order = (await eden.router.post(opts.submit || `/admin/shop/order/${this.order.id}/update`, {
         lines : this.order.lines,
       })).result;
-      
-      console.log(order);
 
       // set invoice
       this.order   = order;
@@ -348,11 +346,11 @@
       // prevent default
       e.preventDefault();
       e.stopPropagation();
-      
+
       // show payment
       this.refs.payment.show();
     }
-    
+
     /**
      * on payment done
      *
@@ -362,19 +360,19 @@
     onPaymentDone({ invoice, orders }) {
       // set orders
       if (!Array.isArray(orders)) orders = [];
-      
+
       // set order
       const order = orders.find(o => o.id === this.order.id);
-      
+
       // set invoice
       this.invoice = invoice;
-      
+
       // set order
       if (order) this.order = order;
 
       // on save
       if (opts.onSave) opts.onSave(order);
-      
+
       // udpate view
       this.update();
     }
@@ -392,7 +390,7 @@
       // show modal
       jQuery(this.refs.product).modal('show');
     }
-    
+
     /**
      * on dismiss product
      *

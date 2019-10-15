@@ -6,7 +6,7 @@
     // do mixins
     this.mixin('product');
     this.mixin('settings');
-    
+
     // get price
     const price = parseFloat(opts.product.pricing.price);
 

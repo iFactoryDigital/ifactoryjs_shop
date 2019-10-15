@@ -8,7 +8,7 @@
         </a>
       </yield>
     </admin-header>
-    
+
     <div class="container-fluid">
 
       <form method="post" action="/admin/shop/product/{ opts.product.id }/remove">
@@ -22,7 +22,7 @@
         </div>
         <button type="submit" class="btn btn-lg btn-success">Submit</button>
       </form>
-      
+
     </div>
   </div>
 

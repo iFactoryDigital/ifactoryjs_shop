@@ -84,7 +84,7 @@ class Order extends Model {
         const product = await Product.findById(line.product);
 
         // return sanitised images
-        return await product.sanitise();
+        return product ? await product.sanitise() : null;
       })),
       address   : address ? (address.sanitise ? await address.sanitise() : address) : null,
       processed : this.get('processed'),

@@ -14,14 +14,14 @@
       </div>
     </yield>
   </field>
-  
+
   <script>
     // do mixins
     this.mixin('acl');
-    
+
     // set initialized
     this.orders = (Array.isArray(opts.data.value) ? opts.data.value : [opts.data.value]).filter((i) => i);
-    
+
     /**
      * return value
      *
@@ -38,8 +38,8 @@
     this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend || this.initialized) return;
-      
+
     });
-    
+
   </script>
 </field-order>

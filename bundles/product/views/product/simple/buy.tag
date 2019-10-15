@@ -5,11 +5,11 @@
         <span class="btn btn-link px-0">
           <span data-is="product-{ opts.product.type }-availability" product={ opts.product } />
         </span>
-        
+
         <a href="/checkout" class="btn btn-primary float-right ml-2" if={ this.cart.has(opts.product) && !opts.onAdd }>
           { this.t('checkout.proceed') }
         </a>
-        
+
         <span class="btn-group float-right">
           <a href="#!" if={ this.cart.has(opts.product) && !opts.onAdd } onclick={ onRemove } class="btn btn-danger">
             <i class="fa fa-times" />

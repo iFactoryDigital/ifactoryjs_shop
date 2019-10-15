@@ -19,7 +19,7 @@
           </button>
         </yield>
       </admin-header>
-      
+
       <div class="container-fluid mb-4">
         <!-- hidden inputs -->
         <input type="hidden" name="public" value={ this.public ? 'true' : 'false' } />
@@ -51,24 +51,24 @@
               </div>
             </div>
             <!-- /product type -->
-              
+
             <!-- product options -->
             <div each={ option, i in this.type.opts.options || [] } data-is="product-{ option }" product={ this.product } type={ this.type } form={ opts.form } fields={ opts.fields } preview={ this.preview } />
             <!-- product options -->
           </div>
 
           <div class="col col-lg-8">
-            
+
             <!-- product sections -->
             <div each={ section, i in this.type.opts.sections || [] } data-is="product-{ section }" product={ this.product } type={ this.type } form={ opts.form } fields={ opts.fields } preview={ this.preview } />
             <!-- product sections -->
-            
+
           </div>
         </div>
         <!-- / product information -->
-        
+
       </div>
-      
+
       <div class="jumbotron py-4 text-right m-0">
         <button class={ 'btn btn-lg mr-3' : true, 'btn-success' : promoted, 'btn-danger' : !promoted } onclick={ togglePromoted }>
           { promoted ? 'Promoted' : 'Unpromoted' }
@@ -96,7 +96,7 @@
     this.preview   = true;
     this.promoted  = this.product.promoted;
     this.published = this.product.published;
-    
+
     /**
      * on preview
      *
@@ -108,10 +108,10 @@
       // prevent default
       e.preventDefault();
       e.stopPropagation();
-      
+
       // set loading
       this.preview = !this.preview;
-      
+
       // update view
       this.update();
     }
@@ -135,10 +135,10 @@
     onType (e) {
       // set type
       this.type = opts.types.find(t => t.type === e.target.value);
-      
+
       // set opts
       const o = this.type.opts;
-      
+
       // set opts
       this.type.opts = {};
 

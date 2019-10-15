@@ -8,9 +8,9 @@
         </a>
       </yield>
     </admin-header>
-    
+
     <div class="container-fluid">
-    
+
       <form method="post" action="/admin/shop/payment/{ opts.payment && opts.payment.id ? (opts.payment.id + '/update') : 'create' }">
         <div class="card">
           <div class="card-header">
@@ -33,7 +33,7 @@
           </div>
         </div>
       </form>
-    
+
     </div>
   </div>
 </payment-admin-update-page>

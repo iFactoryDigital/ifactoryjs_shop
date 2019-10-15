@@ -158,7 +158,7 @@
       if (result.success) {
         // set invoice
         if (!this.invoice) this.invoice = result.result.invoice;
-        
+
         // set invoice
         for (let key in result.result.invoice) {
           // update invoice
@@ -170,7 +170,7 @@
 
         // show modal
         jQuery(this.refs.payment).modal('hide');
-        
+
         // on update
         if (opts.onUpdate) opts.onUpdate(result.result);
       }
