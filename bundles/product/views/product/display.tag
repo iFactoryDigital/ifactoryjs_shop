@@ -9,6 +9,13 @@
   </div>
 
   <script>
+    // do mixins
+    this.mixin('acl');
+    this.mixin('i18n');
+    
+    // require uuid
+    const uuid = require('uuid');  
+
     // set placements
     this.positions = opts.positions || opts.fields.map((field) => {
       // return field
