@@ -43,6 +43,7 @@ class AdminInvoiceController extends Controller {
     this.createSubmitAction = this.createSubmitAction.bind(this);
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
+    this.pdfAction = this.pdfAction.bind(this);
 
     // bind private methods
     this._grid = this._grid.bind(this);
@@ -185,6 +186,8 @@ class AdminInvoiceController extends Controller {
     // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
+    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).ne('status', 'unset').sort('created_at', -1).find();
+
     // render page
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
@@ -192,6 +195,7 @@ class AdminInvoiceController extends Controller {
       orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : true,
+      invoices : await Promise.all(await invoices.map(invoice => invoice.sanitise())),
     });
   }
 
@@ -224,6 +228,8 @@ class AdminInvoiceController extends Controller {
     // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
+    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).ne('status', 'unset').sort('created_at', -1).find();
+
     // render page
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
@@ -231,6 +237,58 @@ class AdminInvoiceController extends Controller {
       orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
+      invoices : await Promise.all(await invoices.map(invoice => invoice.sanitise())),
+    });
+  }
+
+  async _createPdf(invoice, file, user) {
+    // set file
+    file.set('ext', 'pdf');
+
+    // from file
+    await file.fromURL(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/pdf?user=${user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`);
+
+    // set name
+    file.set('name', `invoice-${invoice.get('_id').toString()}.pdf`);
+
+    // save file
+    await file.save();
+
+    return file;
+  }
+
+  /**
+   * update action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {POST} /:id/pdf
+   */
+  async pdfAction(req, res) {
+    // set website variable
+    let invoice = new Invoice();
+
+    // check for website model
+    if (req.params.id) {
+      // load by id
+      invoice = await Invoice.findById(req.params.id);
+    }
+
+    // alert
+    req.alert('info', 'Generating invoice PDF');
+
+    const file = new File();
+
+    await this._createPdf(invoice, file, req.user);
+
+    // alert
+    req.alert('info', 'Generated invoice PDF');
+
+    // get file
+    res.json({
+      result  : await file.sanitise(),
+      success : true,
     });
   }
 
@@ -255,20 +313,9 @@ class AdminInvoiceController extends Controller {
     // alert
     req.alert('info', 'Generating invoice PDF');
 
-    // load file
     const file = new File();
 
-    // set file
-    file.set('ext', 'pdf');
-
-    // from file
-    await file.fromURL(`http://localhost:${config.get('port')}/shop/invoice/${invoice.get('_id').toString()}/pdf?user=${req.user.get('_id').toString()}&skip=NC5jCAheHPjkZwj2fjpYwIBrjOgGCerj`);
-
-    // set name
-    file.set('name', `invoice-${invoice.get('_id').toString()}.pdf`);
-
-    // save file
-    await file.save();
+    await this._createPdf(invoice, file, req.user);
 
     // alert
     req.alert('info', 'Generated invoice PDF');
@@ -284,6 +331,7 @@ class AdminInvoiceController extends Controller {
 
     // send email
     await emailHelper.send(req.body.email.split(',').map(item => item.trim()), 'invoice', {
+      subject     : 'Email Invoice',
       body        : req.body.body,
       invoice     : await invoice.sanitise(),
       attachments : [file],
@@ -321,12 +369,15 @@ class AdminInvoiceController extends Controller {
     // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice);
 
+    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).ne('status', 'unset').sort('created_at', -1).find();
+
     // render page
     res.render('invoice/admin/update', {
-      grid    : await paymentGrid.render(req, invoice),
-      title   : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
-      orders  : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
-      invoice : await invoice.sanitise(),
+      grid     : await paymentGrid.render(req, invoice),
+      title    : create ? 'Create New' : `Update ${invoice.get('_id').toString()}`,
+      orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
+      invoice  : await invoice.sanitise(),
+      invoices : await Promise.all(await invoices.map(invoice => invoice.sanitise())),
     });
   }
 
@@ -419,6 +470,9 @@ class AdminInvoiceController extends Controller {
       // return save
       return order.save(req.user);
     }));
+
+    // add hook for reassign orders
+    if (orders.length > 0) await this.eden.hook('invoice.reassign.orders', invoice.get('_id'), orders);
 
     // render page
     res.json({
@@ -708,6 +762,15 @@ class AdminInvoiceController extends Controller {
         },
       })
       .column('actions', {
+        tag      : 'invoice-actions',
+        type     : false,
+        width    : '1%',
+        title    : 'Actions',
+        priority : 1,
+      });
+
+      /*
+      .column('actions', {
         width  : '1%',
         title  : 'Actions',
         export : false,
@@ -716,12 +779,14 @@ class AdminInvoiceController extends Controller {
             '<div class="btn-group btn-group-sm" role="group">',
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/print" class="btn btn-info" target="_blank"><i class="fa fa-print"></i></a>`,
+            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/pdf" class="btn btn-info" target="_blank"><i class="fa fa-file"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil-alt"></i></a>`,
             `<a href="/admin/shop/invoice/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
             '</div>',
           ].join('');
         },
       });
+      */
 
     // add grid filters
     invoiceGrid.filter('username', {

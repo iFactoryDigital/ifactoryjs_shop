@@ -1,7 +1,7 @@
 <invoice-admin-update-page>
 
   <div class="page page-shop">
-    <admin-header title="{ opts.invoice.id ? 'Update' : 'Create' } Invoice" invoice={ opts.invoice } loading={ this.loading } on-email={ onEmail }>
+    <admin-header title="{ opts.invoice.id ? 'Update' : 'Create' } Invoice" invoice={ opts.invoice } loading={ this.loading } on-email={ onEmail } on-pdf={ onPdf }>
       <yield to="right">
         <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/view" disabled={ !opts.invoice }>
           View Invoice
@@ -9,6 +9,9 @@
         <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/print" disabled={ !opts.invoice }>
           Print Invoice
         </a>
+        <button class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : opts.loading() } onclick={ opts.onPdf } disabled={ opts.loading() }>
+          { opts.loading('pdf') ? 'Create PDF...' : 'Download PDF' }
+        </button>
         <button class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : opts.loading() } onclick={ opts.onEmail } disabled={ opts.loading() }>
           { opts.loading('email') ? 'Emailing...' : 'Email Invoice' }
         </button>
@@ -19,11 +22,11 @@
     </admin-header>
 
     <div class="container">
-      <invoice-update invoice={ opts.invoice } orders={ opts.orders } />
+      <invoice-update invoice={ opts.invoice } orders={ opts.orders } invoices={ opts.invoices }/>
     </div>
 
     <invoice-admin-payment invoice={ opts.invoice } loading={ this.loading } orders={ opts.orders } grid={ opts.grid } />
-
+    <div class="downloadProject"></div>
   </div>
 
   <div class="modal fade" id="modal-email" ref="email">
@@ -72,6 +75,7 @@
     // do mixin
     this.mixin('i18n');
     this.mixin('loading');
+    this.mixin('config');
 
     /**
      * on save
@@ -108,6 +112,41 @@
 
       // loading product
       this.loading('email', false);
+    }
+
+    /**
+     * on select product
+     *
+     * @param  {Event} e
+     */
+    async onPdf(e) {
+      // prevent default
+      e.preventDefault();
+      e.stopPropagation();
+
+      // loading product
+      this.loading('pdf', true);
+
+      // get product
+      const result = (await eden.router.post(`/admin/shop/invoice/${opts.invoice.id}/pdf`, {
+        body  : this.refs['email-body'].value || '',
+      }));
+
+      if (result.success) {
+        const url = `//${this.config.domain}${result.result.url}`;
+
+        var a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `${opts.invoice.invoiceno ? opts.invoice.invoiceno : opts.invoice.id}.pdf`);
+
+        var aj = jQuery(a);
+        aj.appendTo('body');
+        aj[0].click();
+        aj.remove();
+      }
+
+      // loading product
+      this.loading('pdf', false);
     }
 
     // on mount

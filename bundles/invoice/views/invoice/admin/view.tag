@@ -17,7 +17,7 @@
 
     <div class="container{ this.mnt.layout.includes('print') ? '-fluid my-5' : '' }">
 
-      <invoice-view invoice={ opts.invoice } orders={ opts.orders } />
+      <invoice-view invoice={ opts.invoice } orders={ opts.orders } invoices={ opts.invoices ?  opts.invoices : '' } />
 
       <div class="{ this.mnt.layout.includes('print') ? '' : 'card' }" if={ opts.payments }>
         <div class="card-header">

@@ -11,6 +11,7 @@ const Order   = model('order');
 const Block   = model('block');
 const Product = model('product');
 const Payment = model('payment');
+const Invoice = model('invoice');
 
 // bind local dependencies
 const config = require('config');

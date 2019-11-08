@@ -61,6 +61,8 @@ class InvoiceController extends Controller {
     // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice, true);
 
+    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).ne('status', 'unset').sort('created_at', -1).find();
+
     // render page
     res.render('invoice/admin/view', {
       grid     : await paymentGrid.render(req, invoice),
@@ -68,6 +70,7 @@ class InvoiceController extends Controller {
       orders   : await Promise.all((await invoice.get('orders')).map(order => order.sanitise())),
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
+      invoices : await Promise.all(await invoices.map(invoice => invoice.sanitise())),
     });
   }
 

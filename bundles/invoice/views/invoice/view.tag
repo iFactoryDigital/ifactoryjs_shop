@@ -191,6 +191,13 @@
       }, 0);
     }
 
+    getOverdueInvoices() {
+      if(invoices.length > 0) {
+        const invoices = opts.invoices.filter(invoice => { let paid = 0; invoice.payments.map(payment => payment.state === 'paid' ? paid += payment.amount : ''); invoice.paidamount = paid; return paid < invoice.total });
+        return invoices;
+      }
+    }
+
     // on mount
     this.on('mount', () => {
       // check frontend

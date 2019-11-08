@@ -64,7 +64,7 @@ class Order extends Model {
 
     // find invoice
     const invoice = await this.get('invoice') || await Invoice.findOne({
-      'orders.id' : this.get('_id'),
+      'orders.id' : this.get('_id') ? this.get('_id') : 'null',
     });
 
     // return sanitised bot

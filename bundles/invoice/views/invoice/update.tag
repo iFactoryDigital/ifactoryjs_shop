@@ -241,7 +241,7 @@
               { order.id }
             </option>
           </eden-select>
-          
+
         </div>
 
         <!-- Modal footer -->
@@ -383,7 +383,7 @@
       // show modal
       if (!jQuery(this.refs.product).is('.show')) jQuery(this.refs.product).modal('show');
     }
-    
+
     /**
      * on dismiss product
      *
@@ -472,13 +472,13 @@
       // prevent default
       e.preventDefault();
       e.stopPropagation();
-      
+
       // get target
       const target = jQuery(e.target).is('button') ? jQuery(e.target) : jQuery(e.target).closest('button');
 
       // get order
       const order = opts.orders.find(o => o.id === (e.item.line.order || target.attr('data-order')));
-      
+
       // splice out
       order.lines.splice(e.item.i, 1);
 
@@ -504,7 +504,7 @@
       // loading product
       this.loading('product', false);
     }
-    
+
     /**
      * on select order
      *
@@ -518,13 +518,13 @@
 
       // loading product
       this.loading('order', true);
-      
+
       // set orders
       if (!opts.orders) opts.orders = [];
-      
+
       // set order
       const order = (await eden.router.get(`/admin/shop/order/${orderID}/get`)).result;
-      
+
       // set order id
       order.lines.forEach(l => l.order = order.id);
 
@@ -593,7 +593,7 @@
           o[key] = find[key];
         }
       });
-      
+
       // set to invoice
       if (invoice) {
         // loop keys
@@ -602,7 +602,7 @@
           this.invoice[key] = invoice[key];
         }
       }
-      
+
       // on save
       if (opts.onSave) opts.onSave(this.invoice, opts.orders);
 
@@ -638,6 +638,13 @@
       }, 0);
     }
 
+    getOverdueInvoices() {
+      if(invoices.length > 0) {
+        const invoices = opts.invoices.filter(invoice => { let paid = 0; invoice.payments.map(payment => payment.state === 'paid' ? paid += payment.amount : ''); invoice.paidamount = paid; return paid < invoice.total });
+        return invoices;
+      }
+    }
+
     // on mount
     this.on('mount', () => {
       // check frontend
@@ -645,7 +652,7 @@
 
       // set initial discount
       this.discount = (this.getSubtotal() - this.invoice.total);
-      
+
       // fix lines
       (opts.orders || []).forEach((order) => {
         // check lines
