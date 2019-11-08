@@ -71,6 +71,7 @@ class InvoiceController extends Controller {
       invoice  : await invoice.sanitise(),
       payments : !!req.query.payments,
       invoices : await Promise.all(await invoices.map(invoice => invoice.sanitise())),
+      print    : true,
     });
   }
 
