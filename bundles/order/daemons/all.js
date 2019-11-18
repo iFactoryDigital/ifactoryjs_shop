@@ -3,6 +3,7 @@
 // bind dependencies
 const config = require('config');
 const Daemon = require('daemon');
+const moment = require('moment');
 
 // require models
 const Sold    = model('sold');
@@ -66,8 +67,15 @@ class AllOrderDaemon extends Daemon {
   async orderUpdateHook(orderStatus) {
     // load invoice
     const invoice = await orderStatus.get('invoice') || await Invoice.findOne({
-      'orders.id' : orderStatus.get('_id'),
+      'orders.id' : orderStatus.get('_id') ? orderStatus.get('_id') : 'null',
     });
+
+    // Create Order No
+    if (!orderStatus.get('orderno')) {
+      const prefix = await orderStatus.get('customer');
+      const orderno = 'Ord'+ (prefix ? prefix.get('uid') : [...Array(5)].map(i=>(~~(Math.random()*36)).toString(36)).join('')) + moment().format("MD")+[...Array(2)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+      orderStatus.set('orderno', orderno);
+    }
 
     // check invoice
     if (!invoice) return;
@@ -109,11 +117,16 @@ class AllOrderDaemon extends Daemon {
       try {
         // get address
         address = orderStatus.get('address.email') || orderStatus.get('actions.address.value.email');
-
+        if(orderStatus.get('customer')) {
+          const customer = await orderStatus.get('customer');
+          address = customer.get('email');
+        }
         // get email
         if (!address) address = await orderStatus.get('user') ? (await orderStatus.get('user')).get('email') : null;
         if (!address) address = await orderStatus.get('address') ? (await orderStatus.get('address')).get('email') : null;
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
 
       // send email
       if (address) {

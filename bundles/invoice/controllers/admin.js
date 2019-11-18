@@ -370,7 +370,7 @@ class AdminInvoiceController extends Controller {
     // eslint-disable-next-line no-underscore-dangle
     const paymentGrid = await paymentController._grid(req, invoice);
 
-    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).ne('status', 'unset').sort('created_at', -1).find();
+    const invoices = await Invoice.where({ 'customer.id' : invoice.get('customer.id') }).nin('status', ['unset', 'draft']).sort('created_at', -1).find();
 
     // render page
     res.render('invoice/admin/update', {
@@ -724,7 +724,7 @@ class AdminInvoiceController extends Controller {
       format : async (col) => {
         return col && col.length ? col.map((item) => {
           // return item
-          return `<a href="/admin/shop/order/${item.get('_id').toString()}/update">${item.get('_id').toString()}</a>`;
+          return `<a href="/admin/shop/order/${item.get('_id').toString()}/update">${item.get('orderno') ? item.get('orderno') : item.get('_id')}</a>`;
         }).join(', ') : '<i>N/A</i>';
       },
     }).column('total', {
@@ -769,25 +769,6 @@ class AdminInvoiceController extends Controller {
         title    : 'Actions',
         priority : 1,
       });
-
-      /*
-      .column('actions', {
-        width  : '1%',
-        title  : 'Actions',
-        export : false,
-        format : async (col, row) => {
-          return [
-            '<div class="btn-group btn-group-sm" role="group">',
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/view" class="btn btn-info"><i class="fa fa-eye"></i></a>`,
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/print" class="btn btn-info" target="_blank"><i class="fa fa-print"></i></a>`,
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/pdf" class="btn btn-info" target="_blank"><i class="fa fa-file"></i></a>`,
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/update" class="btn btn-primary"><i class="fa fa-pencil-alt"></i></a>`,
-            `<a href="/admin/shop/invoice/${row.get('_id').toString()}/remove" class="btn btn-danger"><i class="fa fa-times"></i></a>`,
-            '</div>',
-          ].join('');
-        },
-      });
-      */
 
     // add grid filters
     invoiceGrid.filter('username', {

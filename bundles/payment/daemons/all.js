@@ -1,6 +1,7 @@
 
 // bind dependencies
 const Daemon = require('daemon');
+const moment = require('moment');
 
 /**
  * build cart controller
@@ -58,6 +59,12 @@ class AllPaymentDaemon extends Daemon {
       // set state paid
       payment.set('state', 'paid');
       payment.set('complete', new Date());
+    }
+    //paymentno update
+    if (!payment.get('paymentno')) {
+      const prefix = await payment.get('customer');
+      const paymentno = 'Pay'+ (prefix ? prefix.get('uid') : [...Array(5)].map(i=>(~~(Math.random()*36)).toString(36)).join('')) + moment().format("MD")+[...Array(2)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+      payment.set('paymentno', paymentno);
     }
   }
 }

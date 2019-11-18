@@ -108,6 +108,7 @@ class Invoice extends Model {
       total,
 
       id     : this.get('_id') ? this.get('_id').toString() : false,
+      invoiceno : this.get('invoiceno') ? this.get('invoiceno').toString() : null,
       rate   : this.get('rate'),
       paid   : await this.hasPaid(invoicePayments),
       note   : this.get('note'),

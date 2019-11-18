@@ -70,6 +70,7 @@ class Order extends Model {
     // return sanitised bot
     const sanitised = {
       id       : this.get('_id') ? this.get('_id').toString() : null,
+      orderno  : this.get('orderno') ? this.get('orderno') : null,
       user     : this.get('user.id') ? await (await this.get('user')).sanitise() : null,
       sent     : this.get('sent'),
       error    : this.get('error'),

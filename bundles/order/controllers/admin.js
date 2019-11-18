@@ -361,6 +361,7 @@ class AdminOrderController extends Controller {
    * @layout  admin
    */
   async updateSubmitAction(req, res) {
+    console.log('updateSubmitAction');
     // set website variable
     let order  = new Order();
     let create = true;
@@ -557,6 +558,11 @@ class AdminOrderController extends Controller {
       format : async (col) => {
         return col ? col.toString() : '<i>N/A</i>';
       },
+    }).column('orderno', {
+      title  : 'Order No',
+      format : async (col, row) => {
+        return row.get('orderno') ? row.get('orderno') : row.get('_id');
+      },
     })
       .column('user', {
         sort   : true,
@@ -628,7 +634,7 @@ class AdminOrderController extends Controller {
         title  : 'Invoice',
         format : async (col) => {
           // get paid
-          return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
+          return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('invoiceno') ? col.get('invoiceno') : col.get('_id').toString()}</a>` : '<i>N/A</i>';
         },
         export : async (col) => {
           // get invoice
