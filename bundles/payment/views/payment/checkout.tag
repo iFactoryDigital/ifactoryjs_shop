@@ -16,7 +16,7 @@
   <script>
     // mixin i18n
     this.mixin('i18n');
-    
+
     // set checkout
     this.checkout = opts.checkout;
 

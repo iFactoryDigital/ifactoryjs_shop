@@ -589,7 +589,7 @@ class AdminOrderController extends Controller {
             const product = await Product.findById(line.product);
 
             // return value
-            return `${line.qty || 1}x <a href="/admin/shop/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>`;
+            return product ? `${line.qty || 1}x <a href="/admin/shop/product/${product.get('_id').toString()}/update">${product.get(`title.${req.language}`)}</a>` : '';
           }))).join(',<br>');
         },
         export : async (col, row) => {
@@ -602,7 +602,7 @@ class AdminOrderController extends Controller {
             const product = await Product.findById(line.product);
 
             // return value
-            return `${line.qty || 1}x ${product.get(`title.${req.language}`)}`;
+            return product ? `${line.qty || 1}x ${product.get(`title.${req.language}`)}` : '';
           }))).join(', ');
         },
       })

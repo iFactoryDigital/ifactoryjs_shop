@@ -54,12 +54,6 @@ class AllPaymentDaemon extends Daemon {
    * @pre payment.create
    */
   async paymentUpdateHook(payment) {
-    // check state
-    if (payment.get('complete') && payment.get('state') !== 'paid') {
-      // set state paid
-      payment.set('state', 'paid');
-      payment.set('complete', new Date());
-    }
     //paymentno update
     if (!payment.get('paymentno')) {
       const prefix = await payment.get('customer');

@@ -522,7 +522,7 @@ class AdminInvoiceController extends Controller {
 
         // save order
         order.set('invoice', invoice);
-        order.save();
+        order.save(req.user);
       });
     }
 
@@ -532,6 +532,7 @@ class AdminInvoiceController extends Controller {
     // save payment
     payment = new Payment({
       invoice,
+      customer : invoice.get('customer'),
       user     : req.user,
       rate     : 1,
       admin    : req.user,
@@ -539,6 +540,8 @@ class AdminInvoiceController extends Controller {
       details  : req.body.details,
       currency : req.body.currency,
     });
+
+    await this.eden.hook('payment.addinfo', payment, req);
 
     // create manual payment
     if (req.body.type === 'manual') {
@@ -709,6 +712,13 @@ class AdminInvoiceController extends Controller {
       format : async (col) => {
         return col ? col.toString() : '<i>N/A</i>';
       },
+    }).column('invoiceno', {
+      sort   : true,
+      title  : 'INV #',
+      format : async (col, row) => {
+        // return item
+        return row.get('invoiceno') ? row.get('invoiceno') : row.get('_id');
+      },
     }).column('user', {
       sort   : true,
       title  : 'User',
@@ -730,45 +740,44 @@ class AdminInvoiceController extends Controller {
     }).column('total', {
       title  : 'Total',
       format : async (col, row) => {
-        return col ? `$${col.toFixed(2)} ${row.get('currency')}` : '<i>N/A</i>';
+        return col ? `$${col.toFixed(2)} ${row.get('currency') ? row.get('currency') : config.get('shop.currency')}` : '<i>N/A</i>';
+      },
+    }).column('state', {
+      sort   : true,
+      title  : 'Status',
+      format : async (col, row) => {
+        return row.get('state') ? `<span class="btn btn-sm">${row.get('state')}</span>` : '<i>N/A</i>';
       },
     })
-      .column('status', {
-        sort   : true,
-        title  : 'Status',
-        format : async (col) => {
-          return col ? `<span class="btn btn-sm">${col}</span>` : '<i>N/A</i>';
-        },
-      })
-      .column('updated_at', {
-        sort   : true,
-        title  : 'Updated',
-        format : async (col) => {
-          return col.toLocaleDateString('en-GB', {
-            day   : 'numeric',
-            month : 'short',
-            year  : 'numeric',
-          });
-        },
-      })
-      .column('created_at', {
-        sort   : true,
-        title  : 'Created',
-        format : async (col) => {
-          return col.toLocaleDateString('en-GB', {
-            day   : 'numeric',
-            month : 'short',
-            year  : 'numeric',
-          });
-        },
-      })
-      .column('actions', {
-        tag      : 'invoice-actions',
-        type     : false,
-        width    : '1%',
-        title    : 'Actions',
-        priority : 1,
-      });
+    .column('updated_at', {
+      sort   : true,
+      title  : 'Updated',
+      format : async (col) => {
+        return col.toLocaleDateString('en-GB', {
+          day   : 'numeric',
+          month : 'short',
+          year  : 'numeric',
+        });
+      },
+    })
+    .column('created_at', {
+      sort   : true,
+      title  : 'Created',
+      format : async (col) => {
+        return col.toLocaleDateString('en-GB', {
+          day   : 'numeric',
+          month : 'short',
+          year  : 'numeric',
+        });
+      },
+    })
+    .column('actions', {
+      tag      : 'invoice-actions',
+      type     : false,
+      width    : '1%',
+      title    : 'Actions',
+      priority : 1,
+    });
 
     // add grid filters
     invoiceGrid.filter('username', {

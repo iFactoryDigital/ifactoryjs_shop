@@ -1,15 +1,15 @@
 <invoice-admin-view-page>
 
   <div class="page page-shop">
-    <admin-header title="View Invoice" if={ !this.mnt.layout.includes('print') } invoice={ opts.invoice }>
+    <admin-header title="View Invoice" if={ !this.mnt.layout.includes('print') } invoice={ opts.invoice } back={ this.back ? this.back : '' }>
       <yield to="right">
-        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/update" disabled={ !opts.invoice }>
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/update{ opts.back ? '?back='+opts.back : ''}" disabled={ !opts.invoice }>
           Update Invoice
         </a>
-        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/print" disabled={ !opts.invoice }>
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/print{ opts.back ? '?back='+opts.back : ''}" disabled={ !opts.invoice }>
           Print Invoice
         </a>
-        <a href="/admin/shop/invoice" class="btn btn-lg btn-primary">
+        <a href={ opts.back ? opts.back : '/admin/shop/invoice' } class="btn btn-lg btn-primary">
           Back
         </a>
       </yield>
@@ -34,6 +34,17 @@
   <script>
     // do mixin
     this.mixin('mount');
+
+    const q = require('querystring');
+    this.back = '';
+
+    // on update
+    this.on('update', () => {
+      // check frontend
+      if (!this.eden.frontend) return;
+      let url_ = location.search ? location.search.substr(1) : '';
+      this.back = q.parse(url_) ? q.parse(url_).back : '';
+    });
 
     // on mount
     this.on('mount', () => {

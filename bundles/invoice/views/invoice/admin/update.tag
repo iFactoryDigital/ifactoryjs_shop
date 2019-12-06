@@ -1,12 +1,12 @@
 <invoice-admin-update-page>
 
   <div class="page page-shop">
-    <admin-header title="{ opts.invoice.id ? 'Update' : 'Create' } Invoice" invoice={ opts.invoice } loading={ this.loading } on-email={ onEmail } on-pdf={ onPdf }>
+    <admin-header title="{ opts.invoice.id ? 'Update' : 'Create' } Invoice" invoice={ opts.invoice } loading={ this.loading } on-email={ onEmail } on-pdf={ onPdf } back={ this.back ? this.back : '' }>
       <yield to="right">
-        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/view" disabled={ !opts.invoice }>
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/view{ opts.back ? '?back='+opts.back : ''}" disabled={ !opts.invoice }>
           View Invoice
         </a>
-        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/print" disabled={ !opts.invoice }>
+        <a class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : !opts.invoice } href="/admin/shop/invoice/{ (opts.invoice || {}).id }/print{ opts.back ? '?back='+opts.back : ''}" disabled={ !opts.invoice }>
           Print Invoice
         </a>
         <button class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : opts.loading() } onclick={ opts.onPdf } disabled={ opts.loading() }>
@@ -15,7 +15,7 @@
         <button class={ 'btn btn-lg btn-info mr-2' : true, 'disabled' : opts.loading() } onclick={ opts.onEmail } disabled={ opts.loading() }>
           { opts.loading('email') ? 'Emailing...' : 'Email Invoice' }
         </button>
-        <a href="/admin/shop/invoice" class="btn btn-lg btn-primary">
+        <a href={ opts.back ? opts.back : '/admin/shop/invoice' } class="btn btn-lg btn-primary">
         Back
         </a>
       </yield>
@@ -76,6 +76,9 @@
     this.mixin('i18n');
     this.mixin('loading');
     this.mixin('config');
+
+    const q = require('querystring');
+    this.back = '';
 
     /**
      * on save
@@ -149,11 +152,18 @@
       this.loading('pdf', false);
     }
 
+    // on update
+    this.on('update', () => {
+      // check frontend
+      if (!this.eden.frontend) return;
+      let url_ = location.search ? location.search.substr(1) : '';
+      this.back = q.parse(url_) ? q.parse(url_).back : '';
+    });
+
     // on mount
     this.on('mount', () => {
       // check frontend
       if (!this.eden.frontend) return;
-
       // update
       this.update();
     });

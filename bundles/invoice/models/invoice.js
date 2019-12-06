@@ -66,7 +66,7 @@ class Invoice extends Model {
     if (!invoicePayments) {
       // payments
       invoicePayments = await Payment.where({
-        'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
+        'invoice.id' : this.get('_id') ? this.get('_id').toString() : null,
       }).find() || [];
     }
 
@@ -120,13 +120,14 @@ class Invoice extends Model {
       }) ? 'paid' : (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
           return a + b;
-        }) > 0 ? 'partial' : (this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
+        }) > 0 ? 'partial' : (await this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
       discount : this.get('discount') || 0,
       currency : this.get('currency'),
       payments : await Promise.all(invoicePayments.map((invoicePayment) => {
         // return sanitised images
         return invoicePayment.sanitise();
       })),
+      state   : this.get('state') ? this.get('state') : '',
       updated : this.get('updated_at'),
       created : this.get('created_at'),
     };

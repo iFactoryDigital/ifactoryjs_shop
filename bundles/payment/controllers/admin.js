@@ -214,8 +214,8 @@ class AdminPaymentController extends Controller {
     }
 
     // get orders on invoice
-    const invoice = await payment.get('invoice');
-    const orders = await invoice.get('orders') || [];
+    const invoice = await payment.get('invoice') || '';
+    const orders = invoice ? await invoice.get('orders') : [];
 
     // set details
     if (!payment.get('complete') && req.body.paid === 'paid') {
@@ -225,6 +225,7 @@ class AdminPaymentController extends Controller {
       });
       payment.set('manual.by', req.user);
       payment.set('complete', true);
+      payment.set('state', 'paid');
 
       // unset data
       payment.unset('data');
@@ -237,6 +238,7 @@ class AdminPaymentController extends Controller {
         updated : new Date(),
       });
       payment.set('manual.by', req.user);
+      payment.set('state', 'unpaid');
 
       // unset data
       payment.unset('data');
@@ -373,7 +375,7 @@ class AdminPaymentController extends Controller {
         const user = await row.get('user');
 
         // get name
-        return user ? user.name() : '<i>N/A</i>';
+        return user && user.get('name') ? user.get('name') : '<i>N/A</i>';
       },
     }).column('amount', {
       title  : 'Amount',

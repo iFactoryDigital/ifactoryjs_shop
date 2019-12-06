@@ -7,14 +7,14 @@
       <div class="row">
         <div class="col-md-7 col-lg-8">
           <h3 class="mb-4">
-            Invoice: { this.invoice.id }
+            Invoice: { this.invoice.invoiceno ?  this.invoice.invoiceno : this.invoice.id }
           </h3>
 
           <p class="lead mb-2">
             Invoice Number
           </p>
           <b class="d-block mb-3">
-            { this.invoice.id }
+            { this.invoice.invoiceno ?  this.invoice.invoiceno : this.invoice.id }
           </b>
 
           <p class="lead mb-2">

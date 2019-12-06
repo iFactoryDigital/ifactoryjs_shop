@@ -197,6 +197,7 @@ class PaymentController extends Controller {
     // check action
     if (action.type !== 'payment') return;
 
+
     // return sanitised data
     action.data.methods.push({
       type     : 'manual',

@@ -4,11 +4,13 @@
 const config = require('config');
 const Daemon = require('daemon');
 const moment = require('moment');
+const uuid   = require('uuid');
 
 // require models
 const Sold    = model('sold');
 const Invoice = model('invoice');
 const Product = model('product');
+const Order   = model('order');
 
 // require helpers
 const emailHelper   = helper('email');
@@ -65,6 +67,8 @@ class AllOrderDaemon extends Daemon {
    * @pre order.create
    */
   async orderUpdateHook(orderStatus) {
+    console.log('orderUpdateHook');
+    console.log(orderStatus);
     // load invoice
     const invoice = await orderStatus.get('invoice') || await Invoice.findOne({
       'orders.id' : orderStatus.get('_id') ? orderStatus.get('_id') : 'null',
@@ -77,8 +81,24 @@ class AllOrderDaemon extends Daemon {
       orderStatus.set('orderno', orderno);
     }
 
+    orderStatus.get('lines').map(l => {
+      !l.uuid ? l.uuid = uuid() : '';
+    });
+
     // check invoice
     if (!invoice) return;
+
+    //Update Invoice total
+    const ototal = invoice.get('total') ? invoice.get('total') : 0;
+    let ninvtotal = 0;
+    (await invoice.get('orders') || []).map(o => o.get('_id') !== orderStatus.get('_id') ? ninvtotal += parseFloat(o.get('total')) : '');
+    ninvtotal += orderStatus.get('total') ? parseFloat(orderStatus.get('total')) : 0;
+    console.log(ototal);
+    console.log(ninvtotal);
+    if (ototal !== ninvtotal) {
+      invoice.set('total', ninvtotal);
+      invoice.save();
+    }
 
     // set invoice
     orderStatus.set('invoice', invoice);
@@ -117,7 +137,7 @@ class AllOrderDaemon extends Daemon {
       try {
         // get address
         address = orderStatus.get('address.email') || orderStatus.get('actions.address.value.email');
-        if(orderStatus.get('customer')) {
+        if (orderStatus.get('customer')) {
           const customer = await orderStatus.get('customer');
           address = customer.get('email');
         }
@@ -200,6 +220,7 @@ class AllOrderDaemon extends Daemon {
         });
       }));
     }
+    console.log(orderStatus);
   }
 }
 
