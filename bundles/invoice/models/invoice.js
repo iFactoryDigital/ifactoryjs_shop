@@ -33,14 +33,17 @@ class Invoice extends Model {
     if (!invoicePayments) {
       // payments
       invoicePayments = await Payment.where({
-        'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
+        'invoices.invoice' : this.get('_id') ? this.get('_id').toString() : 'null',
       }).find() || [];
     }
 
     // load payments
     const payments = invoicePayments.map((invoicePayment) => {
       // return sanitised images
-      return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
+      // return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
+      let amount = 0;
+      (invoicePayment.get('complete') || invoicePayment.get('state') === 'paid') ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? amount += i.amount : '') : '';
+      return amount;
     });
 
     // get total
@@ -66,14 +69,18 @@ class Invoice extends Model {
     if (!invoicePayments) {
       // payments
       invoicePayments = await Payment.where({
-        'invoice.id' : this.get('_id') ? this.get('_id').toString() : null,
+        'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
       }).find() || [];
     }
 
     // load payments
     const payments = (invoicePayments.map((invoicePayment) => {
+      //console.log(invoicePayment);
       // return sanitised images
-      return invoicePayment.get('state') === 'approval' ? invoicePayment.get('amount') : 0;
+      //return invoicePayment.get('state') === 'approval' ? invoicePayment.get('amount') : 0;
+      let amount = 0;
+      invoicePayment.get('state')  === 'approval' ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? amount += i.amount : '') : '';
+      return amount;
     })).reduce((accum, amount) => accum + amount, 0);
 
     // return approval
@@ -88,13 +95,16 @@ class Invoice extends Model {
   async sanitise() {
     // load payments
     const invoicePayments = (await Payment.where({
-      'invoice.id' : this.get('_id') ? this.get('_id').toString() : 'null',
+      'invoices.invoice' : this.get('_id') ? this.get('_id').toString() : 'null',
     }).find() || []);
 
     // load payments
     const payments = invoicePayments.map((invoicePayment) => {
       // return sanitised images
-      return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
+      //return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
+      let amount = 0;
+      (invoicePayment.get('complete') || invoicePayment.get('state') === 'paid') ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? amount += i.amount : '') : '';
+      return amount;
     });
 
     // get total

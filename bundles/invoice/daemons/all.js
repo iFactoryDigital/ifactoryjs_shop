@@ -80,7 +80,6 @@ class AllInvoiceDaemon extends Daemon {
     docket && docket.get('status') ? docket.get('status') === 'complete' ? invoice.set('status', 'complete') : docket.get('status') === 'en-route' ? invoice.set('status', 'delivery') : invoice.set('status', 'draft') : invoice.set('status', 'draft');
     */
   }
-
   /**
    * pre invoice update
    *
@@ -90,6 +89,7 @@ class AllInvoiceDaemon extends Daemon {
    * @pre payment.create
    */
   async invoiceUpdatebyPaymentHook(payment) {
+    /*
     console.log('invoiceUpdatebyPaymentHook');
     const invoice = payment.get('invoice') ? await payment.get('invoice') : '';
     if (!invoice) return ;
@@ -119,6 +119,7 @@ class AllInvoiceDaemon extends Daemon {
     invoice.set('remain', (amount === invoiceamount && invoiceamount > 0) ? 0 : (invoiceamount-amount));
 
     await invoice.save();
+    */
   }
 }
 

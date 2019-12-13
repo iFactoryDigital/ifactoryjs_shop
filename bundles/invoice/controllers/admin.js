@@ -496,6 +496,7 @@ class AdminInvoiceController extends Controller {
     // set website variable
     let invoice = new Invoice();
     let payment = null;
+    let total   = 0;
 
     // check for website model
     if (req.params.id && req.params.id !== 'create') {
@@ -508,24 +509,23 @@ class AdminInvoiceController extends Controller {
         // return orders
         return Order.findById(id);
       }));
-
       // set order
       invoice.set('orders', orders);
-
       // save invoice
       await invoice.save();
-
       // set orders
       orders.forEach((order) => {
         // check order
         if (!order) return;
-
+        total += order.get('total');
         // save order
         order.set('invoice', invoice);
         order.save(req.user);
       });
+      invoice.set('total', total);
+      // save invoice
+      await invoice.save();
     }
-
     // get orders
     const orders = await invoice.get('orders') || [];
 
@@ -539,6 +539,12 @@ class AdminInvoiceController extends Controller {
       amount   : parseFloat(req.body.amount),
       details  : req.body.details,
       currency : req.body.currency,
+      invoices : [{
+          invoice   : invoice.get('_id'),
+          invoiceno : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
+          amount    : parseFloat(req.body.amount),
+          total     : total > 0 ? total : invoice.get('total'),
+      }]
     });
 
     await this.eden.hook('payment.addinfo', payment, req);

@@ -214,8 +214,11 @@ class AdminPaymentController extends Controller {
     }
 
     // get orders on invoice
-    const invoice = await payment.get('invoice') || '';
-    const orders = invoice ? await invoice.get('orders') : [];
+    const invoices = await payment.get('invoices') || '';
+    //const orders = invoice ? await invoice.get('orders') : [];
+    
+    const iids = invoices.map(i => i.invoice);
+    const orders = await Order.where({'donotexist' : null}).in('invoice.id', iids).find();
 
     // set details
     if (!payment.get('complete') && req.body.paid === 'paid') {
@@ -248,7 +251,7 @@ class AdminPaymentController extends Controller {
     await payment.save(req.user);
 
     // save all orders
-    await Promise.all(orders.map(order => order.save(req.user)));
+    await Promise.all(orders.map(async order => await order.save(req.user)));
 
     // render page
     res.render('payment/admin/update', {

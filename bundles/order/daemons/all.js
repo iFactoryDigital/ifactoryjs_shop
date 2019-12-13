@@ -68,7 +68,7 @@ class AllOrderDaemon extends Daemon {
    */
   async orderUpdateHook(orderStatus) {
     console.log('orderUpdateHook');
-    console.log(orderStatus);
+    //console.log(orderStatus);
     // load invoice
     const invoice = await orderStatus.get('invoice') || await Invoice.findOne({
       'orders.id' : orderStatus.get('_id') ? orderStatus.get('_id') : 'null',
@@ -220,7 +220,7 @@ class AllOrderDaemon extends Daemon {
         });
       }));
     }
-    console.log(orderStatus);
+    //console.log(orderStatus);
   }
 }
 
