@@ -102,7 +102,9 @@ class Product extends Model {
       pricing      : this.get('pricing') || {},
       promoted     : this.get('promoted') || false,
       published    : this.get('published') || false,
+      total        : this.get('total') || {},
       availability : this.get('availability') || {},
+      scanned      : this.get('scanned') || {},
     };
 
     // get form
