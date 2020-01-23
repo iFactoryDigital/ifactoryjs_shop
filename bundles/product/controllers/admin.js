@@ -112,7 +112,6 @@ class AdminProductController extends Controller {
     });
   }
 
-
   // ////////////////////////////////////////////////////////////////////////////
   //
   // HOOK METHODS
@@ -219,14 +218,26 @@ class AdminProductController extends Controller {
    * @route {GET} /query
    */
   async queryAction(req, res) {
+    console.log('queryAction');
+    console.log(req.query);
     // find children
     let products = Product;
 
     // set query
     if (req.query.q) {
-      products = products.where({
-        [`title.${req.language}`] : new RegExp(escapeRegex(req.query.q || ''), 'i'),
-      });
+      let param = {};
+      param[`title.${req.language}`] = new RegExp(escapeRegex(req.query.q || ''), 'i');
+      if (req.query.data) {
+        for (var key in req.query.data) {
+          if (req.query.data.hasOwnProperty(key)) {
+              param[key] = req.query.data[key];
+          }
+        }
+      }
+
+      products = products.where(
+        param,
+      );
     }
 
     // add roles
@@ -362,6 +373,7 @@ class AdminProductController extends Controller {
    * @layout  admin
    */
   async updateSubmitAction(req, res) {
+    console.log(req.body);
     // Set website variable
     let create  = true;
     let product = new Product({
@@ -400,16 +412,18 @@ class AdminProductController extends Controller {
     await this.eden.hook('product.pricing', req.body.type || product.get('type'), pricing);
 
     // Load availability
-    const { availability } = req.body;
+    const { total } = req.body;
 
     // Set availability
-    await this.eden.hook('product.availability', req.body.type || product.get('type'), availability);
+    await this.eden.hook('product.availability', req.body.type || product.get('type'), product.get('availability'));
 
     // Load availability
     const { shipping } = req.body;
 
     // Set availability
     await this.eden.hook('product.shipping', req.body.type || product.get('type'), shipping);
+
+    product.get('total.quantity') !== total.quantity ? product.set('availability.quantity', parseInt(((product.get('availability') || {}).quantity || 0)) + parseInt((total.quantity - ((product.get('total') || {}).quantity || 0)))) : '';
 
     // Update product
     product.set('sku', req.body.sku);
@@ -419,7 +433,7 @@ class AdminProductController extends Controller {
     product.set('shipping', shipping);
     product.set('promoted', req.body.promoted === 'true');
     product.set('published', req.body.published === 'true');
-    product.set('availability', availability);
+    product.set('total', total);
 
     // Run hook
     await this.eden.hook('product.submit', req, product, () => {});
