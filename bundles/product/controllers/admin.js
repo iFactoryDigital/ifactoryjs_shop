@@ -546,7 +546,7 @@ class AdminProductController extends Controller {
     // Set grid model
     productGrid.row('product-row');
     productGrid.model(Product);
-    productGrid.models(true);
+    //productGrid.models(true);
 
     // Add grid filters
     productGrid.filter('sku', {

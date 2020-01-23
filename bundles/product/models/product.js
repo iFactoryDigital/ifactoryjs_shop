@@ -105,6 +105,7 @@ class Product extends Model {
       total        : this.get('total') || {},
       availability : this.get('availability') || {},
       scanned      : this.get('scanned') || {},
+      branch       : this.get('Branch') ? this.get('Branch') : '',
     };
 
     // get form
