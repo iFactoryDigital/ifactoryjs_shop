@@ -8,7 +8,7 @@ const escapeRegex = require('escape-string-regexp');
 const User    = model('user');
 const Block   = model('block');
 const Payment = model('payment');
-
+const Order   = model('order');
 // require helpers
 const blockHelper = helper('cms/block');
 
@@ -216,7 +216,7 @@ class AdminPaymentController extends Controller {
     // get orders on invoice
     const invoices = await payment.get('invoices') || '';
     //const orders = invoice ? await invoice.get('orders') : [];
-    
+
     const iids = invoices.map(i => i.invoice);
     const orders = await Order.where({'donotexist' : null}).in('invoice.id', iids).find();
 
