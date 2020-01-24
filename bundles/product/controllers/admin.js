@@ -9,6 +9,7 @@ const escapeRegex = require('escape-string-regexp');
 const Block    = model('block');
 const Product  = model('product');
 const Category = model('category');
+const Branch   = model('branch');
 
 // Bind local dependencies
 const config = require('config');
@@ -45,6 +46,8 @@ class AdminProductController extends Controller {
     this.createSubmitAction = this.createSubmitAction.bind(this);
     this.updateSubmitAction = this.updateSubmitAction.bind(this);
     this.removeSubmitAction = this.removeSubmitAction.bind(this);
+
+    this.copyProductAction = this.copyProductAction.bind(this);
 
     // Bind private methods
     this._grid = this._grid.bind(this);
@@ -252,6 +255,52 @@ class AdminProductController extends Controller {
         value : sanitised.id,
       };
     }));
+  }
+
+  /**
+   * Add/edit action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route   {post} /:id/copy
+   * @layout  admin
+   */
+  async copyProductAction(req, res) {
+
+    const product = await Product.findById(req.params.id);
+
+    if (!((await product.get('Branch'))) || !((await product.get('Branch'))[0])) return;
+    const id = ((await product.get('Branch'))[0]).get('_id');
+    const branches = await Branch.find();
+    const branch = branches.filter(b => b.get('_id') === id);
+    if (!branch) return;
+
+    // get form
+    const form = await formHelper.get('shop.product');
+
+    (await Promise.all(branches.map(async b => {
+      if (b.get('_id') !== id) {
+        const productcopy = new Product();
+        productcopy.set('Branch', [{id: b.get('_id'), model: 'branch'}]);
+        productcopy.set('title.en-us', product.get('title.en-us'));
+        productcopy.set('images', (await product.get('images')));
+        productcopy.set('slug', product.get('slug'));
+        productcopy.set('short.en-us', product.get('short.en-us'));
+        productcopy.set('description.en-us', product.get('description.en-us'));
+        productcopy.set('sku', product.get('sku'));
+        productcopy.set('type', product.get('type'));
+        productcopy.set('published', product.get('published'));
+        productcopy.set('pricing', product.get('pricing'));
+        productcopy.set('promoted', product.get('promoted'));
+        await productcopy.save(req.user);
+      }
+    })));
+
+    // return update action
+    return res.json({
+      success : true,
+    });
   }
 
   /**
