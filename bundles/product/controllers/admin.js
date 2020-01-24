@@ -277,23 +277,24 @@ class AdminProductController extends Controller {
     if (!branch) return;
 
     // get form
-    const form = await formHelper.get('shop.product');
-
-    (await Promise.all(branches.map(async b => {
+    (await Promise.all(await branches.map(async b => {
       if (b.get('_id') !== id) {
-        const productcopy = new Product();
-        productcopy.set('Branch', [{id: b.get('_id'), model: 'branch'}]);
-        productcopy.set('title.en-us', product.get('title.en-us'));
-        productcopy.set('images', (await product.get('images')));
-        productcopy.set('slug', product.get('slug'));
-        productcopy.set('short.en-us', product.get('short.en-us'));
-        productcopy.set('description.en-us', product.get('description.en-us'));
-        productcopy.set('sku', product.get('sku'));
-        productcopy.set('type', product.get('type'));
-        productcopy.set('published', product.get('published'));
-        productcopy.set('pricing', product.get('pricing'));
-        productcopy.set('promoted', product.get('promoted'));
-        await productcopy.save(req.user);
+        const p = await Product.where({'Branch.id' : b.get('_id'), sku: product.get('sku'), type: product.get('type')}).findOne();
+        if (!p) {
+          const productcopy = new Product();
+          productcopy.set('Branch', [{id: b.get('_id'), model: 'branch'}]);
+          productcopy.set('title.en-us', product.get('title.en-us'));
+          productcopy.set('images', (await product.get('images')));
+          productcopy.set('slug', product.get('slug'));
+          productcopy.set('short.en-us', product.get('short.en-us'));
+          productcopy.set('description.en-us', product.get('description.en-us'));
+          productcopy.set('sku', product.get('sku'));
+          productcopy.set('type', product.get('type'));
+          productcopy.set('published', product.get('published'));
+          productcopy.set('pricing', product.get('pricing'));
+          productcopy.set('promoted', product.get('promoted'));
+          await productcopy.save(req.user);
+        }
       }
     })));
 
