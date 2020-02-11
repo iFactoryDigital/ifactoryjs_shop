@@ -745,6 +745,7 @@ class AdminInvoiceController extends Controller {
       },
     }).column('total', {
       title  : 'Total',
+      sort   : true,
       format : async (col, row) => {
         return col ? `$${col.toFixed(2)} ${row.get('currency') ? row.get('currency') : config.get('shop.currency')}` : '<i>N/A</i>';
       },
