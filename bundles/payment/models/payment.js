@@ -43,6 +43,7 @@ class Payment extends Model {
       details  : this.get('details'),
       complete : this.get('complete'),
       invoices : this.get('invoices') ? this.get('invoices') : '',
+      error    : this.get('error') ? this.get('error') : '',
     };
 
     // hook

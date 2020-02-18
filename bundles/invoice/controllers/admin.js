@@ -493,6 +493,7 @@ class AdminInvoiceController extends Controller {
    * @layout  admin
    */
   async paymentCreateAction(req, res) {
+    console.log('paymentCreateAction');
     // set website variable
     let invoice = new Invoice();
     let payment = null;
@@ -571,6 +572,8 @@ class AdminInvoiceController extends Controller {
 
       // unset data
       payment.unset('method.data');
+
+      payment.set('state', payment.get('complete') ? 'approved' : payment.get('error') ? 'error' : 'approval');
 
       // save payment
       await payment.save(req.user);
