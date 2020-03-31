@@ -75,9 +75,6 @@ class Invoice extends Model {
 
     // load payments
     const payments = (invoicePayments.map((invoicePayment) => {
-      //console.log(invoicePayment);
-      // return sanitised images
-      //return invoicePayment.get('state') === 'approval' ? invoicePayment.get('amount') : 0;
       let amount = 0;
       invoicePayment.get('state')  === 'approval' ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? amount += i.amount : '') : '';
       return amount;
@@ -99,12 +96,17 @@ class Invoice extends Model {
     }).find() || []);
 
     // load payments
-    const payments = invoicePayments.map((invoicePayment) => {
+    let payments = 0;
+    invoicePayments.map((invoicePayment) => {
+      (invoicePayment.get('complete') || invoicePayment.get('state') === 'paid') ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? payments += i.amount : '') : '';
+    });
+
+    // load payments
+    let totalpayments = 0;
+    invoicePayments.map((invoicePayment) => {
       // return sanitised images
       //return invoicePayment.get('complete') ? invoicePayment.get('amount') : 0;
-      let amount = 0;
-      (invoicePayment.get('complete') || invoicePayment.get('state') === 'paid') ? invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? amount += i.amount : '') : '';
-      return amount;
+      invoicePayment.get('invoices').map(i => i.invoice === this.get('_id').toString() ? totalpayments += i.amount : '');
     });
 
     // get total
@@ -115,15 +117,12 @@ class Invoice extends Model {
 
     // return sanitised bot
     const sanitised = {
-      total,
-
-      id     : this.get('_id') ? this.get('_id').toString() : false,
+      id        : this.get('_id') ? this.get('_id').toString() : false,
       invoiceno : this.get('invoiceno') ? this.get('invoiceno').toString() : null,
-      rate   : this.get('rate'),
-      paid   : await this.hasPaid(invoicePayments),
-      note   : this.get('note'),
-      // eslint-disable-next-line no-nested-ternary
-      status : total <= (payments.length ? payments : [0]).reduce((a, b) => {
+      rate      : this.get('rate'),
+      paid      : await this.hasPaid(invoicePayments),
+      note      : this.get('note'),
+      status    : total <= (payments.length ? payments : [0]).reduce((a, b) => {
         // return a + b
         return a + b;
       // eslint-disable-next-line no-nested-ternary
@@ -131,15 +130,19 @@ class Invoice extends Model {
         // return a + b
           return a + b;
         }) > 0 ? 'partial' : (await this.hasApproval(invoicePayments) ? 'approval' : 'unpaid'),
-      discount : this.get('discount') || 0,
-      currency : this.get('currency'),
-      payments : await Promise.all(invoicePayments.map((invoicePayment) => {
+      discount   : this.get('discount') || 0,
+      currency   : this.get('currency'),
+      payments   : await Promise.all(invoicePayments.map((invoicePayment) => {
         // return sanitised images
         return invoicePayment.sanitise();
       })),
-      state   : this.get('state') ? this.get('state') : '',
-      updated : this.get('updated_at'),
-      created : this.get('created_at'),
+      state     : this.get('state') ? this.get('state') : '',
+      updated   : this.get('updated_at'),
+      created   : this.get('created_at'),
+      customer  : this.get('customer') ? this.get('customer') : null,
+      total,
+      totalpayments,
+      totalpaidpayments : payments
     };
 
     // invoice sanitise

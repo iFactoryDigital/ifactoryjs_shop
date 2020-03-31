@@ -6,6 +6,7 @@ const Controller = require('controller');
 
 // require models
 const Invoice = model('invoice');
+const Payment = model('payment');
 
 /**
  * build user admin controller

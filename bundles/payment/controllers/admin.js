@@ -9,8 +9,11 @@ const User    = model('user');
 const Block   = model('block');
 const Payment = model('payment');
 const Order   = model('order');
+const Audit   = model('audit');
+
 // require helpers
 const blockHelper = helper('cms/block');
+const paymentHelper = helper('payment');
 
 /**
  * build user admin controller
@@ -114,6 +117,48 @@ class AdminPaymentController extends Controller {
   // ////////////////////////////////////////////////////////////////////////////
 
   /**
+   *
+   * @param {Request} req
+   * @param {Response} res
+   *
+   * @route  {post} /:id/verify
+   * @return {*}
+   */
+  async verifyAction(req, res) {
+    const payment = await Payment.findById(req.params.id);
+    const verify = payment.get('verify') ? payment.get('verify') : false;
+    payment.set('verify', !verify);
+    payment.save(req.user);
+
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'verify', 'payment', payment, verify ? `Varified payment ${payment.get('paymentno')}` : `Unvarified payment ${payment.get('paymentno')}`);
+
+    res.json({
+      succees : true,
+    });
+  }
+
+  /**
+   * User grid action
+   *
+   * @param {Request} req
+   * @param {Response} res
+   *
+   * @route  {post} /:id/history
+   * @return {*}
+   */
+  async displayHistoryAction(req, res) {
+    const logs = await Audit.where({
+      targetid : req.params.id,
+    }).find();
+
+    // get children
+    res.json({
+      result  : (await Promise.all(logs.map(log => log.sanitise()))),
+      success : true,
+    });
+  }
+
+  /**
    * index action
    *
    * @param req
@@ -205,6 +250,7 @@ class AdminPaymentController extends Controller {
     // set website variable
     let create  = true;
     let payment = new Payment();
+    let message = '';
 
     // check for website model
     if (req.params.id) {
@@ -215,7 +261,6 @@ class AdminPaymentController extends Controller {
 
     // get orders on invoice
     const invoices = await payment.get('invoices') || '';
-    //const orders = invoice ? await invoice.get('orders') : [];
 
     const iids = invoices.map(i => i.invoice);
     const orders = await Order.where({'donotexist' : null}).in('invoice.id', iids).find();
@@ -232,6 +277,7 @@ class AdminPaymentController extends Controller {
 
       // unset data
       payment.unset('data');
+      message = 'update status to paid';
     } else {
       // set complete false
       payment.set('complete', false);
@@ -245,10 +291,14 @@ class AdminPaymentController extends Controller {
 
       // unset data
       payment.unset('data');
+      message = 'update status to unpaid';
     }
-
     // save payment
     await payment.save(req.user);
+
+    message =  `#${ payment.get('paymentno') }: ${ message }`;
+    req.params.id && payment ? message = `Update Payment ${message}` : `Create Payment ${ message }`;
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), req.params.id ? 'Update' : 'Create', 'payment', payment, message);
 
     // save all orders
     await Promise.all(orders.map(async order => await order.save(req.user)));
@@ -392,32 +442,45 @@ class AdminPaymentController extends Controller {
         return row.get('complete') ? '<span class="btn btn-sm btn-success">Paid</span>' : '<span class="btn btn-sm btn-danger">Unpaid</span>';
       },
     })
-      .column('method.type', {
-        sort   : true,
-        title  : 'Method',
-        format : async (col) => {
-          return col ? req.t(`${col}.title`) : '<i>N/A</i>';
-        },
-      })
-      .column('details', {
-        sort   : true,
-        title  : 'Details',
-        format : async (col) => {
-          return col || '<i>N/A</i>';
-        },
-      });
-
-    // check invoice
-    if (!invoice) {
-      // add invoice column
-      paymentGrid.column('invoice', {
-        sort   : true,
-        title  : 'Invoice',
-        format : async (col) => {
-          return col ? `<a href="/admin/shop/invoice/${col.get('_id').toString()}/update">${col.get('_id').toString()}</a>` : '<i>N/A</i>';
-        },
-      });
-    }
+    .column('method.type', {
+      sort   : true,
+      title  : 'Method',
+      format : async (col) => {
+        return col ? req.t(`${col}.title`) : '<i>N/A</i>';
+      },
+    })
+    .column('details', {
+      sort   : true,
+      title  : 'Details',
+      format : async (col) => {
+        return col || '<i>N/A</i>';
+      },
+    })
+    .column('invoiceno', {
+      sort     : false,
+      title    : 'INV #',
+      priority : 93,
+      format   : async (col, row) => {
+        const invoice = await row.get('invoices');
+        let invoices = '';
+        invoice ? invoice.map(i => {
+          invoices += `<div class="invoice invoice-${i.invoice}"><span class="no"><a href="/admin/shop/invoice/${i.invoice}/update">${i.invoiceno}</a></span><span class="ml-2"><button class="btn btn-sm" invoice-id="${i.invoice}" payment-id="${row.get('_id').toString()}" data-type="remove-invoice">Remove Transaction</button></span></div>`
+        }) : '';
+        // return customer
+        return invoices;
+      },
+    })
+    .column('unallocated', {
+      sort   : true,
+      title  : 'Unallocated',
+      format : async (col, row) => {
+        let total = row.get('amount');
+        const invoice = row.get('invoices') ? (await row.get('invoices')).map(i => {
+          total -= parseFloat(i.amount);
+        }) : '';
+        return parseFloat(total) <= 0 || total === "0" ? `$${'0.00'.toString()} AUD` : `$${total.toFixed(2)} AUD`;
+      },
+    });
 
     // continue grid
     paymentGrid.column('error', {

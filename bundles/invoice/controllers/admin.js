@@ -15,8 +15,9 @@ const Invoice = model('invoice');
 const Payment = model('payment');
 
 // require helpers
-const emailHelper = helper('email');
-const blockHelper = helper('cms/block');
+const emailHelper   = helper('email');
+const blockHelper   = helper('cms/block');
+const paymentHelper = helper('payment');
 
 /**
  * build user admin controller
@@ -119,6 +120,89 @@ class AdminInvoiceController extends Controller {
   // ACTION METHODS
   //
   // ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * index action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {post} /:id/unpaid
+   */
+  async getUnpaidInvoicesAction(req, res) {
+    const payment = await Payment.findById(req.params.id);
+    const customer = (payment || {}).get('customer.id');
+    const invoices = await Invoice.where('customer.id', customer).find();
+    const invoicesanitise = (await Promise.all(await invoices.map(invoice => invoice.sanitise()))).filter(i => i.total > 0 && i.total > i.totalpayments);
+    const unallocated = payment.get('amount') - ((await payment.get('invoices') || []).map(i => i.amount));
+
+    // return json
+    res.json({
+      unallocated : unallocated < 0 ? 0 : unallocated,
+      unpaid      : invoicesanitise,
+      success     : true,
+    });
+  }
+
+  /**
+   * index action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {post} /:id/:payment/removetransaction
+   */
+  async removeTransactionAction(req, res) {
+    const payment = await Payment.findById(req.params.payment);
+    const invoices  = [];
+    (await payment.get('invoices')) ? (await payment.get('invoices')).map(i => {
+      if (i.invoice !== req.params.id) invoices.push(i);
+    }) : '';
+
+    payment.set('invoices', invoices);
+    payment.save(req.user);
+
+    const message = `Remove Transaction: ${ i.invoiceno }`;
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Remove Transaction', 'payment', payment, message);
+
+    // return json
+    res.json({
+      success     : true,
+    });
+  }
+
+  /**
+   * index action
+   *
+   * @param {Request}  req
+   * @param {Response} res
+   *
+   * @route {post} /:payment/allocate
+   */
+  async allocateInvoiceAction(req, res) {
+    let message = '';
+    const payment = await Payment.findById(req.params.payment);
+    const invoices = (await payment.get('invoices')) ? (await payment.get('invoices')) : [];
+
+    await Promise.all(req.body.allcate.map(async i => {
+      const invoice = await Invoice.findById(i.id);
+      const order   = await (await invoice.get('orders'))[0];
+      message += `Assigned Payment to ${ invoice.get('invoiceno') } : $${ parseFloat(i.amount) } AUD, `
+      invoices.push({invoice: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), order: order.get('_id'), orderno: order.get('orderno'), amount: parseFloat(i.amount)});
+    }));
+
+    if (invoices && Array.isArray(invoices) && invoices.length > 0) {
+      payment.set('invoices', invoices);
+      await payment.save(req.user);
+    }
+
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Allocate', 'payment', payment, message);
+
+    // return json
+    res.json({
+      success     : true,
+    });
+  }
 
   /**
    * index action
@@ -495,14 +579,30 @@ class AdminInvoiceController extends Controller {
   async paymentCreateAction(req, res) {
     console.log('paymentCreateAction');
     // set website variable
+    const amount = parseFloat(req.body.amount);
     let invoice = new Invoice();
     let payment = null;
     let total   = 0;
+    let orderno = '';
 
     // check for website model
     if (req.params.id && req.params.id !== 'create') {
       // load by id
+      let ordertotal = 0;
       invoice = await Invoice.findById(req.params.id);
+      await Promise.all((await invoice.get('orders')).map(async o => {
+        const order = await o;
+        orderno     = o.get('orderno');
+        ordertotal += order.get('total');
+      }));
+      const payments = await Payment.where({ 'invoice.id' : req.params.id }).nin('state', ['canceled', 'refund', 'remove']).find();
+      await Promise.all(await payments.map(async p => {
+        const payment = await p;
+        payment.get('invoices').map(i => {
+          if (i.invoice === invoice.get('_id')) total += i.amount;
+        });
+      }));
+      ordertotal - total <= 0 ? total = 0 : ordertotal - total - amount >= 0 ? total = amount : total = ordertotal - total;
     } else if (req.params.id === 'create') {
       // get order
       // eslint-disable-next-line max-len
@@ -518,12 +618,14 @@ class AdminInvoiceController extends Controller {
       orders.forEach((order) => {
         // check order
         if (!order) return;
-        total += order.get('total');
+        total   += order.get('total');
+        orderno = order.get('orderno');
         // save order
         order.set('invoice', invoice);
         order.save(req.user);
       });
       invoice.set('total', total);
+      total < parseFloat(req.body.amount) ? total : total = parseFloat(req.body.amount);
       // save invoice
       await invoice.save();
     }
@@ -537,14 +639,15 @@ class AdminInvoiceController extends Controller {
       user     : req.user,
       rate     : 1,
       admin    : req.user,
-      amount   : parseFloat(req.body.amount),
+      amount,
       details  : req.body.details,
       currency : req.body.currency,
       invoices : [{
           invoice   : invoice.get('_id'),
           invoiceno : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
-          amount    : parseFloat(req.body.amount),
-          total     : total > 0 ? total : invoice.get('total'),
+          order     : (await orders[0]).get('_id'),
+          orderno   : (await orders[0]).get('orderno') ? (await orders[0]).get('orderno') : (await orders[0]).get('_id'),
+          amount    : total
       }]
     });
 
@@ -558,12 +661,7 @@ class AdminInvoiceController extends Controller {
       });
       payment.set('state', 'approval');
 
-      // save payment
-      await payment.save(req.user);
     } else {
-      // save payment
-      await payment.save(req.user);
-
       // set fields
       payment.set('method', req.body.action.value);
 
@@ -574,10 +672,13 @@ class AdminInvoiceController extends Controller {
       payment.unset('method.data');
 
       payment.set('state', payment.get('complete') ? 'approved' : payment.get('error') ? 'error' : 'approval');
-
-      // save payment
-      await payment.save(req.user);
     }
+
+    // save payment
+    await payment.save(req.user);
+
+    const message = `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ invoice.get('invoiceno') }`;
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Create', 'payment', payment, message);
 
     // orders
     await Promise.all(orders.map(order => order.save(req.user)));
