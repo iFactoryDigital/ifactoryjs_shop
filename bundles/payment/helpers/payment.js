@@ -73,11 +73,14 @@ class PaymentHelper extends Helper {
       currency : invoice.get('currency') || config.get('shop.currency') || 'USD',
       complete : false,
       invoices : [{
-          invoice   : invoice.get('_id'),
-          invoiceno : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
-          order     : (await invoice.get('order')).get('_id'),
-          orderno   : (await invoice.get('order')).get('orderno') ? (await invoice.get('order')).get('orderno') : (await invoice.get('order')).get('_id'),
-          amount    : total
+          invoice     : invoice.get('_id'),
+          invoiceno   : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
+          order       : (await orders[0]).get('_id'),
+          orderno     : (await orders[0]).get('orderno') ? (await orders[0]).get('orderno') : (await orders[0]).get('_id'),
+          amount      : total,
+          invoicedate : invoice.get('created_at'),
+          orderdate   : (await orders[0]).get('created_at'),
+          date        : new Date()
       }]
     });
 

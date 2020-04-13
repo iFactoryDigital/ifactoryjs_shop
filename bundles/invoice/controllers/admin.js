@@ -595,7 +595,7 @@ class AdminInvoiceController extends Controller {
         orderno     = o.get('orderno');
         ordertotal += order.get('total');
       }));
-      const payments = await Payment.where({ 'invoice.id' : req.params.id }).nin('state', ['canceled', 'refund', 'remove']).find();
+      const payments = await Payment.where({ 'invoices.invoice' : req.params.id }).nin('state', ['canceled', 'refund', 'remove']).find();
       await Promise.all(await payments.map(async p => {
         const payment = await p;
         payment.get('invoices').map(i => {
@@ -643,11 +643,14 @@ class AdminInvoiceController extends Controller {
       details  : req.body.details,
       currency : req.body.currency,
       invoices : [{
-          invoice   : invoice.get('_id'),
-          invoiceno : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
-          order     : (await orders[0]).get('_id'),
-          orderno   : (await orders[0]).get('orderno') ? (await orders[0]).get('orderno') : (await orders[0]).get('_id'),
-          amount    : total
+          invoice     : invoice.get('_id'),
+          invoiceno   : invoice.get('invoiceno') ? invoice.get('invoiceno') : '',
+          order       : (await orders[0]).get('_id'),
+          orderno     : (await orders[0]).get('orderno') ? (await orders[0]).get('orderno') : (await orders[0]).get('_id'),
+          amount      : total,
+          invoicedate : invoice.get('created_at'),
+          orderdate   : (await orders[0]).get('created_at'),
+          date        : new Date()
       }]
     });
 
