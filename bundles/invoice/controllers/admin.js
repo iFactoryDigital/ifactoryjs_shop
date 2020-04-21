@@ -656,6 +656,9 @@ class AdminInvoiceController extends Controller {
 
     await this.eden.hook('payment.addinfo', payment, req);
 
+    // save payment
+    await payment.save(req.user);
+
     // create manual payment
     if (req.body.type === 'manual') {
       // set fields
