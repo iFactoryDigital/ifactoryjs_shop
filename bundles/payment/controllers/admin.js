@@ -3,7 +3,7 @@
 const Grid        = require('grid');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
-
+const moment      = require('moment');
 // require models
 const User    = model('user');
 const Block   = model('block');
@@ -127,10 +127,15 @@ class AdminPaymentController extends Controller {
   async verifyAction(req, res) {
     const payment = await Payment.findById(req.params.id);
     const verify = payment.get('verify') ? payment.get('verify') : false;
+
+    payment.set('verifydate', req.body.verifydate ? req.body.verifydate : moment(new Date()).format('YYYY-MM-DD'));
     payment.set('verify', !verify);
+
+    !verify ? payment.set('verifyamount', req.body.verifyamount ? req.body.verifyamount : payment.get('amount')) : payment.set('verifyamount', 0);
+
     payment.save(req.user);
 
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'verify', 'payment', payment, verify ? `Varified payment ${payment.get('paymentno')}` : `Unvarified payment ${payment.get('paymentno')}`);
+    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'verify', 'payment', payment, verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`);
 
     res.json({
       succees : true,
