@@ -132,6 +132,7 @@ class AdminPaymentController extends Controller {
     payment.set('verify', !verify);
 
     !verify ? payment.set('verifyamount', req.body.verifyamount ? req.body.verifyamount : payment.get('amount')) : payment.set('verifyamount', 0);
+    !verify ? payment.set('verifynote', req.body.verifynote ? req.body.verifynote : '') : payment.set('unverifynote', req.body.verifynote ? req.body.verifynote : '');
 
     payment.save(req.user);
 
