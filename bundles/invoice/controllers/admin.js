@@ -162,8 +162,7 @@ class AdminInvoiceController extends Controller {
     payment.set('invoices', invoices);
     payment.save(req.user);
 
-    const message = `Remove Transaction: ${ i.invoiceno }`;
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Remove Transaction', 'payment', payment, message);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : 'Remove', message : `Remove Transaction: ${ i.invoiceno }`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // return json
     res.json({
@@ -196,7 +195,7 @@ class AdminInvoiceController extends Controller {
       await payment.save(req.user);
     }
 
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Allocate', 'payment', payment, message);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : message, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // return json
     res.json({
@@ -544,8 +543,13 @@ class AdminInvoiceController extends Controller {
       return line.total + accum;
     }, 0) - (invoice.get('discount') || 0));
 
+    const origininvoice = req.params.id ? await Invoice.findById(req.params.id) : '';
+    const updates = req.params.id ? invoice.__updates : '';
+
     // save invoice
     await invoice.save(req.user);
+
+    await this.eden.hook('audit.record', req, { model: invoice, modelold: origininvoice, updates, update : req.params.id ? true : false, message: '', no : 'invoiceno', client : config.get('client'), excloude : [] });
 
     // save order
     await Promise.all(orders.map((order) => {
@@ -683,8 +687,7 @@ class AdminInvoiceController extends Controller {
     // save payment
     await payment.save(req.user);
 
-    const message = `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ invoice.get('invoiceno') }`;
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'Create', 'payment', payment, message);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : false, message : `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ invoice.get('invoiceno') }`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // orders
     await Promise.all(orders.map(order => order.save(req.user)));

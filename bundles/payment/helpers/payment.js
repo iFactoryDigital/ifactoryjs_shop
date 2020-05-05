@@ -10,7 +10,6 @@ const Helper = require('helper');
 
 // require models
 const Payment = model('payment');
-const Audit   = model('audit');
 
 /**
  * build payment helper
@@ -129,32 +128,6 @@ class PaymentHelper extends Helper {
         class : 'PaymentHelper',
       });
     } catch (e) {}
-  }
-
-  /**
-   * logs balance transaction
-   *
-   * @param  {String}  targetid
-   * @param  {String}  by
-   * @param  {String}  for_
-   * @param  {String}  way
-   * @param  {String}  type
-   * @param  {Object}  subject
-   * @param  {String}  message
-   */
-  async _recordAudit(targetid, by, for_, way, type, subject, message) {
-    const audit = new Audit({
-      by,
-      for     : for_,
-      way,
-      type,
-      subject,
-      message,
-      targetid,
-    });
-
-    // save entry
-    await audit.save();
   }
 }
 

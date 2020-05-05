@@ -506,6 +506,8 @@ class AdminOrderController extends Controller {
     // delete website
     await order.save(req.user);
 
+    await auditHelper._recordAudit(order, null, 'Remove', `[Cancelled] Order Cancelled: ${order.get('orderno')}`, req.user, await order.get('customer'), [], order.get('orderno'));    
+
     // render index
     return this.indexAction(req, res);
   }

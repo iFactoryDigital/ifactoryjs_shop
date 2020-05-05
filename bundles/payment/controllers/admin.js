@@ -136,7 +136,7 @@ class AdminPaymentController extends Controller {
 
     payment.save(req.user);
 
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), 'verify', 'payment', payment, verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     res.json({
       succees : true,
@@ -299,12 +299,14 @@ class AdminPaymentController extends Controller {
       payment.unset('data');
       message = 'update status to unpaid';
     }
+
+    const originpayment = req.params.id ? await Payment.findById(req.params.id) : '';
+    const updates = req.params.id ? payment.__updates : '';
+
     // save payment
     await payment.save(req.user);
 
-    message =  `#${ payment.get('paymentno') }: ${ message }`;
-    req.params.id && payment ? message = `Update Payment ${message}` : `Create Payment ${ message }`;
-    await paymentHelper._recordAudit(payment.get('_id'), req.user, payment.get('paymentno'), req.params.id ? 'Update' : 'Create', 'payment', payment, message);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: originpayment, updates, update : req.params.id ? true : false, message : message, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // save all orders
     await Promise.all(orders.map(async order => await order.save(req.user)));
