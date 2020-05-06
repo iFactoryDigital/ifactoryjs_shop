@@ -27,7 +27,6 @@ class PaymentHelper extends Helper {
 
     // bind private methods
     this._log = this._log.bind(this);
-    this._recordAudit = this._recordAudit.bind(this);
   }
 
 
@@ -99,7 +98,8 @@ class PaymentHelper extends Helper {
     await payment.save(user);
 
     message = `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ invoice.get('invoiceno') }`;
-    await this._recordAudit(payment.get('_id'), user, payment.get('paymentno'), 'Create', 'payment', payment, message);
+    //await this._recordAudit(payment.get('_id'), user, payment.get('paymentno'), 'Create', 'payment', payment, message);
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : false, message : message, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // return payment
     return payment;
