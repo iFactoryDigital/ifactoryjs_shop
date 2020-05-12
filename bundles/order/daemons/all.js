@@ -109,7 +109,7 @@ class AllOrderDaemon extends Daemon {
       orderStatus.set('status', 'approval');
 
       // save order
-      await orderStatus.save(await orderStatus.get('user'));
+      //await orderStatus.save(await orderStatus.get('user'));
     }
 
     // set status
@@ -119,7 +119,7 @@ class AllOrderDaemon extends Daemon {
       orderStatus.set('complete', new Date());
 
       // save order
-      await orderStatus.save(await orderStatus.get('user'));
+      //await orderStatus.save(await orderStatus.get('user'));
 
       // emit create
       this.eden.emit('order.complete', {
@@ -153,7 +153,7 @@ class AllOrderDaemon extends Daemon {
         // try/catch
         try {
           // email
-          emailHelper.send(address, 'order', {
+          await emailHelper.send(address, 'order', {
             order   : await orderStatus.sanitise(),
             subject : `${config.get('domain')} - order #${orderStatus.get('_id').toString()}`,
           }).then(async (email) => {
@@ -164,7 +164,7 @@ class AllOrderDaemon extends Daemon {
             orderStatus.set('emails.ordered', email);
 
             // save order
-            await orderStatus.save(await orderStatus.get('user'));
+            //await orderStatus.save(await orderStatus.get('user'));
 
             // unlock
             orderStatus.unlock();

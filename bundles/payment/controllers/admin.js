@@ -4,6 +4,7 @@ const Grid        = require('grid');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 const moment      = require('moment');
+
 // require models
 const User    = model('user');
 const Block   = model('block');
@@ -14,6 +15,9 @@ const Audit   = model('audit');
 // require helpers
 const blockHelper = helper('cms/block');
 const paymentHelper = helper('payment');
+
+// bind local dependencies
+const config = require('config');
 
 /**
  * build user admin controller
@@ -136,7 +140,7 @@ class AdminPaymentController extends Controller {
 
     payment.save(req.user);
 
-    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`, no : 'paymentno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : !verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     res.json({
       succees : true,

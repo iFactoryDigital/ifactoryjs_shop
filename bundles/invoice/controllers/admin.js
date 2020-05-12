@@ -2,7 +2,6 @@
 
 // bind dependencies
 const Grid        = require('grid');
-const config      = require('config');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
 
@@ -18,6 +17,9 @@ const Payment = model('payment');
 const emailHelper   = helper('email');
 const blockHelper   = helper('cms/block');
 const paymentHelper = helper('payment');
+
+// bind local dependencies
+const config = require('config');
 
 /**
  * build user admin controller
@@ -132,7 +134,7 @@ class AdminInvoiceController extends Controller {
   async getUnpaidInvoicesAction(req, res) {
     const payment = await Payment.findById(req.params.id);
     const customer = (payment || {}).get('customer.id');
-    const invoices = await Invoice.where('customer.id', customer).find();
+    const invoices = await Invoice.where({'customer.id' : customer }).in('newinvoice', [null, false]).find();
     const invoicesanitise = (await Promise.all(await invoices.map(invoice => invoice.sanitise()))).filter(i => i.total > 0 && i.total > i.totalpayments);
     const unallocated = payment.get('amount') - ((await payment.get('invoices') || []).map(i => i.amount));
 
@@ -155,14 +157,21 @@ class AdminInvoiceController extends Controller {
   async removeTransactionAction(req, res) {
     const payment = await Payment.findById(req.params.payment);
     const invoices  = [];
+    let invoiceno = '';
+    let amount    = 0;
     (await payment.get('invoices')) ? (await payment.get('invoices')).map(i => {
-      if (i.invoice !== req.params.id) invoices.push(i);
+      if (i.invoice === req.params.id) {
+        invoiceno = i.invoiceno;
+        amount    = i.amount;
+      } else {
+        invoices.push(i);
+      }
     }) : '';
 
     payment.set('invoices', invoices);
     payment.save(req.user);
 
-    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : 'Remove', message : `Remove Transaction: ${ i.invoiceno }`, no : 'paymentno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : 'Remove', message : `Remove Transaction: ${ invoiceno } amount: ${ amount }`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // return json
     res.json({
@@ -185,6 +194,7 @@ class AdminInvoiceController extends Controller {
 
     await Promise.all(req.body.allcate.map(async i => {
       const invoice = await Invoice.findById(i.id);
+      console.log(invoice.get('_id'));
       const order   = await (await invoice.get('orders'))[0];
       message += `Assigned Payment to ${ invoice.get('invoiceno') } : $${ parseFloat(i.amount) } AUD, `
       invoices.push({invoice: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), order: order.get('_id'), orderno: order.get('orderno'), amount: parseFloat(i.amount)});
@@ -749,8 +759,15 @@ class AdminInvoiceController extends Controller {
       invoice = await Invoice.findById(req.params.id);
     }
 
+    let total = 0;
+    await Promise.all((await invoice.get('orders')).map(o => {
+      total += o.get('total');
+    }));
+
     // alert Removed
     req.alert('success', `Successfully removed ${invoice.get('_id').toString()}`);
+
+    await this.eden.hook('audit.record', req, { model: invoice, modelold: null, updates: null, update : 'Remove', message : `[Remove] Invoice: ${ invoice.get('invoiceno') } amount: ${ invoice.get('total') }`, no : 'invoiceno', client : config.get('client'), excloude : [] });
 
     // delete website
     await invoice.remove(req.user);

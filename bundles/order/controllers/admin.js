@@ -441,6 +441,8 @@ class AdminOrderController extends Controller {
       order = await Order.findById(req.params.id);
     }
 
+    await this.eden.hook('audit.record', req, { model: order, modelold: null, updates: null, update : 'Remove', message : `[Remove] Order: ${ order.get('orderno') } amount: ${ order.get('total') }`, no : 'orderno', client : config.get('client'), excloude : [] });
+
     // alert Removed
     req.alert('success', `Successfully removed ${order.get('_id').toString()}`);
 
