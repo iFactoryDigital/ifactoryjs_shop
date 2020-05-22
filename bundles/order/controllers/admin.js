@@ -19,6 +19,7 @@ const config = require('config');
 // require helpers
 const blockHelper = helper('cms/block');
 const fieldHelper = helper('form/field');
+const auditHelper = helper('audit/audit');
 
 /**
  * build user admin controller
@@ -439,6 +440,14 @@ class AdminOrderController extends Controller {
     if (req.params.id) {
       // load user
       order = await Order.findById(req.params.id);
+      order.set('remove', req.body.reason ? req.body.reason : '');
+      order.set('status', 'remove');  
+    } else { 
+      if (req.query && req.query.back) { 
+        res.redirect(req.query.back);
+      } else {
+        return this.indexAction(req, res);
+      }
     }
 
     await this.eden.hook('audit.record', req, { model: order, modelold: null, updates: null, update : 'Remove', message : `[Remove] Order: ${ order.get('orderno') } amount: ${ order.get('total') }`, no : 'orderno', client : config.get('client'), excloude : [] });
@@ -446,11 +455,16 @@ class AdminOrderController extends Controller {
     // alert Removed
     req.alert('success', `Successfully removed ${order.get('_id').toString()}`);
 
-    // delete website
-    await order.remove(req.user);
+    await order.save(req.user);
 
-    // render index
-    return this.indexAction(req, res);
+    // delete website
+    //await order.remove(req.user);
+
+    if (req.query && req.query.back) { 
+      res.redirect(req.query.back);
+    } else {
+      return this.indexAction(req, res);
+    }
   }
 
   /**
@@ -480,12 +494,12 @@ class AdminOrderController extends Controller {
   }
 
   /**
-   * delete action
+   * cancel action
    *
    * @param {Request}  req
    * @param {Response} res
    *
-   * @route   {post} /:id/remove
+   * @route   {post} /:id/cancel
    * @title   order Administration
    * @layout  admin
    */
@@ -497,21 +511,28 @@ class AdminOrderController extends Controller {
     if (req.params.id) {
       // load user
       order = await Order.findById(req.params.id);
+      order.set('cancel', req.body.reason ? req.body.reason : '');
+      order.set('status', 'cancel');  
+    } else { 
+      if (req.query && req.query.back) { 
+        res.redirect(req.query.back);
+      } else {
+        return this.indexAction(req, res);
+      }
     }
 
     // alert Removed
     req.alert('success', `Successfully cancelled ${order.get('_id').toString()}`);
 
-    // set status
-    order.set('status', 'cancelled');
-
     // delete website
     await order.save(req.user);
+    await this.eden.hook('audit.record', req, { model: order, modelold: null, updates: null, update : 'Cancel', message : `[Cancelled] Order Cancelled: ${order.get('orderno')}`, no : 'orderno', client : config.get('client'), excloude : [] });
 
-    await auditHelper._recordAudit(order, null, 'Remove', `[Cancelled] Order Cancelled: ${order.get('orderno')}`, req.user, await order.get('customer'), [], order.get('orderno'));    
-
-    // render index
-    return this.indexAction(req, res);
+    if (req.query && req.query.back) { 
+      res.redirect(req.query.back);
+    } else {
+      return this.indexAction(req, res);
+    }
   }
 
   /**
