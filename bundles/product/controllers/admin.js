@@ -216,7 +216,7 @@ class AdminProductController extends Controller {
    * @param {Request}  req
    * @param {Response} res
    *
-   * @acl   admin
+   * @acl   admin.shop.product.query
    * @fail  next
    * @route {GET} /query
    */
