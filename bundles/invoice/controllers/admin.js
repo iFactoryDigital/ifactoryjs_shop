@@ -680,7 +680,6 @@ class AdminInvoiceController extends Controller {
         type : req.body.method,
       });
       payment.set('state', 'approval');
-
     } else {
       // set fields
       payment.set('method', req.body.action.value);
@@ -691,7 +690,12 @@ class AdminInvoiceController extends Controller {
       // unset data
       payment.unset('method.data');
 
-      payment.set('state', payment.get('complete') ? 'approved' : payment.get('error') ? 'error' : 'approval');
+      payment.set('state', payment.get('complete') ? 'paid' : payment.get('error') ? 'error' : 'approval');
+
+      if (payment.get('state') === 'paid') {
+        payment.set('verify', true);
+        payment.set('verifynote', 'Paid by Credit Card');
+      }
     }
 
     // save payment
