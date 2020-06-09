@@ -104,6 +104,7 @@ class AllOrderDaemon extends Daemon {
     orderStatus.set('invoice', invoice);
 
     // check pending paid
+    /*
     if (!await invoice.hasPaid() && await invoice.hasApproval() && orderStatus.get('status') !== 'approval') {
       // set order
       orderStatus.set('status', 'approval');
@@ -111,11 +112,12 @@ class AllOrderDaemon extends Daemon {
       // save order
       //await orderStatus.save(await orderStatus.get('user'));
     }
+    */
 
     // set status
     if (!orderStatus.get('complete') && await invoice.hasPaid()) {
       // set order
-      orderStatus.set('status', 'paid');
+      orderStatus.set('status', 'complete');
       orderStatus.set('complete', new Date());
 
       // save order
