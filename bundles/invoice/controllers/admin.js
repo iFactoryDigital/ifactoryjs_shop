@@ -639,7 +639,8 @@ class AdminInvoiceController extends Controller {
         order.save(req.user);
       });
       invoice.set('total', total);
-      total < parseFloat(req.body.amount) ? total : total = parseFloat(req.body.amount);
+
+      total <= parseFloat(req.body.amount) ? total : total = parseFloat(req.body.amount);
       // save invoice
       await invoice.save();
     }
@@ -705,6 +706,7 @@ class AdminInvoiceController extends Controller {
 
     // orders
     await Promise.all(orders.map(order => order.save(req.user)));
+    //await invoice.save();
 
     // render page
     res.json({
