@@ -77,7 +77,7 @@ class AllOrderDaemon extends Daemon {
     // Create Order No
     if (!orderStatus.get('orderno')) {
       const prefix = await orderStatus.get('customer');
-      const orderno = 'Ord'+ (prefix ? prefix.get('uid') : [...Array(5)].map(i=>(~~(Math.random()*36)).toString(36)).join('')) + moment().format("MD")+[...Array(2)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+      const orderno = 'Ord'+ (prefix && prefix.get('uid') ? prefix.get('uid') : [...Array(5)].map(i=>(~~(Math.random()*36)).toString(36)).join('')) + moment().format("MD")+[...Array(2)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
       orderStatus.set('orderno', orderno);
     }
 
