@@ -115,10 +115,12 @@ class AllOrderDaemon extends Daemon {
     */
 
     // set status
-    if (!orderStatus.get('complete') && await invoice.hasPaid()) {
+//    if (!orderStatus.get('complete') && await invoice.hasPaid()) {
+    if (orderStatus.get('completenow')) {
       // set order
       orderStatus.set('status', 'complete');
       orderStatus.set('complete', new Date());
+      orderStatus.set('completenow', false);
 
       // save order
       //await orderStatus.save(await orderStatus.get('user'));
