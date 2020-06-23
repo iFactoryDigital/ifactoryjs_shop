@@ -293,6 +293,7 @@ class AdminProductController extends Controller {
           productcopy.set('published', product.get('published'));
           productcopy.set('pricing', product.get('pricing'));
           productcopy.set('promoted', product.get('promoted'));
+          productcopy.set('origin', [{id: p.get('_id'), model: 'product'}]);
           await productcopy.save(req.user);
         }
       }
