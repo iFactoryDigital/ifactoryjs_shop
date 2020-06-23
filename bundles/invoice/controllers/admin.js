@@ -158,10 +158,12 @@ class AdminInvoiceController extends Controller {
     const payment = await Payment.findById(req.params.payment);
     const invoices  = [];
     let invoiceno = '';
+    let orderno   = '';
     let amount    = 0;
     (await payment.get('invoices')) ? (await payment.get('invoices')).map(i => {
       if (i.invoice === req.params.id) {
         invoiceno = i.invoiceno;
+        orderno   = i.orderno ? i.orderno : 'N/A';
         amount    = i.amount;
       } else {
         invoices.push(i);
@@ -171,7 +173,7 @@ class AdminInvoiceController extends Controller {
     payment.set('invoices', invoices);
     payment.save(req.user);
 
-    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : 'Remove', message : `Remove Transaction: ${ invoiceno } amount: ${ amount }`, no : 'paymentno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : 'Remove', message : `Remove Transaction: ${ orderno } (${ invoiceno }) amount: ${ amount }`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // return json
     res.json({
@@ -196,7 +198,7 @@ class AdminInvoiceController extends Controller {
       const invoice = await Invoice.findById(i.id);
       console.log(invoice.get('_id'));
       const order   = await (await invoice.get('orders'))[0];
-      message += `Assigned Payment to ${ invoice.get('invoiceno') } : $${ parseFloat(i.amount) } AUD, `
+      message += `Assigned Payment to ${ order.get('orderno') } (${ invoice.get('invoiceno') }) : $${ parseFloat(i.amount) } AUD, `
       invoices.push({invoice: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), order: order.get('_id'), orderno: order.get('orderno'), amount: parseFloat(i.amount)});
     }));
 
@@ -702,7 +704,7 @@ class AdminInvoiceController extends Controller {
     // save payment
     await payment.save(req.user);
 
-    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : false, message : `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ invoice.get('invoiceno') }`, no : 'paymentno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : false, message : `Create Payment #${ payment.get('paymentno') }: ${ (payment.get('method') || {}).type } ${ amount } Assigned Payment to ${ orderno } (${ invoice.get('invoiceno') })`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     // orders
     await Promise.all(orders.map(order => order.save(req.user)));
@@ -766,14 +768,16 @@ class AdminInvoiceController extends Controller {
     }
 
     let total = 0;
+    let order = [];
     await Promise.all((await invoice.get('orders')).map(o => {
       total += o.get('total');
+      oders.put(o.get('orderno'));
     }));
 
     // alert Removed
     req.alert('success', `Successfully removed ${invoice.get('_id').toString()}`);
 
-    await this.eden.hook('audit.record', req, { model: invoice, modelold: null, updates: null, update : 'Remove', message : `[Remove] Invoice: ${ invoice.get('invoiceno') } amount: ${ invoice.get('total') }`, no : 'invoiceno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: invoice, modelold: null, updates: null, update : 'Remove', message : `[Remove] Invoice: ${ invoice.get('invoiceno') } ( ${ oders.join(', ') } ) amount: ${ invoice.get('total') }`, no : 'invoiceno', client : config.get('client'), excloude : [] });
 
     // delete website
     await invoice.remove(req.user);
