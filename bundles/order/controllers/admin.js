@@ -441,7 +441,9 @@ class AdminOrderController extends Controller {
       // load user
       order = await Order.findById(req.params.id);
       order.set('remove', req.body.reason ? req.body.reason : '');
-      order.set('status', 'remove');  
+      order.set('status', 'remove'); 
+      await order.save(req.user); 
+      await this.eden.hook('order.remove', { order: order, req: req});
     } else { 
       if (req.query && req.query.back) { 
         res.redirect(req.query.back);
@@ -484,8 +486,10 @@ class AdminOrderController extends Controller {
     if (req.params.id) {
       // load user
       order = await Order.findById(req.params.id);
+      await order.save(req.user);
+      await this.eden.hook('order.cancel', { order: order, req: req});
     }
-
+    await this.eden.hook('audit.record', req, { model: order, modelold: null, updates: null, update : 'Cancel', message : `[Cancel] Order: ${ order.get('orderno') } amount: ${ order.get('total') }`, no : 'orderno', client : config.get('client'), excloude : [] });
     // render page
     res.render('order/admin/cancel', {
       title : `Remove ${order.get('_id').toString()}`,

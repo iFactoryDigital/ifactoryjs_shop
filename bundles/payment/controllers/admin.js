@@ -140,7 +140,7 @@ class AdminPaymentController extends Controller {
 
     payment.save(req.user);
 
-    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : !verify ? `Varified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} Date: ${payment.get('verifydate')}`, no : 'paymentno', client : config.get('client'), excloude : [] });
+    await this.eden.hook('audit.record', req, { model: payment, modelold: null, updates: null, update : true, message : !verify ? `Varified payment ${payment.get('paymentno')} ${req.body.orderno ? 'Order No:'+req.body.orderno : ''} Date: ${payment.get('verifydate')} Amount: ${payment.get('verifyamount')}` : `Unvarified payment ${payment.get('paymentno')} ${req.body.orderno ? 'Order No:'+req.body.orderno : ''} Date: ${payment.get('verifydate')}`, no : 'paymentno', client : config.get('client'), excloude : [] });
 
     res.json({
       succees : true,
