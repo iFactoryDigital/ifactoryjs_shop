@@ -4,6 +4,7 @@
 const Grid        = require('grid');
 const Controller  = require('controller');
 const escapeRegex = require('escape-string-regexp');
+const moment      = require('moment');
 
 // require models
 const User    = model('user');
@@ -190,6 +191,7 @@ class AdminInvoiceController extends Controller {
    * @route {post} /:payment/allocate
    */
   async allocateInvoiceAction(req, res) {
+    console.log('allocateInvoiceAction');
     let message = '';
     const payment = await Payment.findById(req.params.payment);
     const invoices = (await payment.get('invoices')) ? (await payment.get('invoices')) : [];
@@ -198,8 +200,16 @@ class AdminInvoiceController extends Controller {
       const invoice = await Invoice.findById(i.id);
       console.log(invoice.get('_id'));
       const order   = await (await invoice.get('orders'))[0];
-      message += `Assigned Payment to ${ order.get('orderno') } (${ invoice.get('invoiceno') }) : $${ parseFloat(i.amount) } AUD, `
-      invoices.push({invoice: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), order: order.get('_id'), orderno: order.get('orderno'), amount: parseFloat(i.amount)});
+      message += `Assigned Payment to ${ order.get('orderno') } (${ invoice.get('invoiceno') }) : $${ parseFloat(i.amount) } AUD, `;
+
+      if (invoices && Array.isArray(invoices) && invoices.length > 0 && invoices.includes(order.get('_id'))) {
+        invoices = invoices.map(invoice => {
+          invoice.amount = invoice.amount + parseFloat(i.amount);
+          return invoice
+        });
+      } else {
+        invoices.push({invoice: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), order: order.get('_id'), orderno: order.get('orderno'), amount: parseFloat(i.amount)});
+      }
     }));
 
     if (invoices && Array.isArray(invoices) && invoices.length > 0) {
@@ -697,6 +707,7 @@ class AdminInvoiceController extends Controller {
 
       if (payment.get('state') === 'paid') {
         payment.set('verify', true);
+        payment.set('verifydate', moment(new Date()).format('YYYY-MM-DD'));
         payment.set('verifynote', 'Paid by Credit Card');
       }
     }
