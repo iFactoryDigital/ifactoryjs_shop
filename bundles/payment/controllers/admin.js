@@ -113,7 +113,6 @@ class AdminPaymentController extends Controller {
     });
   }
 
-
   // ////////////////////////////////////////////////////////////////////////////
   //
   // ACTION METHODS
@@ -134,9 +133,25 @@ class AdminPaymentController extends Controller {
 
     payment.set('verifydate', req.body.verifydate ? req.body.verifydate : moment(new Date()).format('YYYY-MM-DD'));
     payment.set('verify', !verify);
+
     !verify ? payment.set('verifyamount', req.body.verifyamount ? req.body.verifyamount : payment.get('amount')) : payment.set('verifyamount', 0);
     !verify ? payment.set('verifynote', req.body.verifynote ? req.body.verifynote : '') : payment.set('unverifynote', req.body.verifynote ? req.body.verifynote : '');
     !verify ? payment.set('state', 'paid') : payment.set('state', 'approval');
+
+    if (req.body.order) {
+      const reduce = parseFloat(payment.get('amount')) - parseFloat(req.body.verifyamount);
+      let invoices = [];
+      (await Promise.all(await payment.get('invoices').map(async i => {
+        if (i.order === req.body.order) {
+          i.oldamount = i.amount;
+          i.amount = i.amount - reduce;
+        } else {
+          i.oldamount = i.amount;
+        }
+        invoices.push(i);
+      }))).filter(t=>t);
+      payment.set('invoices', invoices);
+    }
 
     payment.save(req.user);
 
