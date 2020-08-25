@@ -133,16 +133,46 @@ class AdminInvoiceController extends Controller {
    * @route {post} /:id/unpaid
    */
   async getUnpaidInvoicesAction(req, res) {
+    console.log('getUnpaidInvoicesAction');
     const payment = await Payment.findById(req.params.id);
     const customer = (payment || {}).get('customer.id');
     const invoices = await Invoice.where({'customer.id' : customer }).in('newinvoice', [null, false]).find();
-    const invoicesanitise = (await Promise.all(await invoices.map(invoice => invoice.sanitise()))).filter(i => i.total > 0 && i.total > i.totalpayments);
+    let invoiceids  = [];
+    let invoiceinfo = [];
+    (await Promise.all(await invoices.map(invoice => {
+      invoiceinfo.push({id: invoice.get('_id'), invoiceno: invoice.get('invoiceno'), total: invoice.get('total'), pay: 0});
+      invoiceids.push(invoice.get('_id'));
+    }))).filter(t=>t);
+    const payments = await Payment.where({'donotexist': null}).in('invoices.invoice', invoiceids).find();
+
+    (await Promise.all(await payments.map(async payment => {
+      const invoices = await payment.get('invoices');
+      invoices.map(i => {
+        invoiceinfo.map((ii, index) => {
+          if (ii.id === i.invoice) {
+            ii.pay = ii.pay + i.amount;
+            invoiceinfo[index] = ii;
+          }
+        })
+      });
+    }))).filter(t=>t);
+    console.log('before');
+    console.log(invoiceinfo);
+    invoiceids = [];
+    invoiceinfo.map((i, index) => {
+      if (i.total <= i.pay) {
+        invoiceinfo.splice(index, 1);
+      }
+    });
+    console.log('after');
+    console.log(invoiceinfo);
+    //const invoicesanitise = (await Promise.all(await invoices.map(invoice => invoice.sanitise()))).filter(i => i.total > 0 && i.total > i.totalpayments);
     const unallocated = payment.get('amount') - ((await payment.get('invoices') || []).map(i => i.amount));
 
     // return json
     res.json({
       unallocated : unallocated < 0 ? 0 : unallocated,
-      unpaid      : invoicesanitise,
+      unpaid      : invoiceinfo,
       success     : true,
     });
   }
