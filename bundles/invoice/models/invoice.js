@@ -48,8 +48,9 @@ class Invoice extends Model {
 
     // get total
     const total = this.get('total') || (await this.get('orders') || []).reduce((accum, order) => {
+      let discount = order.get('discount') ? parseFloat(order.get('discount')) : 0;
       // return accumulated
-      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0);
+      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0) - discount;
     }, 0);
 
     // return
@@ -111,8 +112,9 @@ class Invoice extends Model {
 
     // get total
     const total = this.get('total') || (await this.get('orders') || []).reduce((accum, order) => {
+      let discount = order.get('discount') ? parseFloat(order.get('discount')) : 0;
       // return accumulated
-      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0);
+      return accum + (order.get('lines') || []).reduce((a, line) => a + (line.total || (line.qty * line.price)), 0) - discount;
     }, 0);
 
     // return sanitised bot
