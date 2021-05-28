@@ -148,7 +148,8 @@ class InvoiceController extends Controller {
           this.__page = await this.__browser.newPage();
 
           // set to print
-          await this.__page.emulateMedia('print');
+          // disable it because puppeteer do not have emulateMedia anymore
+          //await this.__page.emulateMedia('print');
         }
 
         // go to url
