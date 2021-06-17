@@ -157,6 +157,12 @@ class InvoiceController extends Controller {
           waitUntil : 'networkidle0',
         });
 
+        await this.__page.addStyleTag({
+          content: `
+              @page { margin-top: 1cm; }
+          `,
+        });
+
         // create callback
         await this.__page.pdf({
           format : 'Letter',
