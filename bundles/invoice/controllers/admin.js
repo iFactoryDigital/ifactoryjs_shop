@@ -921,6 +921,7 @@ class AdminInvoiceController extends Controller {
       format : async (col) => {
         return col && col.length ? col.map((item) => {
           // return item
+          
           return `<a href="/admin/shop/order/${item.get('_id').toString()}/update">${item.get('orderno') ? item.get('orderno') : item.get('_id')}</a>`;
         }).join(', ') : '<i>N/A</i>';
       },

@@ -10,9 +10,7 @@
     </admin-header>
     
     <div class="container-fluid">
-    
       <grid grid={ opts.grid } table-class="table table-striped table-bordered" title="Invoices Grid" />
-    
     </div>
   </div>
 </invoice-admin-page>

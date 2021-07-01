@@ -67,8 +67,8 @@ class AllOrderDaemon extends Daemon {
    * @pre order.create
    */
   async orderUpdateHook(orderStatus) {
-    console.log('orderUpdateHook');
-    //console.log(orderStatus);
+    console.log('orderUpdateHook from shop '+orderStatus.get('status'));
+
     // load invoice
     const invoice = await orderStatus.get('invoice') || await Invoice.findOne({
       'orders.id' : orderStatus.get('_id') ? orderStatus.get('_id') : 'null',
@@ -93,8 +93,7 @@ class AllOrderDaemon extends Daemon {
     let ninvtotal = 0;
     (await invoice.get('orders') || []).map(o => o.get('_id') !== orderStatus.get('_id') ? ninvtotal += parseFloat(o.get('total')) : '');
     ninvtotal += orderStatus.get('total') ? parseFloat(orderStatus.get('total')) : 0;
-    console.log(ototal);
-    console.log(ninvtotal);
+
     if (ototal !== ninvtotal) {
       invoice.set('total', ninvtotal);
       invoice.save();
@@ -224,7 +223,6 @@ class AllOrderDaemon extends Daemon {
         });
       }));
     }
-    //console.log(orderStatus);
   }
 }
 
